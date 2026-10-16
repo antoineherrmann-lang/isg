@@ -1,4 +1,4 @@
-/* ISG International — service worker
+/* ISG International — service worker (v0.2 : médias externes et fichiers de l'iPad)
    La version vient de l'adresse d'enregistrement (sw.js?v=X.Y.Z) :
    changer la version crée un nouveau cache sans toucher à ce fichier.
    Les vidéos vivent dans un cache séparé qui survit aux mises à jour. */
@@ -45,24 +45,28 @@ async function rangeResponse(req, cached) {
   });
 }
 
+const MEDIA_PATH = /\/(videos|posters|photos|_local)\//;
+
+async function mediaResponse(req, sameOrigin) {
+  const mc = await caches.open(MEDIA);
+  const hit = await mc.match(req.url, { ignoreSearch: sameOrigin });
+  if (hit) return req.headers.has('range') ? rangeResponse(req, hit) : hit;
+  return fetch(req);
+}
+
 self.addEventListener('fetch', e => {
   const req = e.request;
   if (req.method !== 'GET') return;
-  const url = new URL(req.url);
-  if (url.origin !== self.location.origin) return;
+  const url = new URL(req.url), same = url.origin === self.location.origin;
   /* requêtes avec ?_= (recherche de mise à jour, téléchargement des contenus) : toujours le réseau */
-  if (url.searchParams.has('_')) return;
+  if (same && url.searchParams.has('_')) return;
 
-  const isMedia = /\/(videos|posters)\//.test(url.pathname);
-  if (isMedia) {
-    e.respondWith((async () => {
-      const mc = await caches.open(MEDIA);
-      const hit = await mc.match(url.pathname, { ignoreSearch: true }) || await mc.match(req.url, { ignoreSearch: true });
-      if (hit) return req.headers.has('range') ? rangeResponse(req, hit) : hit;
-      return fetch(req);
-    })());
+  /* médias : fichiers du dépôt, fichiers ajoutés depuis l'iPad (_local/) et liens externes copiés dans le cache */
+  if ((same && MEDIA_PATH.test(url.pathname)) || (!same && req.destination !== 'document' && req.destination !== 'iframe')) {
+    e.respondWith(mediaResponse(req, same));
     return;
   }
+  if (!same) return;
 
   e.respondWith((async () => {
     const sc = await caches.open(SHELL);
