@@ -1,0 +1,165 @@
+{
+  "version": 1,
+  "lieux": [
+    {
+      "id": "montreal",
+      "ville": "Montréal",
+      "pays": "Canada",
+      "code": "CA",
+      "lat": 45.5017,
+      "lon": -73.5673,
+      "continent": "Amérique du Nord",
+      "etablissement": "Université partenaire (démo)",
+      "etudiant": {
+        "prenom": "Étudiant·e démo",
+        "programme": "Bachelor 3",
+        "annee": "2025-2026"
+      },
+      "titre": "Mon semestre à Montréal",
+      "video": "videos/montreal.mp4",
+      "poster": "posters/montreal.jpg",
+      "duree": 6,
+      "demo": true
+    },
+    {
+      "id": "sao-paulo",
+      "ville": "São Paulo",
+      "pays": "Brésil",
+      "code": "BR",
+      "lat": -23.5505,
+      "lon": -46.6333,
+      "continent": "Amérique du Sud",
+      "etablissement": "Université partenaire (démo)",
+      "etudiant": {
+        "prenom": "Étudiant·e démo",
+        "programme": "Bachelor 3",
+        "annee": "2025-2026"
+      },
+      "titre": "Mon semestre à São Paulo",
+      "video": "videos/sao-paulo.mp4",
+      "poster": "posters/sao-paulo.jpg",
+      "duree": 6,
+      "demo": true
+    },
+    {
+      "id": "dublin",
+      "ville": "Dublin",
+      "pays": "Irlande",
+      "code": "IE",
+      "lat": 53.3498,
+      "lon": -6.2603,
+      "continent": "Europe",
+      "etablissement": "Université partenaire (démo)",
+      "etudiant": {
+        "prenom": "Étudiant·e démo",
+        "programme": "Bachelor 3",
+        "annee": "2025-2026"
+      },
+      "titre": "Mon semestre à Dublin",
+      "video": "videos/dublin.mp4",
+      "poster": "posters/dublin.jpg",
+      "duree": 6,
+      "demo": true
+    },
+    {
+      "id": "madrid",
+      "ville": "Madrid",
+      "pays": "Espagne",
+      "code": "ES",
+      "lat": 40.4168,
+      "lon": -3.7038,
+      "continent": "Europe",
+      "etablissement": "Université partenaire (démo)",
+      "etudiant": {
+        "prenom": "Étudiant·e démo",
+        "programme": "Bachelor 3",
+        "annee": "2025-2026"
+      },
+      "titre": "Mon semestre à Madrid",
+      "video": "videos/madrid.mp4",
+      "poster": "posters/madrid.jpg",
+      "duree": 6,
+      "demo": true
+    },
+    {
+      "id": "le-cap",
+      "ville": "Le Cap",
+      "pays": "Afrique du Sud",
+      "code": "ZA",
+      "lat": -33.9249,
+      "lon": 18.4241,
+      "continent": "Afrique",
+      "etablissement": "Université partenaire (démo)",
+      "etudiant": {
+        "prenom": "Étudiant·e démo",
+        "programme": "Bachelor 3",
+        "annee": "2025-2026"
+      },
+      "titre": "Mon semestre à Le Cap",
+      "video": "videos/le-cap.mp4",
+      "poster": "posters/le-cap.jpg",
+      "duree": 6,
+      "demo": true
+    },
+    {
+      "id": "shanghai",
+      "ville": "Shanghai",
+      "pays": "Chine",
+      "code": "CN",
+      "lat": 31.2304,
+      "lon": 121.4737,
+      "continent": "Asie",
+      "etablissement": "Université partenaire (démo)",
+      "etudiant": {
+        "prenom": "Étudiant·e démo",
+        "programme": "Bachelor 3",
+        "annee": "2025-2026"
+      },
+      "titre": "Mon semestre à Shanghai",
+      "video": "videos/shanghai.mp4",
+      "poster": "posters/shanghai.jpg",
+      "duree": 6,
+      "demo": true
+    },
+    {
+      "id": "tokyo",
+      "ville": "Tokyo",
+      "pays": "Japon",
+      "code": "JP",
+      "lat": 35.6762,
+      "lon": 139.6503,
+      "continent": "Asie",
+      "etablissement": "Université partenaire (démo)",
+      "etudiant": {
+        "prenom": "Étudiant·e démo",
+        "programme": "Bachelor 3",
+        "annee": "2025-2026"
+      },
+      "titre": "Mon semestre à Tokyo",
+      "video": "videos/tokyo.mp4",
+      "poster": "posters/tokyo.jpg",
+      "duree": 6,
+      "demo": true
+    },
+    {
+      "id": "sydney",
+      "ville": "Sydney",
+      "pays": "Australie",
+      "code": "AU",
+      "lat": -33.8688,
+      "lon": 151.2093,
+      "continent": "Océanie",
+      "etablissement": "Université partenaire (démo)",
+      "etudiant": {
+        "prenom": "Étudiant·e démo",
+        "programme": "Bachelor 3",
+        "annee": "2025-2026"
+      },
+      "titre": "Mon semestre à Sydney",
+      "video": "videos/sydney.mp4",
+      "poster": "posters/sydney.jpg",
+      "duree": 6,
+      "demo": true
+    }
+  ]
+}
