@@ -186,6 +186,45 @@
       ]
     },
     {
+      "id": "barcelone",
+      "ville": "Barcelone",
+      "pays": "Espagne",
+      "code": "ES",
+      "lat": 41.3874,
+      "lon": 2.1686,
+      "etablissement": "Université partenaire (démo)",
+      "description": "Texte de présentation de la destination : établissement d’accueil, vie étudiante, conseils pratiques. Contenu de démonstration à remplacer.",
+      "demo": true,
+      "videos": [
+        {
+          "id": "v1",
+          "titre": "Mon semestre à Barcelone",
+          "etudiant": {
+            "prenom": "Clara",
+            "programme": "Bachelor 3",
+            "annee": "2025-2026"
+          },
+          "citation": "Entre mer et montagne, un cadre de rêve.",
+          "ratio": 0.5625,
+          "url": "videos/barcelone.mp4",
+          "poster": "posters/barcelone.jpg",
+          "duree": 6
+        }
+      ],
+      "photos": [
+        {
+          "id": "p1",
+          "url": "photos/barcelone-1.jpg",
+          "legende": "Barcelone — photo de démonstration 1"
+        },
+        {
+          "id": "p2",
+          "url": "photos/barcelone-2.jpg",
+          "legende": "Barcelone — photo de démonstration 2"
+        }
+      ]
+    },
+    {
       "id": "le-cap",
       "ville": "Le Cap",
       "pays": "Afrique du Sud",
