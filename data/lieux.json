@@ -16,10 +16,12 @@
           "id": "v1",
           "titre": "Mon semestre à Montréal",
           "etudiant": {
-            "prenom": "Étudiant·e démo",
+            "prenom": "Camille",
             "programme": "Bachelor 3",
             "annee": "2025-2026"
           },
+          "citation": "Une session qui m’a ouvert l’esprit.",
+          "ratio": 0.5625,
           "url": "videos/montreal.mp4",
           "poster": "posters/montreal.jpg",
           "duree": 6
@@ -28,10 +30,12 @@
           "id": "v2",
           "titre": "Ce que j’ai retenu de mon échange",
           "etudiant": {
-            "prenom": "Autre étudiant·e",
+            "prenom": "Manon",
             "programme": "Master 1",
             "annee": "2024-2025"
           },
+          "citation": "Un vrai tremplin pour la suite.",
+          "ratio": 1.7778,
           "url": "videos/montreal-2.mp4",
           "poster": "posters/montreal-2.jpg",
           "duree": 6
@@ -65,10 +69,12 @@
           "id": "v1",
           "titre": "Mon semestre à São Paulo",
           "etudiant": {
-            "prenom": "Étudiant·e démo",
+            "prenom": "Léo",
             "programme": "Bachelor 3",
             "annee": "2025-2026"
           },
+          "citation": "Découvrir une autre façon de travailler.",
+          "ratio": 0.5625,
           "url": "videos/sao-paulo.mp4",
           "poster": "posters/sao-paulo.jpg",
           "duree": 6
@@ -102,10 +108,12 @@
           "id": "v1",
           "titre": "Mon semestre à Dublin",
           "etudiant": {
-            "prenom": "Étudiant·e démo",
+            "prenom": "Inès",
             "programme": "Bachelor 3",
             "annee": "2025-2026"
           },
+          "citation": "Mon anglais a fait un bond en quelques mois.",
+          "ratio": 0.5625,
           "url": "videos/dublin.mp4",
           "poster": "posters/dublin.jpg",
           "duree": 6
@@ -139,10 +147,12 @@
           "id": "v1",
           "titre": "Mon semestre à Madrid",
           "etudiant": {
-            "prenom": "Étudiant·e démo",
+            "prenom": "Hugo",
             "programme": "Bachelor 3",
             "annee": "2025-2026"
           },
+          "citation": "Une ville incroyable pour étudier.",
+          "ratio": 0.5625,
           "url": "videos/madrid.mp4",
           "poster": "posters/madrid.jpg",
           "duree": 6
@@ -151,10 +161,12 @@
           "id": "v2",
           "titre": "Ce que j’ai retenu de mon échange",
           "etudiant": {
-            "prenom": "Autre étudiant·e",
+            "prenom": "Manon",
             "programme": "Master 1",
             "annee": "2024-2025"
           },
+          "citation": "Un vrai tremplin pour la suite.",
+          "ratio": 1.7778,
           "url": "videos/madrid-2.mp4",
           "poster": "posters/madrid-2.jpg",
           "duree": 6
@@ -188,10 +200,12 @@
           "id": "v1",
           "titre": "Mon semestre à Le Cap",
           "etudiant": {
-            "prenom": "Étudiant·e démo",
+            "prenom": "Sarah",
             "programme": "Bachelor 3",
             "annee": "2025-2026"
           },
+          "citation": "Je referais ce départ sans hésiter.",
+          "ratio": 0.5625,
           "url": "videos/le-cap.mp4",
           "poster": "posters/le-cap.jpg",
           "duree": 6
@@ -225,10 +239,12 @@
           "id": "v1",
           "titre": "Mon semestre à Shanghai",
           "etudiant": {
-            "prenom": "Étudiant·e démo",
+            "prenom": "Yann",
             "programme": "Bachelor 3",
             "annee": "2025-2026"
           },
+          "citation": "Un choc culturel qui fait grandir.",
+          "ratio": 0.5625,
           "url": "videos/shanghai.mp4",
           "poster": "posters/shanghai.jpg",
           "duree": 6
@@ -262,10 +278,12 @@
           "id": "v1",
           "titre": "Mon semestre à Tokyo",
           "etudiant": {
-            "prenom": "Étudiant·e démo",
+            "prenom": "Emma",
             "programme": "Bachelor 3",
             "annee": "2025-2026"
           },
+          "citation": "Chaque jour, quelque chose de nouveau.",
+          "ratio": 0.5625,
           "url": "videos/tokyo.mp4",
           "poster": "posters/tokyo.jpg",
           "duree": 6
@@ -274,10 +292,12 @@
           "id": "v2",
           "titre": "Ce que j’ai retenu de mon échange",
           "etudiant": {
-            "prenom": "Autre étudiant·e",
+            "prenom": "Manon",
             "programme": "Master 1",
             "annee": "2024-2025"
           },
+          "citation": "Un vrai tremplin pour la suite.",
+          "ratio": 1.7778,
           "url": "videos/tokyo-2.mp4",
           "poster": "posters/tokyo-2.jpg",
           "duree": 6
@@ -311,10 +331,12 @@
           "id": "v1",
           "titre": "Mon semestre à Sydney",
           "etudiant": {
-            "prenom": "Étudiant·e démo",
+            "prenom": "Noah",
             "programme": "Bachelor 3",
             "annee": "2025-2026"
           },
+          "citation": "Des rencontres que je n’oublierai pas.",
+          "ratio": 0.5625,
           "url": "videos/sydney.mp4",
           "poster": "posters/sydney.jpg",
           "duree": 6
