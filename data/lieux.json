@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "lieux": [
     {
       "id": "montreal",
@@ -8,18 +8,47 @@
       "code": "CA",
       "lat": 45.5017,
       "lon": -73.5673,
-      "continent": "Amérique du Nord",
       "etablissement": "Université partenaire (démo)",
-      "etudiant": {
-        "prenom": "Étudiant·e démo",
-        "programme": "Bachelor 3",
-        "annee": "2025-2026"
-      },
-      "titre": "Mon semestre à Montréal",
-      "video": "videos/montreal.mp4",
-      "poster": "posters/montreal.jpg",
-      "duree": 6,
-      "demo": true
+      "description": "Texte de présentation de la destination : établissement d’accueil, vie étudiante, conseils pratiques. Contenu de démonstration à remplacer.",
+      "demo": true,
+      "videos": [
+        {
+          "id": "v1",
+          "titre": "Mon semestre à Montréal",
+          "etudiant": {
+            "prenom": "Étudiant·e démo",
+            "programme": "Bachelor 3",
+            "annee": "2025-2026"
+          },
+          "url": "videos/montreal.mp4",
+          "poster": "posters/montreal.jpg",
+          "duree": 6
+        },
+        {
+          "id": "v2",
+          "titre": "Ce que j’ai retenu de mon échange",
+          "etudiant": {
+            "prenom": "Autre étudiant·e",
+            "programme": "Master 1",
+            "annee": "2024-2025"
+          },
+          "url": "videos/montreal-2.mp4",
+          "poster": "posters/montreal-2.jpg",
+          "duree": 6
+        }
+      ],
+      "photos": [
+        {
+          "id": "p1",
+          "url": "photos/montreal-1.jpg",
+          "legende": "Montréal — photo de démonstration 1"
+        },
+        {
+          "id": "p2",
+          "url": "photos/montreal-2.jpg",
+          "legende": "Montréal — photo de démonstration 2"
+        }
+      ]
     },
     {
       "id": "sao-paulo",
@@ -28,18 +57,35 @@
       "code": "BR",
       "lat": -23.5505,
       "lon": -46.6333,
-      "continent": "Amérique du Sud",
       "etablissement": "Université partenaire (démo)",
-      "etudiant": {
-        "prenom": "Étudiant·e démo",
-        "programme": "Bachelor 3",
-        "annee": "2025-2026"
-      },
-      "titre": "Mon semestre à São Paulo",
-      "video": "videos/sao-paulo.mp4",
-      "poster": "posters/sao-paulo.jpg",
-      "duree": 6,
-      "demo": true
+      "description": "Texte de présentation de la destination : établissement d’accueil, vie étudiante, conseils pratiques. Contenu de démonstration à remplacer.",
+      "demo": true,
+      "videos": [
+        {
+          "id": "v1",
+          "titre": "Mon semestre à São Paulo",
+          "etudiant": {
+            "prenom": "Étudiant·e démo",
+            "programme": "Bachelor 3",
+            "annee": "2025-2026"
+          },
+          "url": "videos/sao-paulo.mp4",
+          "poster": "posters/sao-paulo.jpg",
+          "duree": 6
+        }
+      ],
+      "photos": [
+        {
+          "id": "p1",
+          "url": "photos/sao-paulo-1.jpg",
+          "legende": "São Paulo — photo de démonstration 1"
+        },
+        {
+          "id": "p2",
+          "url": "photos/sao-paulo-2.jpg",
+          "legende": "São Paulo — photo de démonstration 2"
+        }
+      ]
     },
     {
       "id": "dublin",
@@ -48,18 +94,35 @@
       "code": "IE",
       "lat": 53.3498,
       "lon": -6.2603,
-      "continent": "Europe",
       "etablissement": "Université partenaire (démo)",
-      "etudiant": {
-        "prenom": "Étudiant·e démo",
-        "programme": "Bachelor 3",
-        "annee": "2025-2026"
-      },
-      "titre": "Mon semestre à Dublin",
-      "video": "videos/dublin.mp4",
-      "poster": "posters/dublin.jpg",
-      "duree": 6,
-      "demo": true
+      "description": "Texte de présentation de la destination : établissement d’accueil, vie étudiante, conseils pratiques. Contenu de démonstration à remplacer.",
+      "demo": true,
+      "videos": [
+        {
+          "id": "v1",
+          "titre": "Mon semestre à Dublin",
+          "etudiant": {
+            "prenom": "Étudiant·e démo",
+            "programme": "Bachelor 3",
+            "annee": "2025-2026"
+          },
+          "url": "videos/dublin.mp4",
+          "poster": "posters/dublin.jpg",
+          "duree": 6
+        }
+      ],
+      "photos": [
+        {
+          "id": "p1",
+          "url": "photos/dublin-1.jpg",
+          "legende": "Dublin — photo de démonstration 1"
+        },
+        {
+          "id": "p2",
+          "url": "photos/dublin-2.jpg",
+          "legende": "Dublin — photo de démonstration 2"
+        }
+      ]
     },
     {
       "id": "madrid",
@@ -68,18 +131,47 @@
       "code": "ES",
       "lat": 40.4168,
       "lon": -3.7038,
-      "continent": "Europe",
       "etablissement": "Université partenaire (démo)",
-      "etudiant": {
-        "prenom": "Étudiant·e démo",
-        "programme": "Bachelor 3",
-        "annee": "2025-2026"
-      },
-      "titre": "Mon semestre à Madrid",
-      "video": "videos/madrid.mp4",
-      "poster": "posters/madrid.jpg",
-      "duree": 6,
-      "demo": true
+      "description": "Texte de présentation de la destination : établissement d’accueil, vie étudiante, conseils pratiques. Contenu de démonstration à remplacer.",
+      "demo": true,
+      "videos": [
+        {
+          "id": "v1",
+          "titre": "Mon semestre à Madrid",
+          "etudiant": {
+            "prenom": "Étudiant·e démo",
+            "programme": "Bachelor 3",
+            "annee": "2025-2026"
+          },
+          "url": "videos/madrid.mp4",
+          "poster": "posters/madrid.jpg",
+          "duree": 6
+        },
+        {
+          "id": "v2",
+          "titre": "Ce que j’ai retenu de mon échange",
+          "etudiant": {
+            "prenom": "Autre étudiant·e",
+            "programme": "Master 1",
+            "annee": "2024-2025"
+          },
+          "url": "videos/madrid-2.mp4",
+          "poster": "posters/madrid-2.jpg",
+          "duree": 6
+        }
+      ],
+      "photos": [
+        {
+          "id": "p1",
+          "url": "photos/madrid-1.jpg",
+          "legende": "Madrid — photo de démonstration 1"
+        },
+        {
+          "id": "p2",
+          "url": "photos/madrid-2.jpg",
+          "legende": "Madrid — photo de démonstration 2"
+        }
+      ]
     },
     {
       "id": "le-cap",
@@ -88,18 +180,35 @@
       "code": "ZA",
       "lat": -33.9249,
       "lon": 18.4241,
-      "continent": "Afrique",
       "etablissement": "Université partenaire (démo)",
-      "etudiant": {
-        "prenom": "Étudiant·e démo",
-        "programme": "Bachelor 3",
-        "annee": "2025-2026"
-      },
-      "titre": "Mon semestre à Le Cap",
-      "video": "videos/le-cap.mp4",
-      "poster": "posters/le-cap.jpg",
-      "duree": 6,
-      "demo": true
+      "description": "Texte de présentation de la destination : établissement d’accueil, vie étudiante, conseils pratiques. Contenu de démonstration à remplacer.",
+      "demo": true,
+      "videos": [
+        {
+          "id": "v1",
+          "titre": "Mon semestre à Le Cap",
+          "etudiant": {
+            "prenom": "Étudiant·e démo",
+            "programme": "Bachelor 3",
+            "annee": "2025-2026"
+          },
+          "url": "videos/le-cap.mp4",
+          "poster": "posters/le-cap.jpg",
+          "duree": 6
+        }
+      ],
+      "photos": [
+        {
+          "id": "p1",
+          "url": "photos/le-cap-1.jpg",
+          "legende": "Le Cap — photo de démonstration 1"
+        },
+        {
+          "id": "p2",
+          "url": "photos/le-cap-2.jpg",
+          "legende": "Le Cap — photo de démonstration 2"
+        }
+      ]
     },
     {
       "id": "shanghai",
@@ -108,18 +217,35 @@
       "code": "CN",
       "lat": 31.2304,
       "lon": 121.4737,
-      "continent": "Asie",
       "etablissement": "Université partenaire (démo)",
-      "etudiant": {
-        "prenom": "Étudiant·e démo",
-        "programme": "Bachelor 3",
-        "annee": "2025-2026"
-      },
-      "titre": "Mon semestre à Shanghai",
-      "video": "videos/shanghai.mp4",
-      "poster": "posters/shanghai.jpg",
-      "duree": 6,
-      "demo": true
+      "description": "Texte de présentation de la destination : établissement d’accueil, vie étudiante, conseils pratiques. Contenu de démonstration à remplacer.",
+      "demo": true,
+      "videos": [
+        {
+          "id": "v1",
+          "titre": "Mon semestre à Shanghai",
+          "etudiant": {
+            "prenom": "Étudiant·e démo",
+            "programme": "Bachelor 3",
+            "annee": "2025-2026"
+          },
+          "url": "videos/shanghai.mp4",
+          "poster": "posters/shanghai.jpg",
+          "duree": 6
+        }
+      ],
+      "photos": [
+        {
+          "id": "p1",
+          "url": "photos/shanghai-1.jpg",
+          "legende": "Shanghai — photo de démonstration 1"
+        },
+        {
+          "id": "p2",
+          "url": "photos/shanghai-2.jpg",
+          "legende": "Shanghai — photo de démonstration 2"
+        }
+      ]
     },
     {
       "id": "tokyo",
@@ -128,18 +254,47 @@
       "code": "JP",
       "lat": 35.6762,
       "lon": 139.6503,
-      "continent": "Asie",
       "etablissement": "Université partenaire (démo)",
-      "etudiant": {
-        "prenom": "Étudiant·e démo",
-        "programme": "Bachelor 3",
-        "annee": "2025-2026"
-      },
-      "titre": "Mon semestre à Tokyo",
-      "video": "videos/tokyo.mp4",
-      "poster": "posters/tokyo.jpg",
-      "duree": 6,
-      "demo": true
+      "description": "Texte de présentation de la destination : établissement d’accueil, vie étudiante, conseils pratiques. Contenu de démonstration à remplacer.",
+      "demo": true,
+      "videos": [
+        {
+          "id": "v1",
+          "titre": "Mon semestre à Tokyo",
+          "etudiant": {
+            "prenom": "Étudiant·e démo",
+            "programme": "Bachelor 3",
+            "annee": "2025-2026"
+          },
+          "url": "videos/tokyo.mp4",
+          "poster": "posters/tokyo.jpg",
+          "duree": 6
+        },
+        {
+          "id": "v2",
+          "titre": "Ce que j’ai retenu de mon échange",
+          "etudiant": {
+            "prenom": "Autre étudiant·e",
+            "programme": "Master 1",
+            "annee": "2024-2025"
+          },
+          "url": "videos/tokyo-2.mp4",
+          "poster": "posters/tokyo-2.jpg",
+          "duree": 6
+        }
+      ],
+      "photos": [
+        {
+          "id": "p1",
+          "url": "photos/tokyo-1.jpg",
+          "legende": "Tokyo — photo de démonstration 1"
+        },
+        {
+          "id": "p2",
+          "url": "photos/tokyo-2.jpg",
+          "legende": "Tokyo — photo de démonstration 2"
+        }
+      ]
     },
     {
       "id": "sydney",
@@ -148,18 +303,35 @@
       "code": "AU",
       "lat": -33.8688,
       "lon": 151.2093,
-      "continent": "Océanie",
       "etablissement": "Université partenaire (démo)",
-      "etudiant": {
-        "prenom": "Étudiant·e démo",
-        "programme": "Bachelor 3",
-        "annee": "2025-2026"
-      },
-      "titre": "Mon semestre à Sydney",
-      "video": "videos/sydney.mp4",
-      "poster": "posters/sydney.jpg",
-      "duree": 6,
-      "demo": true
+      "description": "Texte de présentation de la destination : établissement d’accueil, vie étudiante, conseils pratiques. Contenu de démonstration à remplacer.",
+      "demo": true,
+      "videos": [
+        {
+          "id": "v1",
+          "titre": "Mon semestre à Sydney",
+          "etudiant": {
+            "prenom": "Étudiant·e démo",
+            "programme": "Bachelor 3",
+            "annee": "2025-2026"
+          },
+          "url": "videos/sydney.mp4",
+          "poster": "posters/sydney.jpg",
+          "duree": 6
+        }
+      ],
+      "photos": [
+        {
+          "id": "p1",
+          "url": "photos/sydney-1.jpg",
+          "legende": "Sydney — photo de démonstration 1"
+        },
+        {
+          "id": "p2",
+          "url": "photos/sydney-2.jpg",
+          "legende": "Sydney — photo de démonstration 2"
+        }
+      ]
     }
   ]
 }
