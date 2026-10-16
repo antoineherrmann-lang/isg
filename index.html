@@ -28,7 +28,7 @@
   --line:rgba(255,255,255,.14);
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none}
-html,body{margin:0;height:100%;min-height:-webkit-fill-available;overflow:hidden;overscroll-behavior:none;background:#041326;
+html,body{margin:0;height:100%;min-height:-webkit-fill-available;overflow:hidden;overscroll-behavior:none;background:#03101f;
   font-family:var(--f-text);font-weight:500;color:#fff;-webkit-user-select:none;user-select:none;-webkit-text-size-adjust:100%}
 body{position:fixed;left:0;right:0;top:0;bottom:0}
 h1,h2,h3,button,.title,.cn{font-family:var(--f-title);font-weight:700;margin:0}
@@ -40,7 +40,11 @@ input,textarea{-webkit-user-select:text;user-select:text}
 
 /* ---------- fond noir étoilé ---------- */
 #app{position:fixed;left:0;right:0;top:0;bottom:0;overflow:hidden;
-  background:radial-gradient(75% 60% at 50% 44%,rgba(34,112,196,.34) 0%,rgba(34,112,196,0) 72%),linear-gradient(180deg,#0a2748 0%,#071d38 50%,#051429 100%)}
+  background:radial-gradient(75% 60% at 50% 44%,var(--glow) 0%,rgba(0,0,0,0) 72%),linear-gradient(180deg,var(--bg1) 0%,var(--bg2) 50%,var(--bg3) 100%)}
+body{--bg1:#081f3c;--bg2:#051830;--bg3:#030f20;--glow:rgba(30,100,184,.28)}
+body[data-bg=bleu]{--bg1:#0a2748;--bg2:#071d38;--bg3:#051429;--glow:rgba(34,112,196,.34)}
+body[data-bg=sombre]{--bg1:#050f1f;--bg2:#030b16;--bg3:#02060d;--glow:rgba(24,80,150,.16)}
+body[data-bg=noir]{--bg1:#02050a;--bg2:#010307;--bg3:#000;--glow:rgba(20,60,120,.08)}
 #stage{position:absolute;inset:0;touch-action:none}
 #gl{position:absolute;inset:0;width:100%;height:100%;display:block}
 #labels{position:absolute;inset:0;pointer-events:none;overflow:hidden}
@@ -56,11 +60,11 @@ input,textarea{-webkit-user-select:text;user-select:text}
 .round:active,.xbtn:active,.abtn:active{background:rgba(255,255,255,.28)}
 
 /* ---------- étiquettes : noms de villes en Aileron bold ---------- */
-.lbl{position:absolute;left:0;top:0;white-space:nowrap;font-family:var(--f-title);font-weight:700;font-size:15px;line-height:1;color:#fff;
+.lbl{position:absolute;left:0;top:0;white-space:nowrap;font-family:var(--f-title);font-weight:700;font-size:var(--lblsz,15px);line-height:1;color:#fff;
   opacity:0;transition:opacity .3s,color .25s,background .25s;will-change:transform,opacity;letter-spacing:.01em}
 .lbl.on{opacity:1}
 body[data-labels=text] .lbl{padding:2px 0;text-shadow:0 0 10px rgba(0,0,0,.95),0 1px 3px rgba(0,0,0,.9),0 0 22px rgba(0,0,0,.7)}
-body[data-labels=text] .lbl.sel{color:var(--sky);font-size:17px}
+body[data-labels=text] .lbl.sel{color:var(--sky);font-size:calc(var(--lblsz,15px) + 2px)}
 body[data-labels=pill] .lbl{padding:7px 14px 8px;border-radius:999px;background:rgba(10,30,56,.7);border:1px solid rgba(255,255,255,.22)}
 body[data-labels=pill] .lbl.sel{background:rgba(255,255,255,.96);color:var(--ink);border-color:transparent}
 body[data-labels=classic] .lbl{padding:6px 10px 7px;border-radius:999px;background:rgba(0,35,59,.62);border:1px solid rgba(255,255,255,.18)}
@@ -235,7 +239,7 @@ body.vplay #stage,body.vplay #labels,body.vplay #top,body.vplay #logo,body.vplay
 
 /* ====================== Espace équipe : pages séparées ====================== */
 #admin{left:0;top:0;right:0;bottom:0;border-radius:0;display:flex;flex-direction:column;z-index:30;
-  background:linear-gradient(180deg,#0a2748 0%,#071d38 55%,#051429 100%);-webkit-backdrop-filter:none;backdrop-filter:none;border:0;box-shadow:none}
+  background:linear-gradient(180deg,#081f3c 0%,#051830 55%,#030f20 100%);-webkit-backdrop-filter:none;backdrop-filter:none;border:0;box-shadow:none}
 #admin.pre{transform:translateY(30px) scale(.985)}
 .ahead{position:relative;display:flex;align-items:center;gap:12px;flex:none;padding:calc(var(--sat) + 12px) calc(var(--sar) + 20px) 12px calc(var(--sal) + 20px);
   background:#061b33;border-bottom:1px solid var(--line);z-index:3}
@@ -443,7 +447,7 @@ button.grow:active{background:rgba(255,255,255,.1)}
 #vTop #vX{flex:none}
 
 /* ---------- écran de chargement ---------- */
-#boot{background:radial-gradient(85% 65% at 50% 40%,#134682 0%,#0a2748 52%,#051429 100%)!important}
+#boot{background:radial-gradient(85% 65% at 50% 40%,#103c6f 0%,#081f3c 52%,#030f20 100%)!important}
 .bstars{position:absolute;left:0;top:0;width:1px;height:1px;border-radius:50%;animation:tw 4.2s ease-in-out infinite alternate}
 .bstars.b2{animation-duration:2.7s;animation-delay:-1.3s}
 @keyframes tw{from{opacity:.3}to{opacity:1}}
@@ -465,6 +469,63 @@ button.grow:active{background:rgba(255,255,255,.1)}
 #bootBar i{display:block;height:100%;width:6%;background:linear-gradient(90deg,#3fc0f0,#a6eeff);border-radius:2px;transition:width .6s ease}
 #bootMsg{font-size:15px!important;opacity:.6!important;letter-spacing:.02em;min-height:20px}
 
+/* ---------- bouton pour re-masquer les boutons ---------- */
+body:not(.hide-ui) #btnHide{display:none}
+
+/* ====================== Espace équipe : trois espaces distincts ====================== */
+#admin{--acc:#3fc0f0}
+#admin[data-space=data]{--acc:#8da2ff}
+#admin[data-space=stats]{--acc:#3fe0b5}
+#admin .ahead{border-bottom:2px solid color-mix(in srgb,var(--acc) 55%,transparent)}
+.ltitle::before{content:"";display:block;width:46px;height:5px;border-radius:3px;background:var(--acc);margin-bottom:12px}
+.seg button.on{background:linear-gradient(180deg,color-mix(in srgb,var(--acc) 55%,#fff 0%),color-mix(in srgb,var(--acc) 35%,#000 0%));color:#04121f}
+.sw.on{background:linear-gradient(180deg,color-mix(in srgb,var(--acc) 90%,#fff),var(--acc))}
+.gl{color:var(--acc);opacity:.95}
+.hub{grid-template-columns:repeat(3,1fr)}
+.hcard{min-height:250px}
+.hcard.h-settings{background:linear-gradient(155deg,rgba(63,192,240,.30),rgba(63,192,240,.05) 70%)}
+.hcard.h-data{background:linear-gradient(155deg,rgba(141,162,255,.30),rgba(141,162,255,.05) 70%)}
+.hcard.h-stats{background:linear-gradient(155deg,rgba(63,224,181,.28),rgba(63,224,181,.05) 70%)}
+.hcard.h-settings .ic{background:linear-gradient(160deg,#6fd6ff,#0a78b8)}
+.hcard.h-data .ic{background:linear-gradient(160deg,#a9b8ff,#4a5fd6)}
+.hcard.h-stats .ic{background:linear-gradient(160deg,#6ff0cc,#0a9a78)}
+.hcard.h-settings i{color:#6fd6ff}.hcard.h-data i{color:#a9b8ff}.hcard.h-stats i{color:#6ff0cc}
+.hcard .big{font-family:var(--f-title);font-weight:700;font-size:15px;opacity:.9;margin-top:auto}
+
+/* Données : deux entrées principales en grand, outils en retrait */
+.dtiles{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+.dtile{position:relative;text-align:left;padding:18px 20px;border-radius:26px;background:rgba(255,255,255,.06);border:2px solid transparent;display:flex;flex-direction:column;gap:2px}
+.dtile b{font-family:var(--f-title);font-weight:700;font-size:44px;line-height:1;letter-spacing:-.02em}
+.dtile span{font-family:var(--f-title);font-weight:700;font-size:20px;margin-top:4px}
+.dtile small{font-size:14.5px;opacity:.68}
+.dtile.on{border-color:var(--acc);background:linear-gradient(155deg,color-mix(in srgb,var(--acc) 26%,transparent),rgba(255,255,255,.04))}
+.dtools{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:16px 4px 0}
+.dtools .lbl2{font-size:13px;opacity:.55;letter-spacing:.06em;margin-right:4px}
+.tool{min-height:38px;padding:0 15px;border-radius:999px;font-size:14.5px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.72)}
+.tool.on{background:rgba(255,255,255,.16);color:#fff;border-color:rgba(255,255,255,.35)}
+.dhead{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:22px 4px 10px}
+.dhead h3{font-size:22px}
+.pgroup{margin-top:14px}
+.pgroup .ph{display:flex;align-items:center;justify-content:space-between;padding:0 6px 8px;gap:10px}
+.pgroup .ph b{font-family:var(--f-title);font-size:19px}
+.pgroup .ph small{opacity:.65;font-size:14px;margin-left:8px}
+.pav2{width:42px;height:42px;border-radius:50%;flex:none;background:var(--sky) center/cover no-repeat;display:grid;place-items:center;font-family:var(--f-title);font-weight:700;font-size:16px;color:var(--ink);font-style:normal}
+.badge{font-size:12.5px;padding:3px 9px;border-radius:999px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.16);white-space:nowrap}
+.badge.v{background:rgba(63,192,240,.2);border-color:rgba(63,192,240,.5)}
+select.in{padding-right:36px;background-image:linear-gradient(45deg,transparent 50%,#fff 50%),linear-gradient(135deg,#fff 50%,transparent 50%);background-position:calc(100% - 20px) 50%,calc(100% - 14px) 50%;background-size:6px 6px,6px 6px;background-repeat:no-repeat}
+select.in option{color:#000}
+
+/* personnalisation du globe */
+.swatches{display:flex;flex-wrap:wrap;gap:10px;margin-top:4px}
+.swt{width:42px;height:42px;border-radius:50%;border:3px solid rgba(255,255,255,.18);box-shadow:inset 0 1px 0 rgba(255,255,255,.35)}
+.swt.on{border-color:#fff;box-shadow:0 0 0 3px rgba(63,192,240,.5)}
+#prevBack{position:absolute;left:50%;bottom:calc(var(--sab) + 26px);transform:translateX(-50%);z-index:46;display:none;padding:0 26px;min-height:56px;border-radius:999px;font-family:var(--f-title);font-weight:700;font-size:18px;color:#fff;background:linear-gradient(180deg,#5fd0ff,#1f95d6);color:#00202f;box-shadow:0 14px 34px rgba(0,100,180,.45)}
+#prevBack.on{display:block}
+@media (orientation:portrait){.hub{grid-template-columns:1fr}.hcard{min-height:0}.dtile b{font-size:36px}}
+
+.fcard.nov{cursor:pointer}
+.fcard.nov::before{background:linear-gradient(180deg,rgba(0,8,20,.1) 0%,rgba(0,8,20,.55) 50%,rgba(0,8,20,.92) 100%)}
+
 </style>
 </head>
 <body>
@@ -482,6 +543,9 @@ button.grow:active{background:rgba(255,255,255,.1)}
       <button class="round" id="btnSet" aria-label="Réglages">
         <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
         <i class="dot"></i>
+      </button>
+      <button class="round uibtn" id="btnHide" aria-label="Masquer les boutons">
+        <svg viewBox="0 0 24 24"><path d="M3 12s3.6-6 9-6 9 6 9 6-3.6 6-9 6-9-6-9-6z"/><circle cx="12" cy="12" r="2.8"/><path d="M4 4l16 16"/></svg>
       </button>
     </div>
   </header>
@@ -564,6 +628,8 @@ button.grow:active{background:rgba(255,255,255,.1)}
 
   <aside id="news" class="glass" aria-live="polite"><button class="xbtn x" id="newsX" aria-label="Fermer"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button><h3 id="newsT"></h3><small id="newsS"></small><ul id="newsL"></ul><div id="newsBar"><i></i></div></aside>
 
+  <button id="prevBack">Retour aux réglages</button>
+
   <div id="dl"></div>
   <div id="toast" role="status"></div>
   <div id="boot">
@@ -600,8 +666,16 @@ button.grow:active{background:rgba(255,255,255,.1)}
    APP_VERSION est comparée par le système de mise à jour :
    à chaque livraison elle doit augmenter (build.py s'en charge).
 ===================================================================== */
-const APP_VERSION = "1.5.1";
+const APP_VERSION = "1.5.2";
 const CHANGELOG = [
+  { v: "1.5.2", d: "16 octobre 2026", t: [
+    "Fond un peu plus sombre (4 ambiances au choix : Bleu, Nuit, Très sombre, Noir)",
+    "Bouton pour re-masquer les boutons quand ils sont apparus",
+    "Profils étudiants : nouvel onglet dans Données, un ou plusieurs profils par voyage, vidéo facultative",
+    "Personnalisation du globe : couleurs, points, marqueurs, mouvement, vue d’accueil, visite des villes, aperçu",
+    "Données : Destinations et Profils en avant, outils (Excel, contenus, sauvegarde) en retrait",
+    "Espace équipe : Réglages, Données, Statistiques, trois espaces distincts"
+  ]},
   { v: "1.5.1", d: "16 octobre 2026", t: [
     "Fiches de présentation plus hautes : boutons du coin déplacés (en bas à gauche en paysage)",
     "Fiche ville centrée sur la vidéo à la une, avec « En savoir plus sur » l’étudiant",
@@ -673,17 +747,30 @@ const store = {
 };
 
 /* Réglages */
+const GLOBE_DEFAULTS = { globeTheme: 'isg', landColor: '#3fc0f0', hiColor: '#d4f3ff', oceanColor: '#004f9f', markerColor: '#ffffff', hiCountries: true,
+  bg: 'nuit', dots: 'normal', markerSize: 'm', lblSize: 'm', atmo: 'doux', stars: 'normal', cluster: 'normal',
+  tilt: 'normale', home: 'europe', homeCity: '', zoomRest: 'normal', focusZoom: 'moyen', spinDir: 'est', tour: false };
+const GLOBE_THEMES = {
+  isg: { label: 'Bleu ISG', landColor: '#3fc0f0', hiColor: '#d4f3ff', oceanColor: '#004f9f', markerColor: '#ffffff' },
+  turquoise: { label: 'Turquoise', landColor: '#6fe3d0', hiColor: '#e1fff9', oceanColor: '#0a5a66', markerColor: '#ffffff' },
+  dore: { label: 'Doré', landColor: '#f1c96c', hiColor: '#fff1c9', oceanColor: '#1e3a68', markerColor: '#ffffff' },
+  mono: { label: 'Mono', landColor: '#e8eef5', hiColor: '#ffffff', oceanColor: '#2a3544', markerColor: '#3fc0f0' }
+};
 const CFG = (() => {
   const saved = store.get('cfg', {});
-  if (saved.v !== 3 && saved.v !== 4) { delete saved.labels; }
-  saved.v = 4; delete saved.arcs;
-  return Object.assign({ v: 4, idleSec: 60, spin: 'normal', autoUpdate: true, labels: 'text', breathe: true, hideUi: true, logo: true }, saved);
+  if (saved.v !== 3 && saved.v !== 4 && saved.v !== 5) { delete saved.labels; }
+  saved.v = 5; delete saved.arcs;
+  if (saved.spin === undefined) saved.spin = 'normal';
+  return Object.assign({ v: 5, idleSec: 60, spin: 'normal', autoUpdate: true, labels: 'text', breathe: true, hideUi: true, logo: true }, GLOBE_DEFAULTS, saved);
 })();
 function saveCfg() { store.set('cfg', CFG); applyCfg(); }
 function applyCfg() {
-  document.body.dataset.labels = CFG.labels;
-  document.body.classList.toggle('hide-ui', !!CFG.hideUi);
-  document.body.classList.toggle('no-logo', !CFG.logo);
+  const b = document.body;
+  b.dataset.labels = CFG.labels; b.dataset.bg = CFG.bg;
+  b.classList.toggle('hide-ui', !!CFG.hideUi);
+  b.classList.toggle('no-logo', !CFG.logo);
+  b.style.setProperty('--lblsz', { s: '13px', m: '15px', l: '18px' }[CFG.lblSize] || '15px');
+  if (typeof G !== 'undefined' && G.applyCfg) G.applyCfg();
 }
 
 /* Code d'accès aux réglages : ISG par défaut, modifiable dans les réglages */
@@ -913,7 +1000,7 @@ function initGlobe(terre, lieux) {
     vertexShader: 'varying vec3 vN; void main(){ vN=normalize(normalMatrix*normal); gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.); }',
     fragmentShader: 'uniform vec3 uA,uB,uRim; varying vec3 vN; void main(){ vec3 n=normalize(vN); float f=clamp(n.z,0.,1.); float rim=pow(1.-f,2.4); float l=clamp(dot(n,normalize(vec3(-.5,.62,.6)))*.5+.5,0.,1.); vec3 c=mix(uA,uB,pow(l,1.25)); c=mix(c,uRim,rim*.6); gl_FragColor=vec4(c,1.); }'
   }));
-  globe.add(ocean);
+  globe.add(ocean); G.ocean = ocean;
 
   /* Terre : un point par position, pays avec vidéo plus clairs */
   const n = terre.n;
@@ -941,11 +1028,11 @@ function initGlobe(terre, lieux) {
   const AR = 1.15, fmax = Math.sqrt(1 - 1 / (AR * AR));
   const atmo = new THREE.Mesh(new THREE.SphereGeometry(AR, 48, 32), new THREE.ShaderMaterial({
     side: THREE.BackSide, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
-    uniforms: { uC: { value: new THREE.Color(0x3fc0f0) }, uM: { value: fmax } },
+    uniforms: { uC: { value: new THREE.Color(0x3fc0f0) }, uM: { value: fmax }, uK: { value: 1 } },
     vertexShader: 'varying vec3 vN; void main(){ vN=normalize(normalMatrix*normal); gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.); }',
-    fragmentShader: 'uniform vec3 uC; uniform float uM; varying vec3 vN; void main(){ float f=clamp(-vN.z/uM,0.,1.); float i=pow(f,2.6); gl_FragColor=vec4(uC*i*.9,i); }'
+    fragmentShader: 'uniform vec3 uC; uniform float uM,uK; varying vec3 vN; void main(){ float f=clamp(-vN.z/uM,0.,1.); float i=pow(f,2.6)*uK; gl_FragColor=vec4(uC*i*.9,i); }'
   }));
-  scene.add(atmo);
+  scene.add(atmo); G.atmo = atmo;
 
   buildStars();
   G.setLieux(lieux);
@@ -1001,8 +1088,8 @@ function buildStars() {
   g.setAttribute('aKind', new THREE.BufferAttribute(kind, 1));
   const m = new THREE.ShaderMaterial({
     transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
-    uniforms: { uT: { value: 0 }, uPR: { value: G.pr } },
-    vertexShader: 'attribute float aSeed,aSize,aKind; uniform float uT,uPR; varying float vA,vS,vK; void main(){ vS=aSeed; vK=aKind; float tw=.5+.5*sin(uT*(.25+aSeed*1.1)+aSeed*80.); vA=mix(.5+.5*tw,.72+.28*tw,aKind); gl_PointSize=aSize*uPR; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.); }',
+    uniforms: { uT: { value: 0 }, uPR: { value: G.pr }, uDens: { value: 0.7 } },
+    vertexShader: 'attribute float aSeed,aSize,aKind; uniform float uT,uPR,uDens; varying float vA,vS,vK; void main(){ vS=aSeed; vK=aKind; float tw=.5+.5*sin(uT*(.25+aSeed*1.1)+aSeed*80.); vA=mix(.5+.5*tw,.72+.28*tw,aKind); gl_PointSize=aSize*uPR*(aKind>.5||aSeed<uDens?1.:0.); gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.); }',
     fragmentShader: 'varying float vA,vS,vK; void main(){ float d=length(gl_PointCoord-.5)*2.; if(d>1.) discard; float core=vK>.5 ? exp(-d*d*7.)+.55*exp(-d*d*28.) : smoothstep(1.,.15,d); vec3 warm=vec3(1.,.92,.8), cool=vec3(.78,.88,1.); vec3 c=mix(cool,warm,step(.55,vS)); c=mix(c,vec3(1.),.35); gl_FragColor=vec4(c,core*vA*(vK>.5?.9:.75)); }'
   });
   G.stars = new THREE.Points(g, m); G.stars.renderOrder = -1; G.scene.add(G.stars);
@@ -1025,6 +1112,7 @@ function buildMarkers(lieux) {
     const breath = mk(new THREE.RingGeometry(0.027, 0.0295, 48), 0xffffff, 0, 0.0025);
     const ring = mk(new THREE.RingGeometry(0.027, 0.0305, 48), 0xffffff, 0.5, 0.003);
     const dot = mk(new THREE.CircleGeometry(0.016, 24), 0xffffff, 1, 0.004);
+    dot.material.color.set(CFG.markerColor); ring.material.color.set(CFG.markerColor); grp.scale.setScalar({ s: 0.8, m: 1, l: 1.35 }[CFG.markerSize] || 1);
     grp.add(halo, breath, ring, dot); G.globe.add(grp);
     const el = document.createElement('div'); el.className = 'lbl'; el.textContent = l.ville; wrap.appendChild(el);
     G.markers.push({ lieu: l, home: false, pos: p, grp, dot, ring, halo, breath, el, facing: -1, sx: 0, sy: 0, lw: 0, lh: 0, lx: 0, ly: 0, lblOn: false, phase: idx * 0.37, key: '' });
@@ -1032,7 +1120,7 @@ function buildMarkers(lieux) {
 }
 G.setHighlight = lieux => {
   if (!G.hiAttr) return;
-  const codes = new Set(lieux.map(l => l.code).filter(Boolean));
+  const codes = new Set(CFG.hiCountries ? lieux.map(l => l.code).filter(Boolean) : []);
   const hiIdx = new Set(G.terre.pays.filter(p => p.a2 && codes.has(p.a2)).map(p => p.i));
   const a = G.hiAttr.array, n = a.length;
   for (let i = 0; i < n; i++) a[i] = hiIdx.has(G.cc[i]) ? 1 : 0;
@@ -1059,14 +1147,14 @@ function flyToLieu(l, o) {
   o = o || {};
   animateTo({ rx: l.lat * D2R, ry: -l.lon * D2R, z: o.zoom, sx: o.sx, sy: o.sy }, o.ms || 900);
 }
-function resetView(ms) { animateTo({ rx: G.home.rotX, ry: G.home.rotY, z: 1, sx: 0, sy: 0 }, ms || 1100); }
+function resetView(ms) { animateTo({ rx: G.home.rotX, ry: G.home.rotY, z: G.home.zoom, sx: 0, sy: 0 }, ms || 1100); }
 function selectMarker(m) {
   G.selected = m || null;
   G.markers.forEach(k => {
     if (k.home) return;
     const on = k === m;
     k.dot.scale.setScalar(on ? 1.45 : 1);
-    k.ring.material.color.setHex(on ? 0x3fc0f0 : 0xffffff); k.ring.material.opacity = on ? 0.95 : 0.5;
+    k.ring.material.color.set(on ? '#3fc0f0' : CFG.markerColor); k.ring.material.opacity = on ? 0.95 : 0.5;
     k.halo.material.opacity = on ? 0.32 : 0.15; k.el.classList.toggle('sel', on);
   });
 }
@@ -1136,7 +1224,7 @@ function projectMarkers() {
 }
 /* Villes proches : regroupées en une seule étiquette (ex. « Barcelone · Madrid ») ; un toucher propose le choix.
    En zoomant, les points s'écartent et le regroupement disparaît. */
-const CLUSTER_PX = 42;
+function clusterPx() { return { aucun: 0, normal: 42, large: 68 }[CFG.cluster] != null ? { aucun: 0, normal: 42, large: 68 }[CFG.cluster] : 42; }
 function setLblText(m, txt) {
   if (m.txt === txt) return;
   m.txt = txt; m.el.textContent = txt; m.lw = m.el.offsetWidth; m.lh = m.el.offsetHeight; m.key = '';
@@ -1144,11 +1232,11 @@ function setLblText(m, txt) {
 function layoutLabels() {
   const vis = G.markers.filter(m => m.facing > 0.22).sort((a, b) => b.facing - a.facing);
   G.markers.forEach(m => { m.want = false; m.group = null; });
-  const groups = [];
+  const groups = [], cp = clusterPx();
   for (const m of vis) {
     if (m.group) continue;
     const g = [m]; m.group = g;
-    if (m !== G.selected) for (const o of vis) { if (o.group || o === G.selected) continue; if (Math.hypot(o.sx - m.sx, o.sy - m.sy) < CLUSTER_PX) { g.push(o); o.group = g; } }
+    if (cp && m !== G.selected) for (const o of vis) { if (o.group || o === G.selected) continue; if (Math.hypot(o.sx - m.sx, o.sy - m.sy) < cp) { g.push(o); o.group = g; } }
     groups.push(g);
   }
   for (const g of groups) {
@@ -1210,9 +1298,9 @@ function frame(t) {
       v.rotY += G.vel.y * dt; v.rotX = clamp(v.rotX + G.vel.x * dt, -1.25, 1.25);
       const dec = Math.exp(-dt * 2.8); G.vel.x *= dec; G.vel.y *= dec;
     }
-    if (G.spin && CFG.spin !== 'off') v.rotY += (CFG.spin === 'slow' ? 0.035 : 0.075) * dt;
+    if (G.spin && CFG.spin !== 'off') v.rotY += (CFG.spinDir === 'ouest' ? -1 : 1) * ({ slow: 0.035, normal: 0.075, fast: 0.14 }[CFG.spin] || 0.075) * dt;
   }
-  G.pm.uniforms.uSize.value = 0.0125 * (0.6 + 0.4 * Math.min(1, v.zoom));   // points un peu plus fins quand on zoome sur une ville
+  G.pm.uniforms.uSize.value = 0.0125 * ({ fin: 0.78, normal: 1, gros: 1.32 }[CFG.dots] || 1) * (0.6 + 0.4 * Math.min(1, v.zoom));   // points un peu plus fins quand on zoome sur une ville
   applyCam();
   projectMarkers();
   const br = CFG.breathe;
@@ -1229,6 +1317,28 @@ function frame(t) {
   if (!slow && frames % 120 === 0 && ema > 30 && G.pr > 1.25) { G.pr = Math.max(1.25, G.pr - 0.25); onResize(); ema = 18; }
 }
 G.pause = b => { G.paused = !!b; if (!b) lastT = 0; };
+
+/* ---------- personnalisation du globe (réglages) ---------- */
+const HOME_LON = { europe: 7, ameriques: -75, afrique: 20, asie: 105, monde: -20 };
+function computeHome() {
+  const tilt = { faible: 0.26, normale: 0.6, forte: 0.9 }[CFG.tilt] || 0.6;
+  let rx = tilt, lon = HOME_LON[CFG.home] != null ? HOME_LON[CFG.home] : 7;
+  if (CFG.home === 'ville') { const l = S.byId[CFG.homeCity] || S.lieux[0]; if (l) { rx = clamp(l.lat * D2R, -1.1, 1.1); lon = l.lon; } }
+  return { rotX: rx, rotY: -lon * D2R, zoom: { loin: 1.18, normal: 1, pres: 0.86 }[CFG.zoomRest] || 1 };
+}
+G.applyCfg = function (instant) {
+  if (!G.ready) return;
+  G.pm.uniforms.uLand.value.set(CFG.landColor); G.pm.uniforms.uHi.value.set(CFG.hiColor);
+  const oc = new THREE.Color(CFG.oceanColor);
+  G.ocean.material.uniforms.uB.value.copy(oc); G.ocean.material.uniforms.uA.value.copy(oc).multiplyScalar(0.55);
+  G.atmo.visible = CFG.atmo !== 'off'; G.atmo.material.uniforms.uK.value = CFG.atmo === 'fort' ? 1.7 : 1;
+  if (G.stars) { G.stars.visible = CFG.stars !== 'off'; G.stars.material.uniforms.uDens.value = { peu: 0.3, normal: 0.7, beaucoup: 1.01 }[CFG.stars] || 0.7; }
+  const sc = { s: 0.8, m: 1, l: 1.35 }[CFG.markerSize] || 1;
+  G.markers.forEach(m => { m.grp.scale.setScalar(sc); m.dot.material.color.set(CFG.markerColor); if (m !== G.selected) m.ring.material.color.set(CFG.markerColor); });
+  G.setHighlight(S.lieux); G.remeasure();
+  G.home = computeHome();
+  if (instant) { G.view.rotX = G.home.rotX; G.view.rotY = G.home.rotY; G.view.zoom = G.home.zoom; }
+};
 
 /* =====================================================================
    INTERFACE — fiche destination (vidéos + photos), liste, lecteur,
@@ -1250,15 +1360,16 @@ function hidePanel(el) {
   el.classList.add('pre');
   setTimeout(() => { if (panelTok.get(el) === tok) el.hidden = true; }, 340);
 }
-function setMode(m) { S.mode = m; G.spin = (m === 'attract'); }
+function setMode(m) { S.mode = m; G.spin = (m === 'attract' && !CFG.tour); }
 
 /* ---------- placement du globe à côté d'un panneau ---------- */
 function panelFocus(panel) {
   /* zoom = facteur de distance caméra : < 1 rapproche la caméra. La ville est centrée dans la zone libre à côté du panneau. */
   const land = G.w >= G.h;
-  if (land) { const pw = panel.offsetWidth + 22 + 20; return { zoom: 0.52, sx: pw / 2, sy: 0 }; }
+  const fz = { leger: 0.72, moyen: 0.52, fort: 0.4 }[CFG.focusZoom] || 0.52;
+  if (land) { const pw = panel.offsetWidth + 22 + 20; return { zoom: fz, sx: pw / 2, sy: 0 }; }
   const ph = panel.offsetHeight + 18 + 18, top = 84, avail = G.h - ph - top;
-  return { zoom: 0.56, sx: 0, sy: G.h / 2 - (top + avail / 2) };
+  return { zoom: fz + 0.04, sx: 0, sy: G.h / 2 - (top + avail / 2) };
 }
 
 /* ---------- fiche d'une destination ---------- */
@@ -1276,14 +1387,16 @@ function miniCard(v, attr, on) {
 function featHtml(l) {
   if (!l.videos.length) return '';
   const v = l.videos.find(x => x.id === S.focusV) || l.videos[0]; S.focusV = v.id;
-  const e = v.etudiant, r = clamp(ratioOf(v), 0.5, 1.9), d = fmtDur(v.duree), sub = [e.programme, e.annee].filter(Boolean).join(' · ');
-  const name = e.prenom || 'l’étudiant·e';
-  const card = `<button class="fcard ${r < 1 ? 'port' : ''}" data-act="play" data-v="${esc(v.id)}" style="--r:${r};background-image:${cssUrl(posterOf(v))}">
-    ${d ? `<span class="vdur">${esc(d)}</span>` : ''}<span class="vplay">${ICON_PLAY}</span>
-    <span class="vinfo">${v.titre ? `<span class="vtit">${esc(v.titre)}</span>` : ''}<span class="vwho">${avatarHtml(v)}<span><b>${esc(e.prenom || 'Étudiant·e')}</b>${sub ? `<small>${esc(sub)}</small>` : ''}</span></span>${v.citation ? `<span class="vcit">“${esc(v.citation)}”</span>` : ''}</span></button>`;
-  const act = `<div class="fact"><button class="btn primary" data-act="play" data-v="${esc(v.id)}">${ICON_PLAY}Regarder</button><button class="btn ghost" data-act="more" data-v="${esc(v.id)}">En savoir plus sur ${esc(name)}</button></div>`;
-  const others = l.videos.length > 1 ? `<div class="others"><h3 class="sec">Autres témoignages <small>${l.videos.length - 1}</small></h3><div class="mrow">${l.videos.filter(x => x !== v).map(x => miniCard(x, 'data-focus', false)).join('')}</div></div>` : '';
-  return `<h3 class="sec">Témoignage à la une</h3><div class="feat">${card}${act}</div>${others}`;
+  const e = v.etudiant, r = clamp(ratioOf(v), 0.5, 1.9), d = fmtDur(v.duree), sub = [e.programme, e.annee].filter(Boolean).join(' · '), hasV = !!v.url;
+  const name = e.prenom || 'l’étudiant·e', po = posterOf(v);
+  const inner = `${d && hasV ? `<span class="vdur">${esc(d)}</span>` : ''}${hasV ? `<span class="vplay">${ICON_PLAY}</span>` : ''}
+    <span class="vinfo">${v.titre ? `<span class="vtit">${esc(v.titre)}</span>` : ''}<span class="vwho">${avatarHtml(v)}<span><b>${esc(e.prenom || 'Étudiant·e')}</b>${sub ? `<small>${esc(sub)}</small>` : ''}</span></span>${v.citation ? `<span class="vcit">“${esc(v.citation)}”</span>` : ''}</span>`;
+  const card = hasV
+    ? `<button class="fcard ${r < 1 ? 'port' : ''}" data-act="play" data-v="${esc(v.id)}" style="--r:${r};background-image:${cssUrl(po)}">${inner}</button>`
+    : `<button class="fcard nov" data-act="more" data-v="${esc(v.id)}" style="--r:1.9;background-image:${cssUrl(po)}">${inner}</button>`;
+  const act = `<div class="fact">${hasV ? `<button class="btn primary" data-act="play" data-v="${esc(v.id)}">${ICON_PLAY}Regarder</button>` : ''}<button class="btn ${hasV ? 'ghost' : 'primary'}" data-act="more" data-v="${esc(v.id)}">En savoir plus sur ${esc(name)}</button></div>`;
+  const others = l.videos.length > 1 ? `<div class="others"><h3 class="sec">Autres étudiants <small>${l.videos.length - 1}</small></h3><div class="mrow">${l.videos.filter(x => x !== v).map(x => miniCard(x, 'data-focus', false)).join('')}</div></div>` : '';
+  return `<h3 class="sec">${l.videos.length > 1 ? 'Étudiant à la une' : 'Étudiant'}</h3><div class="feat">${card}${act}</div>${others}`;
 }
 /* photo de la ville en haut de la fiche */
 const HS = { i: 0 };
@@ -1319,7 +1432,7 @@ function closeFiche(keepView) {
   closeLightbox(true); stopHero(); hideProf();
   hidePanel($('#fiche')); S.current = null; selectMarker(null);
   if (S.mode === 'fiche') setMode('explore');
-  if (!keepView && G.ready) animateTo({ z: 1, sx: 0, sy: 0 }, 700);
+  if (!keepView && G.ready) animateTo({ z: G.home.zoom, sx: 0, sy: 0 }, 700);
 }
 
 /* ---------- fiche étudiant (profil complet) ---------- */
@@ -1332,13 +1445,13 @@ function fillProf(l, v) {
   $('#pBody').innerHTML = `
     <div class="phero">${avatarHtml(v, 'pav')}<h2 class="pname">${esc(e.prenom || 'Étudiant·e')}</h2>${sub ? `<div class="psub">${esc(sub)}</div>` : ''}
       <div class="ploc">${PIN}${esc(l.ville)}, ${esc(l.pays)}${l.etablissement ? ' · ' + esc(l.etablissement) : ''}</div></div>
-    <div class="pcta"><button class="btn primary" data-act="play" data-v="${esc(v.id)}">${ICON_PLAY}Regarder son témoignage${d ? ' · ' + esc(d) : ''}</button></div>
+    ${v.url ? `<div class="pcta"><button class="btn primary" data-act="play" data-v="${esc(v.id)}">${ICON_PLAY}Regarder son témoignage${d ? ' · ' + esc(d) : ''}</button></div>` : ''}
     ${v.citation ? `<div class="pquote">${esc(v.citation)}</div>` : ''}
     ${facts.length ? `<div class="facts">${facts.map(f => `<div><small>${esc(f[0])}</small><b>${esc(f[1])}</b></div>`).join('')}</div>` : ''}
     ${e.bio ? `<div class="psec"><h3>Son parcours</h3><p>${esc(e.bio)}</p></div>` : ''}
     ${e.conseil ? `<div class="psec"><h3>Son conseil</h3><p>${esc(e.conseil)}</p></div>` : ''}
     ${tags.length ? `<div class="psec"><h3>Mots-clés</h3><div class="tags">${tags.map(t => `<span class="tag">${esc(t)}</span>`).join('')}</div></div>` : ''}
-    ${others.length ? `<div class="psec"><h3>Autres témoignages · ${esc(l.ville)}</h3><div class="mrow" style="padding:0">${others.map(x => miniCard(x, 'data-prof', false)).join('')}</div></div>` : ''}
+    ${others.length ? `<div class="psec"><h3>Autres étudiants · ${esc(l.ville)}</h3><div class="mrow" style="padding:0">${others.map(x => miniCard(x, 'data-prof', false)).join('')}</div></div>` : ''}
     <div style="height:26px"></div>`;
 }
 function openProf(vid) {
@@ -1374,12 +1487,12 @@ function openList() {
   if (!$('#fiche').hidden) { closeLightbox(true); hidePanel($('#fiche')); selectMarker(null); S.current = null; }
   $('#lSearch').value = ''; buildList('');
   showPanel($('#list')); setMode('list');
-  if (G.ready) { const fo = panelFocus($('#list')); animateTo({ z: G.w >= G.h ? 1.1 : 1.3, sx: fo.sx, sy: fo.sy }, 800); }   // la liste décale le globe sans zoomer
+  if (G.ready) { const fo = panelFocus($('#list')); animateTo({ z: G.home.zoom * (G.w >= G.h ? 1.1 : 1.3), sx: fo.sx, sy: fo.sy }, 800); }   // la liste décale le globe sans zoomer
 }
 function closeList() {
   $('#lSearch').blur(); hidePanel($('#list'));
   if (S.mode === 'list') setMode('explore');
-  if (G.ready) animateTo({ z: 1, sx: 0, sy: 0 }, 700);
+  if (G.ready) animateTo({ z: G.home.zoom, sx: 0, sy: 0 }, 700);
 }
 
 /* ---------- lecteur vidéo (fichier, lien direct, YouTube, Vimeo, Drive) ---------- */
@@ -1395,7 +1508,7 @@ function syncVideo() {
 }
 function openVideo(id) {
   const l = S.current; if (!l) return;
-  const vd = l.videos.find(x => x.id === id); if (!vd) return;
+  const vd = l.videos.find(x => x.id === id); if (!vd || !vd.url) return;
   const kind = mediaKind(vd.url), host = $('#vHost'), vid = $('#vid');
   host.innerHTML = ''; vid.classList.remove('err', 'wait', 'playing', 'hideui', 'embed', 'portrait');
   $('#vTitle').innerHTML = `${esc(l.ville)}, ${esc(l.pays)}<small>${esc(vd.titre || '')}${vd.etudiant.prenom ? (vd.titre ? ' · ' : '') + esc(vd.etudiant.prenom) : ''}</small>`;
@@ -1554,7 +1667,8 @@ function loadLogo() {
 /* ---------- branchements ---------- */
 function initUI() {
   buildList('');
-  G.onTouch = () => { if (S.mode === 'attract') setMode('explore'); };
+  G.onTouch = () => { if (S.mode === 'attract') { setMode('explore'); if (!S.current && G.selected) selectMarker(null); } };
+  setInterval(tourTick, 1000);
   G.onTap = (x, y, dbl) => {
     if (S.mode === 'settings' || S.mode === 'video' || LB.on || !$('#gate').hidden) return;
     clearTimeout(S.tapT);
@@ -1587,6 +1701,7 @@ function initUI() {
   $('#lSearch').addEventListener('input', () => { touchAct(); buildList(); });
   $('#listBody').onclick = e => { const b = e.target.closest('.row'); if (b) { touchAct(); openFiche(b.dataset.id); } };
   onTap($('#btnSet'), () => { touchAct(); requireCode(openAdmin); });
+  onTap($('#btnHide'), () => { document.body.classList.remove('ui-on'); clearTimeout(S.uiT); });
   onTap($('#fEdit'), () => { touchAct(); const l = S.current; if (l) requireCode(() => openAdminAt(l.id, null)); });
   onTap($('#pEdit'), () => { touchAct(); const l = S.current, v = S.profV; if (l) requireCode(() => openAdminAt(l.id, v)); });
   onTap($('#pClose'), () => closeFiche()); onTap($('#pBack'), hideProf);
@@ -1636,7 +1751,7 @@ function resetAll() {
 function idleTick() {
   const idle = (now() - S.lastAct) / 1000;
   if (!$('#gate').hidden && idle > 45) closeGate();
-  if (S.mode === 'explore' && idle > 8) { setMode('attract'); if (G.ready) animateTo({ z: 1, sx: 0, sy: 0 }, 1600); }
+  if (S.mode === 'explore' && idle > 8) { setMode('attract'); if (G.ready) animateTo({ z: G.home.zoom, sx: 0, sy: 0 }, 1600); }
   else if ((S.mode === 'fiche' || S.mode === 'list') && idle > CFG.idleSec) resetAll();
   else if (S.mode === 'video') { if (V.embed ? idle > 600 : (!videoPlaying() && idle > CFG.idleSec)) resetAll(); }
   else if (S.mode === 'settings' && idle > 300) { closeAdmin(); resetAll(); }
@@ -1665,12 +1780,23 @@ function checkNews() {
   if (entries.length) setTimeout(() => showNews(entries), 1800);
 }
 
+
+/* ---------- visite des villes : au repos, le globe se rend de ville en ville ---------- */
+function tourTick() {
+  if (!CFG.tour || S.mode !== 'attract' || !G.ready || !S.lieux.length || G.fly || document.hidden) return;
+  if (now() - (S.tourT || 0) < 9000) return;
+  S.tourT = now(); S.tourI = ((S.tourI == null ? -1 : S.tourI) + 1) % S.lieux.length;
+  const l = S.lieux[S.tourI], m = G.markers.find(k => k.lieu === l);
+  animateTo({ rx: l.lat * D2R, ry: -l.lon * D2R, z: G.home.zoom * 0.78, sx: 0, sy: 0 }, 2600);
+  if (m) selectMarker(m);
+}
+
 /* =====================================================================
    ESPACE ÉQUIPE (code d'accès) — trois pages séparées :
    Réglages · Statistiques · Données (destinations, import Excel, contenus, sauvegarde)
 ===================================================================== */
 const A = { page: 'hub', dtab: 'dests', sub: null, draft: null, isNew: false, md: null, mType: 'video', mIdx: -1, mSrc: 'file',
-  showLog: false, busy: false, period: 'today', imp: null, frames: null, cp: null };
+  showLog: false, busy: false, period: 'today', imp: null, frames: null, cp: null, stab: 'general', mBack: 'dest', prev: false };
 const PAGE_TITLE = { hub: 'Espace équipe', settings: 'Réglages', stats: 'Statistiques', data: 'Données' };
 
 function getPath(o, p) { return p.split('.').reduce((a, k) => (a == null ? a : a[k]), o); }
@@ -1683,15 +1809,15 @@ function openAdmin() { A.page = 'hub'; A.sub = null; A.draft = null; A.imp = nul
 /* raccourci depuis une fiche ouverte : ouvre directement l'éditeur de la destination (ou du témoignage) */
 function openAdminAt(id, vid) {
   const l = S.byId[id]; if (!l) { openAdmin(); return; }
-  A.page = 'data'; A.dtab = 'dests'; A.draft = clone(l); A.isNew = false; A.imp = null; A.frames = null; A.cp = null; A.sub = 'dest';
-  if (vid) { const i = l.videos.findIndex(x => x.id === vid); if (i > -1) { A.mType = 'video'; A.mIdx = i; A.md = clone(l.videos[i]); A.mSrc = mediaKind(A.md.url) === 'local' ? 'file' : 'link'; A.sub = 'media'; } }
+  A.page = 'data'; A.dtab = 'dests'; A.draft = clone(l); A.isNew = false; A.imp = null; A.frames = null; A.cp = null; A.sub = 'dest'; A.mBack = 'dest';
+  if (vid) { const i = l.videos.findIndex(x => x.id === vid); if (i > -1) { A.mType = 'video'; A.mIdx = i; A.md = clone(l.videos[i]); A.mSrc = mediaKind(A.md.url) === 'local' || !A.md.url ? 'file' : 'link'; A.sub = 'media'; } }
   renderAdmin(true); showPanel($('#admin')); setMode('settings'); touchAct();
 }
 function closeAdmin() { hidePanel($('#admin')); if (S.mode === 'settings') setMode(S.current && !$('#fiche').hidden ? 'fiche' : 'explore'); touchAct(); purgeLocal(); }
 function go(sub) { A.sub = sub; renderAdmin(true); }
 function gotoPage(p) { A.page = p; A.sub = null; A.draft = null; A.imp = null; renderAdmin(true); }
 function back() {
-  if (A.sub === 'media') { A.sub = 'dest'; A.frames = null; if (A.draft && !A.isNew) { const l = S.byId[A.draft.id]; if (l) A.draft = clone(l); } }
+  if (A.sub === 'media') { A.sub = A.mBack === 'list' ? null : 'dest'; A.frames = null; if (A.draft && !A.isNew) { const l = S.byId[A.draft.id]; if (l) A.draft = clone(l); } }
   else if (A.sub) A.sub = null;
   else A.page = 'hub';
   renderAdmin(true);
@@ -1728,42 +1854,42 @@ const ICONS = {
 
 /* ====================== HUB ====================== */
 function vHub() {
-  const td = Stats.range(1)[0].d;
+  const td = Stats.range(1)[0].d, nP = S.lieux.reduce((x, l) => x + l.videos.length, 0);
   return `
     <div class="ltitle">Espace équipe</div>
-    <div class="lsub">ISG International · v${APP_VERSION} · aujourd’hui ${td.s} visiteur${td.s > 1 ? 's' : ''}</div>
+    <div class="lsub">ISG International · v${APP_VERSION}</div>
     <div class="hub">
-      <button class="hcard" data-page="settings"><div class="ic">${ICONS.gear}</div><b>Réglages</b><span>Version, mise à jour, logo ISG, affichage, code d’accès.</span><i>${UPD.state === 'available' ? 'Mise à jour disponible' : 'Ouvrir'}</i></button>
-      <button class="hcard" data-page="stats"><div class="ic">${ICONS.chart}</div><b>Statistiques</b><span>Visiteurs, destinations et vidéos les plus vues, heures de pointe.</span><i>Ouvrir</i></button>
-      <button class="hcard" data-page="data"><div class="ic">${ICONS.db}</div><b>Données</b><span>Destinations, import Excel, contenus hors-ligne, sauvegarde.</span><i>Ouvrir</i></button>
+      <button class="hcard h-settings" data-page="settings"><div class="ic">${ICONS.gear}</div><b>Réglages</b><span>Application, interface et personnalisation du globe.</span><div class="big">v${APP_VERSION}${UPD.state === 'available' ? ' · mise à jour disponible' : ''}</div><i>Ouvrir</i></button>
+      <button class="hcard h-data" data-page="data"><div class="ic">${ICONS.db}</div><b>Données</b><span>Destinations, profils étudiants, import Excel.</span><div class="big">${S.lieux.length} destinations · ${nP} profils</div><i>Ouvrir</i></button>
+      <button class="hcard h-stats" data-page="stats"><div class="ic">${ICONS.chart}</div><b>Statistiques</b><span>Fréquentation, villes et vidéos les plus vues.</span><div class="big">Aujourd’hui : ${td.s} visiteur${td.s > 1 ? 's' : ''}</div><i>Ouvrir</i></button>
     </div>
     <div class="group mt"><button class="grow" data-act="lock"><div class="m"><div class="t">Verrouiller et fermer</div></div>${CHEV}</button></div>`;
 }
 
 /* ====================== RÉGLAGES ====================== */
+const SWATCH = {
+  landColor: ['#3fc0f0', '#ffffff', '#6fe3d0', '#f1c96c', '#ff9d8a', '#b9a2ff'],
+  hiColor: ['#d4f3ff', '#ffffff', '#fff1c9', '#e1fff9', '#ffd9d2', '#e6dcff'],
+  oceanColor: ['#004f9f', '#0a5a66', '#1e3a68', '#3a2a7a', '#2a3544', '#6a1f2e'],
+  markerColor: ['#ffffff', '#3fc0f0', '#f1c96c', '#ff9d8a', '#7be0a8']
+};
+function swatches(key) { return `<div class="swatches">${SWATCH[key].map(c => `<button class="swt ${String(CFG[key]).toLowerCase() === c ? 'on' : ''}" data-ck="${key}" data-col="${c}" style="background:${c}" aria-label="${c}"></button>`).join('')}</div>`; }
+const grow = (t, s, ctrl) => `<div class="grow col"><div class="t">${t}</div>${s ? `<div class="s">${s}</div>` : ''}${ctrl}</div>`;
+const srow = (t, s, key) => `<div class="grow"><div class="m"><div class="t">${t}</div>${s ? `<div class="s">${s}</div>` : ''}</div><div class="r">${sw(key, CFG[key])}</div></div>`;
 function vSettings() {
-  const hasLogo = !$('#logoImg').hidden;
+  const tabs = seg('stab', [['general', 'Général'], ['interface', 'Interface'], ['globe', 'Globe']], A.stab);
+  return `<div class="ltitle">Réglages</div><div class="btnrow" style="margin-top:6px">${tabs}</div>${({ general: sGeneral, interface: sInterface, globe: sGlobe })[A.stab]()}`;
+}
+function sGeneral() {
   const log = A.showLog ? `<ul class="vers">${CHANGELOG.map(c => `<li><b class="title">v${esc(c.v)}</b> · ${esc(c.d)}<ul>${c.t.map(t => `<li>${esc(t)}</li>`).join('')}</ul></li>`).join('')}</ul>` : '';
   return `
-    <div class="ltitle">Réglages</div>
     <div class="gl">APPLICATION</div>
     <div class="group">
       <button class="grow" data-act="log"><div class="m"><div class="t">Version</div></div><div class="r">v${APP_VERSION}${CHEV}</div></button>
       ${log}
       <div class="grow"><div class="m"><div class="t">Mise à jour</div><div class="s" id="sUpdTxt">${esc(updText())}</div></div>
         <div class="r"><button class="mini" id="sCheck" data-act="check">Rechercher</button>${UPD.state === 'available' ? '<button class="mini ok" id="sApply" data-act="apply">Installer</button>' : ''}</div></div>
-      <div class="grow"><div class="m"><div class="t">Mises à jour automatiques</div><div class="s">Installées seules quand le globe tourne et que personne ne touche l’écran.</div></div><div class="r">${sw('autoUpdate', CFG.autoUpdate)}</div></div>
-    </div>
-    <div class="gl">AFFICHAGE</div>
-    <div class="group">
-      <div class="grow"><div class="m"><div class="t">Logo ISG en haut à gauche</div><div class="s">Toujours en blanc, sur fond transparent.</div></div><div class="r">${sw('logo', CFG.logo)}</div></div>
-      <div class="grow col"><div class="logoprev">${hasLogo ? `<img src="${esc($('#logoImg').src)}" alt="">` : '<span>ISG</span>'}</div>
-        <div class="btnrow" style="margin-top:0"><label class="mini filebtn">Choisir le logo<input type="file" data-file="logo" accept="image/*"></label>${hasLogo ? '<button class="mini" data-act="rmLogo">Retirer</button>' : ''}</div><div id="aLogoInfo"></div></div>
-      <div class="grow"><div class="m"><div class="t">Boutons invisibles</div><div class="s">Un double toucher sur le globe les fait apparaître.</div></div><div class="r">${sw('hideUi', CFG.hideUi)}</div></div>
-      <div class="grow"><div class="m"><div class="t">Animation douce des points</div></div><div class="r">${sw('breathe', CFG.breathe)}</div></div>
-      <div class="grow col"><div class="t">Étiquettes des villes</div>${seg('labels', [['text', 'Texte'], ['pill', 'Pastille'], ['classic', 'Classique']], CFG.labels)}</div>
-      <div class="grow col"><div class="t">Rotation du globe au repos</div>${seg('spin', [['slow', 'Lente'], ['normal', 'Normale'], ['off', 'Arrêtée']], CFG.spin)}</div>
-      <div class="grow col"><div class="t">Retour au globe après inactivité</div>${seg('idleSec', [[30, '30 s'], [60, '1 min'], [120, '2 min'], [300, '5 min']], CFG.idleSec)}</div>
+      ${srow('Mises à jour automatiques', 'Installées seules quand le globe tourne et que personne ne touche l’écran.', 'autoUpdate')}
     </div>
     <div class="gl">SÉCURITÉ</div>
     <div class="group">
@@ -1771,6 +1897,66 @@ function vSettings() {
       <button class="grow" data-act="reload"><div class="m"><div class="t">Relancer l’application</div></div>${CHEV}</button>
     </div>`;
 }
+function sInterface() {
+  const hasLogo = !$('#logoImg').hidden;
+  return `
+    <div class="gl">LOGO</div>
+    <div class="group">
+      ${srow('Logo ISG en haut à gauche', 'Toujours en blanc, sur fond transparent.', 'logo')}
+      <div class="grow col"><div class="logoprev">${hasLogo ? `<img src="${esc($('#logoImg').src)}" alt="">` : '<span>ISG</span>'}</div>
+        <div class="btnrow" style="margin-top:0"><label class="mini filebtn">Choisir le logo<input type="file" data-file="logo" accept="image/*"></label>${hasLogo ? '<button class="mini" data-act="rmLogo">Retirer</button>' : ''}</div><div id="aLogoInfo"></div></div>
+    </div>
+    <div class="gl">BOUTONS ET FOND</div>
+    <div class="group">
+      ${srow('Boutons invisibles', 'Un double toucher sur le globe les fait apparaître, un bouton œil les masque.', 'hideUi')}
+      ${grow('Fond de l’écran', 'Ambiance du dégradé derrière le globe.', seg('bg', [['bleu', 'Bleu'], ['nuit', 'Nuit'], ['sombre', 'Très sombre'], ['noir', 'Noir']], CFG.bg))}
+    </div>
+    <div class="gl">PRÉSENTATION</div>
+    <div class="group">
+      ${grow('Retour au globe après inactivité', '', seg('idleSec', [[30, '30 s'], [60, '1 min'], [120, '2 min'], [300, '5 min']], CFG.idleSec))}
+    </div>`;
+}
+function sGlobe() {
+  const cities = S.lieux.slice().sort((x, y) => x.ville.localeCompare(y.ville, 'fr')).map(l => `<option value="${esc(l.id)}" ${CFG.homeCity === l.id ? 'selected' : ''}>${esc(l.ville)}</option>`).join('');
+  const themes = seg('globeTheme', [['isg', 'Bleu ISG'], ['turquoise', 'Turquoise'], ['dore', 'Doré'], ['mono', 'Mono']], CFG.globeTheme);
+  return `
+    <div class="btnrow" style="margin-top:12px"><button class="btn primary" data-act="previewGlobe">Aperçu du globe</button><button class="btn ghost" data-act="globeReset" data-confirm="1">Réinitialiser le globe</button></div>
+    <div class="gl">COULEURS</div>
+    <div class="group">
+      ${grow('Thème', 'Un ensemble de couleurs prêt à l’emploi.', themes)}
+      ${grow('Couleur des terres', '', swatches('landColor'))}
+      ${srow('Colorer les pays qui ont une destination', '', 'hiCountries')}
+      ${CFG.hiCountries ? grow('Couleur de ces pays', '', swatches('hiColor')) : ''}
+      ${grow('Couleur de l’océan', '', swatches('oceanColor'))}
+      ${grow('Couleur des marqueurs', '', swatches('markerColor'))}
+    </div>
+    <div class="gl">POINTS ET NOMS DES VILLES</div>
+    <div class="group">
+      ${grow('Taille des points de terre', '', seg('dots', [['fin', 'Fins'], ['normal', 'Normaux'], ['gros', 'Gros']], CFG.dots))}
+      ${grow('Taille des marqueurs', '', seg('markerSize', [['s', 'Petits'], ['m', 'Moyens'], ['l', 'Grands']], CFG.markerSize))}
+      ${grow('Style des noms de villes', '', seg('labels', [['text', 'Texte'], ['pill', 'Pastille'], ['classic', 'Classique']], CFG.labels))}
+      ${grow('Taille des noms de villes', '', seg('lblSize', [['s', 'Petite'], ['m', 'Moyenne'], ['l', 'Grande']], CFG.lblSize))}
+      ${srow('Animation douce des marqueurs', '', 'breathe')}
+      ${grow('Villes proches regroupées', 'Madrid et Barcelone en une seule étiquette tant qu’elles se chevauchent.', seg('cluster', [['aucun', 'Non'], ['normal', 'Normal'], ['large', 'Large']], CFG.cluster))}
+    </div>
+    <div class="gl">MOUVEMENT</div>
+    <div class="group">
+      ${grow('Rotation au repos', '', seg('spin', [['off', 'Arrêtée'], ['slow', 'Lente'], ['normal', 'Normale'], ['fast', 'Rapide']], CFG.spin))}
+      ${grow('Sens de rotation', '', seg('spinDir', [['est', 'Vers l’est'], ['ouest', 'Vers l’ouest']], CFG.spinDir))}
+      ${srow('Visite des villes', 'Au repos, le globe se rend de ville en ville (toutes les 9 s) au lieu de tourner.', 'tour')}
+      ${grow('Vue d’accueil', 'Zone montrée au démarrage et au retour au globe.', seg('home', [['europe', 'Europe'], ['ameriques', 'Amériques'], ['afrique', 'Afrique'], ['asie', 'Asie'], ['monde', 'Monde'], ['ville', 'Une ville']], CFG.home) + (CFG.home === 'ville' ? `<select class="in" data-cfgsel="homeCity" style="margin-top:10px"><option value="">Choisir une ville…</option>${cities}</select>` : ''))}
+      ${grow('Inclinaison de la planète', '', seg('tilt', [['faible', 'Faible'], ['normale', 'Normale'], ['forte', 'Forte']], CFG.tilt))}
+      ${grow('Distance de la caméra au repos', '', seg('zoomRest', [['loin', 'Loin'], ['normal', 'Normale'], ['pres', 'Proche']], CFG.zoomRest))}
+      ${grow('Zoom à l’ouverture d’une fiche', '', seg('focusZoom', [['leger', 'Léger'], ['moyen', 'Moyen'], ['fort', 'Fort']], CFG.focusZoom))}
+    </div>
+    <div class="gl">ÉLÉMENTS</div>
+    <div class="group">
+      ${grow('Halo autour de la planète', '', seg('atmo', [['off', 'Aucun'], ['doux', 'Doux'], ['fort', 'Fort']], CFG.atmo))}
+      ${grow('Étoiles', '', seg('stars', [['off', 'Aucune'], ['peu', 'Peu'], ['normal', 'Normal'], ['beaucoup', 'Beaucoup']], CFG.stars))}
+    </div>
+    <div class="btnrow"><button class="btn primary" data-act="previewGlobe">Aperçu du globe</button></div>`;
+}
+
 function vCode() {
   return `<div class="ltitle">Code d’accès</div><div class="lsub">Il protège l’espace équipe. Il est enregistré sur cet iPad.</div>
     <div id="aMsg" class="note" hidden></div>
@@ -1827,17 +2013,43 @@ function vStats() {
 
 /* ====================== DONNÉES ====================== */
 function vData() {
-  const tabs = seg('dtab', [['dests', 'Destinations'], ['import', 'Import Excel'], ['contenus', 'Contenus'], ['backup', 'Sauvegarde']], A.dtab);
-  const body = { dests: dData, import: dImport, contenus: dContenus, backup: dBackup }[A.dtab]();
-  return `<div class="ltitle">Données</div><div class="btnrow" style="margin-top:6px">${tabs}</div>${body}`;
+  const nP = S.lieux.reduce((x, l) => x + l.videos.length, 0);
+  const tiles = `<div class="dtiles">
+    <button class="dtile ${A.dtab === 'dests' ? 'on' : ''}" data-set="dtab" data-val="dests"><b>${S.lieux.length}</b><span>Destinations</span><small>Villes, pays, photo de la ville</small></button>
+    <button class="dtile ${A.dtab === 'profils' ? 'on' : ''}" data-set="dtab" data-val="profils"><b>${nP}</b><span>Profils</span><small>Étudiants : fiche, photo et vidéo</small></button></div>`;
+  const tools = `<div class="dtools"><span class="lbl2">OUTILS</span>${[['import', 'Import Excel'], ['contenus', 'Contenus hors-ligne'], ['backup', 'Sauvegarde']].map(t => `<button class="tool ${A.dtab === t[0] ? 'on' : ''}" data-set="dtab" data-val="${t[0]}">${t[1]}</button>`).join('')}</div>`;
+  const body = { dests: dData, profils: dProfils, import: dImport, contenus: dContenus, backup: dBackup }[A.dtab]();
+  return `<div class="ltitle">Données</div>${tiles}${tools}${body}`;
 }
+
 function dData() {
-  const arr = S.lieux.slice().sort((a, b) => a.ville.localeCompare(b.ville, 'fr'));
+  const arr = S.lieux.slice().sort((x, y) => x.ville.localeCompare(y.ville, 'fr'));
   const nocov = S.lieux.filter(l => !l.cover).length;
-  return `<div class="btnrow"><button class="btn primary" data-act="newDest">+ Ajouter une destination</button>${nocov ? `<button class="btn ghost" data-act="autoCovers">Photos automatiques (${nocov})</button>` : ''}</div><div id="aAutoMsg"></div>
-    <div class="lsub" style="margin:14px 4px 0">${S.lieux.length} destination${S.lieux.length > 1 ? 's' : ''} · ${S.isLocal ? 'catalogue modifié sur cet iPad' : 'catalogue d’origine (démonstration)'}</div>
-    <div class="group mt">${arr.length ? arr.map(l => `<button class="grow" data-act="editDest" data-id="${esc(l.id)}"><div class="m"><div class="t cn">${esc(l.ville)}</div><div class="s">${esc(l.pays)} · ${l.videos.length} témoignage${l.videos.length > 1 ? 's' : ''} · ${l.photos.length} photo${l.photos.length > 1 ? 's' : ''}</div></div>${CHEV}</button>`).join('') : '<div class="grow"><div class="m"><div class="t">Aucune destination</div><div class="s">Ajoutez la première ou importez un fichier Excel.</div></div></div>'}</div>`;
+  return `<div class="dhead"><h3>Destinations</h3><div class="btnrow" style="margin:0"><button class="btn primary" data-act="newDest">+ Ajouter une destination</button>${nocov ? `<button class="btn ghost" data-act="autoCovers">Photos automatiques (${nocov})</button>` : ''}</div></div><div id="aAutoMsg"></div>
+    <div class="lsub" style="margin:0 4px 0">${S.lieux.length} destination${S.lieux.length > 1 ? 's' : ''} · ${S.isLocal ? 'catalogue modifié sur cet iPad' : 'catalogue d’origine (démonstration)'}</div>
+    <div class="group mt">${arr.length ? arr.map(l => `<button class="grow" data-act="editDest" data-id="${esc(l.id)}"><div class="m"><div class="t cn">${esc(l.ville)}</div><div class="s">${esc(l.pays)} · ${l.videos.length} profil${l.videos.length > 1 ? 's' : ''} · ${l.photos.length} photo${l.photos.length > 1 ? 's' : ''}</div></div>${CHEV}</button>`).join('') : '<div class="grow"><div class="m"><div class="t">Aucune destination</div><div class="s">Ajoutez la première ou importez un fichier Excel.</div></div></div>'}</div>`;
 }
+
+/* ---------- profils étudiants : un ou plusieurs par voyage ---------- */
+function profRow(l, v, i) {
+  const e = v.etudiant, sub = [e.programme, e.annee].filter(Boolean).join(' · ');
+  const av = v.avatar ? `<i class="pav2" style="background-image:${cssUrl(srcOf(v.avatar))}"></i>` : `<i class="pav2">${esc(initials(e.prenom))}</i>`;
+  return `<button class="grow" data-act="editProfile" data-id="${esc(l.id)}" data-i="${i}">${av}<div class="m"><div class="t cn">${esc(e.prenom || 'Étudiant·e')}</div><div class="s">${esc(sub || 'Profil à compléter')}</div></div><span class="badge ${v.url ? 'v' : ''}">${v.url ? 'Vidéo' : 'Sans vidéo'}</span>${CHEV}</button>`;
+}
+function dProfils() {
+  const byV = S.lieux.slice().sort((x, y) => x.ville.localeCompare(y.ville, 'fr'));
+  const withP = byV.filter(l => l.videos.length), without = byV.filter(l => !l.videos.length);
+  return `<div class="dhead"><h3>Profils étudiants</h3><button class="btn primary" data-act="pickDest">+ Ajouter un profil</button></div>
+    <div class="lsub" style="margin:0 4px">Un voyage peut avoir plusieurs profils. La vidéo est facultative.</div>
+    ${withP.map(l => `<div class="pgroup"><div class="ph"><div><b class="cn">${esc(l.ville)}</b><small>${esc(l.pays)} · ${l.videos.length} profil${l.videos.length > 1 ? 's' : ''}</small></div><button class="mini" data-act="addProfile" data-id="${esc(l.id)}">+ Profil</button></div><div class="group">${l.videos.map((v, i) => profRow(l, v, i)).join('')}</div></div>`).join('') || '<div class="note">Aucun profil pour l’instant.</div>'}
+    ${without.length ? `<div class="gl">DESTINATIONS SANS PROFIL (${without.length})</div><div class="group">${without.map(l => `<div class="grow"><div class="m"><div class="t cn">${esc(l.ville)}</div><div class="s">${esc(l.pays)}</div></div><button class="mini" data-act="addProfile" data-id="${esc(l.id)}">+ Profil</button></div>`).join('')}</div>` : ''}`;
+}
+function vPick() {
+  const arr = S.lieux.slice().sort((x, y) => x.ville.localeCompare(y.ville, 'fr'));
+  return `<div class="ltitle">Choisir le voyage</div><div class="lsub">Le profil est rattaché à une destination.</div>
+    <div class="group">${arr.map(l => `<button class="grow" data-act="addProfile" data-id="${esc(l.id)}"><div class="m"><div class="t cn">${esc(l.ville)}</div><div class="s">${esc(l.pays)} · ${l.videos.length} profil${l.videos.length > 1 ? 's' : ''}</div></div>${CHEV}</button>`).join('')}</div>`;
+}
+
 function dContenus() {
   const warn = (MEDIA.fail ? `<div class="note bad">${MEDIA.fail} lien${MEDIA.fail > 1 ? 's' : ''} ne peu${MEDIA.fail > 1 ? 'vent' : 't'} pas être copié${MEDIA.fail > 1 ? 's' : ''} hors-ligne (le serveur l’interdit) : lecture avec Internet uniquement.</div>` : '') +
     (MEDIA.localMissing > 0 ? `<div class="note bad">${MEDIA.localMissing} fichier${MEDIA.localMissing > 1 ? 's' : ''} ajouté${MEDIA.localMissing > 1 ? 's' : ''} depuis l’iPad introuvable${MEDIA.localMissing > 1 ? 's' : ''} : à ajouter de nouveau.</div>` : '');
@@ -1860,12 +2072,12 @@ function dBackup() {
 function dImport() {
   const im = A.imp;
   let html = `<div class="gl">MODÈLE</div><div class="group">
-    <a class="grow" href="modele-import-ISG.xlsx" download style="text-decoration:none"><div class="m"><div class="t">Télécharger le modèle Excel</div><div class="s">Trois feuilles : Destinations, Témoignages, Photos, avec un mode d’emploi.</div></div>${CHEV}</a>
+    <a class="grow" href="modele-import-ISG.xlsx" download style="text-decoration:none"><div class="m"><div class="t">Télécharger le modèle Excel</div><div class="s">Trois feuilles : Destinations, Profils, Photos, avec un mode d’emploi.</div></div>${CHEV}</a>
     <div class="grow col"><div class="t">Importer un fichier rempli</div><div class="s">Formats : Excel (.xlsx) ou CSV. Envoyez d’abord le fichier sur l’iPad (AirDrop, iCloud Drive).</div>
       <div class="btnrow" style="margin-top:0"><label class="btn primary filebtn">Choisir le fichier<input type="file" data-file="import" accept=".xlsx,.csv,.txt,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv"></label></div><div id="aImpMsg"></div></div></div>`;
   if (im && im.built) {
     const b = im.built, miss = b.dests.filter(d => d.lat === '' || d.lon === '').length;
-    html += `<div class="gl">APERÇU · ${esc(im.name)}</div><div class="prev"><div><b>${b.dests.length}</b><small>destination${b.dests.length > 1 ? 's' : ''}</small></div><div><b>${b.cnt.videos}</b><small>témoignage${b.cnt.videos > 1 ? 's' : ''}</small></div><div><b>${b.cnt.photos}</b><small>photo${b.cnt.photos > 1 ? 's' : ''}</small></div></div>
+    html += `<div class="gl">APERÇU · ${esc(im.name)}</div><div class="prev"><div><b>${b.dests.length}</b><small>destination${b.dests.length > 1 ? 's' : ''}</small></div><div><b>${b.cnt.videos}</b><small>profil${b.cnt.videos > 1 ? 's' : ''}</small></div><div><b>${b.cnt.photos}</b><small>photo${b.cnt.photos > 1 ? 's' : ''}</small></div></div>
       ${miss ? `<div class="note">${miss} destination${miss > 1 ? 's' : ''} sans coordonnées : l’app les cherchera automatiquement (Internet nécessaire).</div>` : ''}
       ${b.warn.length ? `<ul class="warns">${b.warn.slice(0, 12).map(w => `<li>${esc(w)}</li>`).join('')}${b.warn.length > 12 ? `<li>… et ${b.warn.length - 12} autre${b.warn.length - 12 > 1 ? 's' : ''}.</li>` : ''}</ul>` : ''}
       <div class="btnrow">${seg('impMode', [['merge', 'Ajouter / mettre à jour'], ['replace', 'Tout remplacer']], im.mode)}</div>
@@ -1914,15 +2126,15 @@ async function runImport() {
 function emptyLieu() { return { id: '', ville: '', pays: '', code: '', lat: '', lon: '', etablissement: '', description: '', videos: [], photos: [] }; }
 function mediaRow(kind, o, i) {
   const k = mediaKind(o.url), th = kind === 'video' ? posterOf(o) : srcOf(o.url);
-  const t = kind === 'video' ? (o.titre || 'Témoignage') : (o.legende || 'Photo ' + (i + 1));
-  const sub = [KIND_LABEL[k], kind === 'video' ? [o.etudiant.prenom, o.etudiant.programme].filter(Boolean).join(' · ') : (o.credit ? 'Crédit : ' + o.credit : '')].filter(Boolean).join(' · ');
+  const t = kind === 'video' ? (o.etudiant.prenom || o.titre || 'Profil') : (o.legende || 'Photo ' + (i + 1));
+  const sub = [KIND_LABEL[k], kind === 'video' ? [o.etudiant.programme, o.url ? 'Vidéo' : 'Sans vidéo'].filter(Boolean).join(' · ') : (o.credit ? 'Crédit : ' + o.credit : '')].filter(Boolean).join(' · ');
   return `<div class="item"><i class="th" style="background-image:${cssUrl(th)}${kind === 'video' && ratioOf(o) < 1 ? ';aspect-ratio:9/16;width:40px' : ''}"></i><div class="m"><b>${esc(t)}</b><small>${esc(sub)}</small></div><button class="mini" data-act="editMedia" data-t="${kind}" data-i="${i}">Modifier</button><button class="mini danger" data-act="delMedia" data-t="${kind}" data-i="${i}" data-confirm="1">Supprimer</button></div>`;
 }
 function vDest() {
   const d = A.draft;
-  const media = A.isNew ? '<div class="note mt">Enregistrez d’abord la destination pour ajouter des témoignages et des photos.</div>' :
-    `<div class="gl">TÉMOIGNAGES (${d.videos.length})</div>${d.videos.map((v, i) => mediaRow('video', v, i)).join('')}
-       <div class="btnrow"><button class="btn ghost" data-act="addMedia" data-t="video">+ Ajouter un témoignage vidéo</button></div>
+  const media = A.isNew ? '<div class="note mt">Enregistrez d’abord la destination pour ajouter des profils et des photos.</div>' :
+    `<div class="gl">PROFILS ÉTUDIANTS (${d.videos.length})</div>${d.videos.map((v, i) => mediaRow('video', v, i)).join('')}
+       <div class="btnrow"><button class="btn ghost" data-act="addMedia" data-t="video">+ Ajouter un profil</button></div>
      <div class="gl">AUTRES PHOTOS (${d.photos.length}) · FACULTATIF</div>${d.photos.map((p, i) => mediaRow('photo', p, i)).join('')}
        <div class="btnrow"><button class="btn ghost" data-act="addMedia" data-t="photo">+ Ajouter une photo à la galerie</button></div>`;
   return `<div class="ltitle cn">${A.isNew ? 'Nouvelle destination' : esc(d.ville || 'Destination')}</div><div id="aMsg" class="note" hidden></div>
@@ -2068,56 +2280,73 @@ async function autoCovers() {
 
 /* ====================== TÉMOIGNAGE / PHOTO (formulaire) ====================== */
 function kindPill(u) { const k = mediaKind(u); if (k === 'none' || k === 'local') return ''; return `<span class="pill ${k === 'direct' ? '' : 'warn'}">${esc(KIND_LABEL[k])}${k === 'direct' ? '' : ' · en ligne uniquement'}</span>`; }
-function vMedia() {
-  const m = A.md, isV = A.mType === 'video';
-  const src = `<div class="fl">Source du ${isV ? 'fichier vidéo' : 'fichier photo'}</div><div class="btnrow" style="margin-top:0">${seg('mSrc', [['file', 'Fichier de l’iPad'], ['link', 'Lien']], A.mSrc)}</div>`;
+function vMedia() { return A.mType === 'video' ? vProfile() : vPhotoForm(); }
+function vPhotoForm() {
+  const m = A.md;
+  const src = `<div class="fl">Source de la photo</div><div class="btnrow" style="margin-top:0">${seg('mSrc', [['file', 'Fichier de l’iPad'], ['link', 'Lien']], A.mSrc)}</div>`;
   let body;
   if (A.mSrc === 'file') {
     const has = m.url && mediaKind(m.url) === 'local';
-    body = `<div class="btnrow"><label class="btn ghost filebtn">${has ? 'Choisir un autre fichier' : (isV ? 'Choisir une vidéo' : 'Choisir une photo')}<input type="file" data-file="${A.mType}" accept="${isV ? 'video/*' : 'image/*'}"></label></div>
-      <div class="note ${has ? 'good' : ''}" id="aFileInfo">${has ? 'Fichier enregistré sur l’iPad : lecture hors-ligne garantie.' : 'Envoyez d’abord le fichier sur l’iPad (AirDrop, Photos, iCloud Drive), puis choisissez-le ici. Il reste sur l’iPad et fonctionne sans Internet.'}</div>`;
+    body = `<div class="btnrow"><label class="btn ghost filebtn">${has ? 'Choisir une autre photo' : 'Choisir une photo'}<input type="file" data-file="photo" accept="image/*"></label></div>
+      <div class="note ${has ? 'good' : ''}" id="aFileInfo">${has ? 'Photo enregistrée sur l’iPad : disponible sans Internet.' : 'Envoyez d’abord la photo sur l’iPad (AirDrop, Photos, iCloud Drive), puis choisissez-la ici.'}</div>`;
   } else {
-    body = `${inp(isV ? 'Lien de la vidéo' : 'Lien de la photo', 'url', m.url && mediaKind(m.url) !== 'local' ? m.url : '', { ph: 'https://…  (fichier .mp4, YouTube, Vimeo, Google Drive)' })}
+    body = `${inp('Lien de la photo', 'url', m.url && mediaKind(m.url) !== 'local' ? m.url : '', { ph: 'https://…' })}
       <div class="mt" id="aKind">${kindPill(m.url)}</div>
       <div class="btnrow"><button class="mini" data-act="testLink">Tester le lien</button></div><div class="note" id="aTest" hidden></div>`;
   }
-  let fields;
-  if (isV) {
-    const po = posterOf(m), port = ratioOf(m) < 1;
-    const frames = A.frames ? (A.frames.busy ? '<div class="note">Extraction des images de la vidéo…</div>' : A.frames.err ? `<div class="note bad">${esc(A.frames.err)}</div>` :
-      `<div class="frames">${A.frames.list.map((f, i) => `<button class="${port ? 'port' : ''}" data-fr="${i}" style="background-image:${cssUrl(f.url)}"></button>`).join('')}</div><div class="s" style="opacity:.7;font-size:14px;margin-top:6px">Touchez une image pour l’utiliser comme vignette.</div>`) : '';
-    fields = `
-    ${inp('Titre de la vidéo', 'titre', m.titre, { ph: 'Mon semestre à Montréal', cap: 'sentences' })}
-    <div class="fl">Vignette de la vidéo</div>
-    <div class="thumbcur"><i class="${port ? 'port' : ''}" style="background-image:${cssUrl(po)}"></i><div class="btnrow" style="margin:0"><label class="mini filebtn">Choisir une image<input type="file" data-file="poster" accept="image/*"></label><button class="mini" data-act="thumbFrames">Image de la vidéo</button>${m.poster ? '<button class="mini" data-act="thumbRemove">Retirer</button>' : ''}</div></div>
-    ${frames}
-    ${A.mSrc === 'link' ? inp('…ou lien d’une image', 'poster', m.poster && mediaKind(m.poster) !== 'local' ? m.poster : '', { ph: 'https://…' }) : ''}
-    <div class="two"><div>${inp('Prénom de l’étudiant·e', 'etudiant.prenom', m.etudiant.prenom, { cap: 'words' })}</div><div>${inp('Programme', 'etudiant.programme', m.etudiant.programme, { ph: 'Bachelor 3', cap: 'sentences' })}</div></div>
-    ${inp('Année', 'etudiant.annee', m.etudiant.annee, { ph: '2025-2026' })}
-    <div class="fl">Citation de l’étudiant·e (une phrase, facultatif)</div><textarea class="in" data-f="citation" placeholder="Une expérience qui m’a changé(e)." autocapitalize="sentences" style="min-height:76px">${esc(m.citation)}</textarea>
-    <div class="gl">FICHE ÉTUDIANT (« EN SAVOIR PLUS ») · FACULTATIF</div>
-    ${inp('Séjour (période ou durée)', 'etudiant.sejour', m.etudiant.sejour, { ph: 'Semestre 5 · 5 mois', cap: 'sentences' })}
-    <div class="fl">Son parcours (texte affiché sur la fiche étudiant)</div><textarea class="in" data-f="etudiant.bio" placeholder="Pourquoi cette destination, ce qu’il ou elle y a fait, ce que ça a changé…" autocapitalize="sentences">${esc(m.etudiant.bio)}</textarea>
-    <div class="fl">Son conseil aux futurs étudiants</div><textarea class="in" data-f="etudiant.conseil" placeholder="Un conseil pratique ou personnel." autocapitalize="sentences" style="min-height:76px">${esc(m.etudiant.conseil)}</textarea>
-    ${inp('Mots-clés (séparés par des virgules)', 'etudiant.tags', m.etudiant.tags, { ph: 'Culture, Langues, Réseau' })}
-    <div class="fl">Photo de profil de l’étudiant·e (facultatif)</div>
+  return `<div class="ltitle">${A.mIdx < 0 ? 'Ajouter' : 'Modifier'} une photo</div><div id="aMsg" class="note" hidden></div>${src}${body}
+    ${inp('Légende (facultatif)', 'legende', m.legende, { ph: 'Le campus au printemps', cap: 'sentences' })}${inp('Crédit (facultatif)', 'credit', m.credit, { ph: 'Auteur, licence' })}
+    <div class="btnrow" style="margin-top:22px"><button class="btn primary" data-act="saveMedia">Enregistrer</button><button class="btn ghost" data-act="cancelMedia">Annuler</button></div>`;
+}
+function vProfile() {
+  const m = A.md, ville = A.draft ? A.draft.ville : '';
+  const po = posterOf(m), port = ratioOf(m) < 1, hasV = !!m.url && mediaKind(m.url) !== 'none';
+  const frames = A.frames ? (A.frames.busy ? '<div class="note">Extraction des images de la vidéo…</div>' : A.frames.err ? `<div class="note bad">${esc(A.frames.err)}</div>` :
+    `<div class="frames">${A.frames.list.map((f, i) => `<button class="${port ? 'port' : ''}" data-fr="${i}" style="background-image:${cssUrl(f.url)}"></button>`).join('')}</div><div class="s" style="opacity:.7;font-size:14px;margin-top:6px">Touchez une image pour l’utiliser comme vignette.</div>`) : '';
+  let vsrc;
+  if (A.mSrc === 'file') {
+    const has = m.url && mediaKind(m.url) === 'local';
+    vsrc = `<div class="btnrow"><label class="btn ghost filebtn">${has ? 'Choisir une autre vidéo' : 'Choisir une vidéo'}<input type="file" data-file="video" accept="video/*"></label></div>
+      <div class="note ${has ? 'good' : ''}" id="aFileInfo">${has ? 'Fichier enregistré sur l’iPad : lecture hors-ligne garantie.' : 'Envoyez d’abord la vidéo sur l’iPad (AirDrop, Photos, iCloud Drive), puis choisissez-la ici.'}</div>`;
+  } else {
+    vsrc = `${inp('Lien de la vidéo', 'url', m.url && mediaKind(m.url) !== 'local' ? m.url : '', { ph: 'https://…  (fichier .mp4, YouTube, Vimeo, Google Drive)' })}
+      <div class="mt" id="aKind">${kindPill(m.url)}</div>
+      <div class="btnrow"><button class="mini" data-act="testLink">Tester le lien</button></div><div class="note" id="aTest" hidden></div>`;
+  }
+  return `<div class="ltitle">${A.mIdx < 0 ? 'Nouveau profil' : 'Profil étudiant'}</div><div class="lsub" style="margin-top:-6px">Voyage : <b class="cn">${esc(ville)}</b></div><div id="aMsg" class="note" hidden></div>
+    <div class="gl">ÉTUDIANT·E</div>
     <div class="thumbcur">${m.avatar ? `<i class="av" id="aAv" style="background-image:${cssUrl(srcOf(m.avatar))}"></i>` : '<i class="av" id="aAv">' + esc(initials(m.etudiant.prenom)) + '</i>'}<div class="btnrow" style="margin:0"><label class="mini filebtn">Choisir une photo<input type="file" data-file="avatar" accept="image/*"></label>${m.avatar ? '<button class="mini" data-act="rmAvatar">Retirer</button>' : ''}</div></div>
     ${inp('…ou lien de la photo de profil', 'avatar', m.avatar && mediaKind(m.avatar) !== 'local' ? m.avatar : '', { ph: 'https://…' })}
+    <div class="two"><div>${inp('Prénom', 'etudiant.prenom', m.etudiant.prenom, { cap: 'words' })}</div><div>${inp('Programme', 'etudiant.programme', m.etudiant.programme, { ph: 'Bachelor 3', cap: 'sentences' })}</div></div>
+    <div class="two"><div>${inp('Année', 'etudiant.annee', m.etudiant.annee, { ph: '2025-2026' })}</div><div>${inp('Séjour (période ou durée)', 'etudiant.sejour', m.etudiant.sejour, { ph: 'Semestre 5 · 5 mois', cap: 'sentences' })}</div></div>
+    <div class="gl">FICHE « EN SAVOIR PLUS »</div>
+    <div class="fl" style="margin-top:0">Citation (une phrase)</div><textarea class="in" data-f="citation" placeholder="Une expérience qui m’a changé(e)." autocapitalize="sentences" style="min-height:76px">${esc(m.citation)}</textarea>
+    <div class="fl">Son parcours</div><textarea class="in" data-f="etudiant.bio" placeholder="Pourquoi cette destination, ce qu’il ou elle y a fait, ce que ça a changé…" autocapitalize="sentences">${esc(m.etudiant.bio)}</textarea>
+    <div class="fl">Son conseil aux futurs étudiants</div><textarea class="in" data-f="etudiant.conseil" placeholder="Un conseil pratique ou personnel." autocapitalize="sentences" style="min-height:76px">${esc(m.etudiant.conseil)}</textarea>
+    ${inp('Mots-clés (séparés par des virgules)', 'etudiant.tags', m.etudiant.tags, { ph: 'Culture, Langues, Réseau' })}
+    <div class="gl">VIDÉO · FACULTATIVE</div>
+    <div class="s" style="opacity:.7;font-size:15px;margin:-4px 0 6px">Sans vidéo, la fiche du profil s’affiche quand même.</div>
+    <div class="btnrow" style="margin-top:0">${seg('mSrc', [['file', 'Fichier de l’iPad'], ['link', 'Lien']], A.mSrc)}</div>
+    ${vsrc}
+    ${inp('Titre de la vidéo', 'titre', m.titre, { ph: 'Mon semestre à Montréal', cap: 'sentences' })}
+    <div class="fl">Vignette de la vidéo</div>
+    <div class="thumbcur"><i class="${port ? 'port' : ''}" style="background-image:${cssUrl(po)}"></i><div class="btnrow" style="margin:0"><label class="mini filebtn">Choisir une image<input type="file" data-file="poster" accept="image/*"></label>${hasV ? '<button class="mini" data-act="thumbFrames">Image de la vidéo</button>' : ''}${m.poster ? '<button class="mini" data-act="thumbRemove">Retirer</button>' : ''}</div></div>
+    ${frames}
+    ${A.mSrc === 'link' ? inp('…ou lien d’une image', 'poster', m.poster && mediaKind(m.poster) !== 'local' ? m.poster : '', { ph: 'https://…' }) : ''}
     <div class="fl">Format de la vidéo</div>
     <div class="btnrow" style="margin-top:0">${seg('mRatio', [['auto', 'Automatique'], ['land', 'Paysage'], ['port', 'Portrait']], !m.ratio ? 'auto' : (m.ratio >= 1 ? 'land' : 'port'))}</div>
-    ${A.mSrc === 'link' ? inp('Durée en secondes (facultatif)', 'duree', m.duree || '', { mode: 'numeric' }) : ''}`;
-  } else fields = inp('Légende (facultatif)', 'legende', m.legende, { ph: 'Le campus au printemps', cap: 'sentences' }) + inp('Crédit (facultatif)', 'credit', m.credit, { ph: 'Auteur, licence' });
-  return `<div class="ltitle">${A.mIdx < 0 ? 'Ajouter' : 'Modifier'} ${isV ? 'un témoignage' : 'une photo'}</div><div id="aMsg" class="note" hidden></div>${src}${body}${fields}
-    <div class="btnrow" style="margin-top:22px"><button class="btn primary" data-act="saveMedia">Enregistrer</button><button class="btn ghost" data-act="cancelMedia">Annuler</button></div>`;
+    ${A.mSrc === 'link' ? inp('Durée en secondes (facultatif)', 'duree', m.duree || '', { mode: 'numeric' }) : ''}
+    <div class="btnrow" style="margin-top:24px"><button class="btn primary" data-act="saveMedia">Enregistrer le profil</button><button class="btn ghost" data-act="cancelMedia">Annuler</button>${A.mIdx > -1 ? '<button class="btn ghost" data-act="delProfile" data-confirm="1">Supprimer ce profil</button>' : ''}</div>`;
 }
 
 /* ====================== RENDU ====================== */
 const PAGE_VIEWS = { hub: vHub, settings: vSettings, stats: vStats, data: vData };
-const SUB_VIEWS = { dest: vDest, media: vMedia, code: vCode };
+const SUB_VIEWS = { dest: vDest, media: vMedia, code: vCode, pick: vPick };
 function renderAdmin(top) {
   const body = $('#aBody'), st = body.scrollTop;
   let title = PAGE_TITLE[A.page], prev = 'Espace équipe';
-  if (A.sub) { title = { dest: 'Destination', media: 'Média', code: 'Code d’accès' }[A.sub]; prev = A.sub === 'media' ? 'Destination' : PAGE_TITLE[A.page]; }
+  if (A.sub) { title = { dest: 'Destination', media: A.mType === 'video' ? 'Profil' : 'Photo', code: 'Code d’accès', pick: 'Nouveau profil' }[A.sub]; prev = A.sub === 'media' ? (A.mBack === 'list' ? 'Profils' : 'Destination') : (A.sub === 'dest' ? 'Destinations' : PAGE_TITLE[A.page]); }
+  $('#admin').dataset.space = A.page;
   $('#aTitle').textContent = title;
   $('#aBack').hidden = A.page === 'hub' && !A.sub; $('#aBackTxt').textContent = prev;
   body.innerHTML = `<div class="wrap">${(A.sub ? SUB_VIEWS[A.sub] : PAGE_VIEWS[A.page])()}</div>`;
@@ -2266,12 +2495,12 @@ function saveMedia() {
   const m = A.md, isV = A.mType === 'video';
   if (A.busy) { setMsg('Patientez, le fichier est en cours d’enregistrement.', 'bad'); return; }
   m.url = normalizeLink(m.url);
-  if (!m.url) { setMsg(A.mSrc === 'file' ? 'Choisissez un fichier.' : 'Collez un lien.', 'bad'); return; }
+  if (!m.url && !(isV && (m.etudiant.prenom || '').trim())) { setMsg(isV ? 'Indiquez au moins le prénom de l’étudiant·e (la vidéo est facultative).' : (A.mSrc === 'file' ? 'Choisissez un fichier.' : 'Collez un lien.'), 'bad'); return; }
   if (isV) { m.duree = +m.duree || 0; if (m.poster) m.poster = normalizeLink(m.poster); if (m.avatar) m.avatar = normalizeLink(m.avatar); m.ratio = +m.ratio || 0; if (!m.ratio && /youtube\.com\/shorts\//.test(m.url)) m.ratio = 0.5625; }
   const arr = isV ? A.draft.videos : A.draft.photos;
   if (A.mIdx < 0) arr.push(m); else arr[A.mIdx] = m;
   if (!commitDraft()) { A.sub = 'dest'; renderAdmin(); setMsg('Média non enregistré : corrigez la destination.', 'bad'); return; }
-  A.sub = 'dest'; A.frames = null; renderAdmin(true); setMsg('Média enregistré.', 'good'); toast('Média enregistré');
+  A.frames = null; if (A.mBack === 'list') { A.sub = null; renderAdmin(true); toast('Profil enregistré'); } else { A.sub = 'dest'; renderAdmin(true); setMsg(isV ? 'Profil enregistré.' : 'Photo enregistrée.', 'good'); toast(isV ? 'Profil enregistré' : 'Photo enregistrée'); }
 }
 
 /* ====================== ACTIONS ====================== */
@@ -2296,6 +2525,8 @@ async function onAct(b) {
     case 'reload': location.reload(); break;
     case 'lock': S.unlockUntil = 0; closeAdmin(); break;
     case 'resetCat': store.del('cat'); location.reload(); break;
+    case 'globeReset': Object.assign(CFG, GLOBE_DEFAULTS, { spin: 'normal', labels: 'text', breathe: true }); saveCfg(); renderAdmin(); toast('Globe réinitialisé'); break;
+    case 'previewGlobe': startPreview(); break;
     case 'newDest': A.draft = emptyLieu(); A.isNew = true; go('dest'); break;
     case 'editDest': A.draft = clone(S.byId[b.dataset.id]); A.isNew = false; go('dest'); break;
     case 'geo': geocode(); break;
@@ -2305,10 +2536,14 @@ async function onAct(b) {
       if (i > -1) { S.lieux.splice(i, 1); saveCatalog(); S.isLocal = true; applyCatalog(); }
       A.sub = null; A.page = 'data'; A.dtab = 'dests'; renderAdmin(true); toast('Destination supprimée'); purgeLocal(); break;
     }
-    case 'addMedia': if (!commitDraft()) return; A.mType = b.dataset.t; A.md = newMedia(A.mType); A.mIdx = -1; A.mSrc = 'file'; A.frames = null; go('media'); break;
+    case 'addMedia': if (!commitDraft()) return; A.mType = b.dataset.t; A.md = newMedia(A.mType); A.mIdx = -1; A.mSrc = 'file'; A.frames = null; A.mBack = 'dest'; go('media'); break;
+    case 'pickDest': go('pick'); break;
+    case 'addProfile': { const l = S.byId[b.dataset.id]; if (!l) break; A.draft = clone(l); A.isNew = false; A.mType = 'video'; A.md = newMedia('video'); A.mIdx = -1; A.mSrc = 'file'; A.frames = null; A.mBack = 'list'; A.page = 'data'; A.dtab = 'profils'; go('media'); break; }
+    case 'editProfile': { const l = S.byId[b.dataset.id]; if (!l) break; A.draft = clone(l); A.isNew = false; A.mType = 'video'; A.mIdx = +b.dataset.i; A.md = clone(A.draft.videos[A.mIdx]); A.mSrc = mediaKind(A.md.url) === 'local' || !A.md.url ? 'file' : 'link'; A.frames = null; A.mBack = 'list'; go('media'); break; }
+    case 'delProfile': { A.draft.videos.splice(A.mIdx, 1); commitDraft(); A.frames = null; A.sub = A.mBack === 'list' ? null : 'dest'; renderAdmin(true); toast('Profil supprimé'); purgeLocal(); break; }
     case 'editMedia': {
       A.mType = b.dataset.t; A.mIdx = +b.dataset.i; A.md = clone((A.mType === 'video' ? A.draft.videos : A.draft.photos)[A.mIdx]); A.frames = null;
-      A.mSrc = mediaKind(A.md.url) === 'local' ? 'file' : 'link'; go('media'); break;
+      A.mSrc = mediaKind(A.md.url) === 'local' || !A.md.url ? 'file' : 'link'; A.mBack = 'dest'; go('media'); break;
     }
     case 'delMedia': { (b.dataset.t === 'video' ? A.draft.videos : A.draft.photos).splice(+b.dataset.i, 1); commitDraft(); renderAdmin(); toast('Média supprimé'); purgeLocal(); break; }
     case 'testLink': testLink(A.md.url); break;
@@ -2353,10 +2588,13 @@ async function onAct(b) {
 function initAdmin() {
   const body = $('#aBody');
   $('#aClose').onclick = closeAdmin;
+  onTap($('#prevBack'), endPreview);
   $('#aBack').onclick = back;
   body.addEventListener('click', e => {
     touchAct();
     const pg = e.target.closest('[data-page]'); if (pg) { gotoPage(pg.dataset.page); return; }
+    const ck = e.target.closest('[data-ck]');
+    if (ck) { CFG[ck.dataset.ck] = ck.dataset.col; CFG.globeTheme = 'perso'; saveCfg(); renderAdmin(); return; }
     const swb = e.target.closest('[data-sw]');
     if (swb) { const k = swb.dataset.sw; CFG[k] = !CFG[k]; saveCfg(); renderAdmin(); return; }
     const ci = e.target.closest('[data-ci]');
@@ -2371,9 +2609,11 @@ function initAdmin() {
       if (k === 'period') { A.period = v; renderAdmin(); return; }
       if (k === 'dtab') { A.dtab = v; renderAdmin(true); return; }
       if (k === 'impMode') { A.imp.mode = v; renderAdmin(); return; }
+      if (k === 'stab') { A.stab = v; renderAdmin(true); return; }
+      if (k === 'globeTheme' && GLOBE_THEMES[v]) { const th = GLOBE_THEMES[v]; Object.assign(CFG, { globeTheme: v, landColor: th.landColor, hiColor: th.hiColor, oceanColor: th.oceanColor, markerColor: th.markerColor }); saveCfg(); renderAdmin(); return; }
       if (k === 'mRatio') { A.md.ratio = v === 'land' ? 1.7778 : v === 'port' ? 0.5625 : 0; renderAdmin(); return; }
       CFG[k] = v; saveCfg(); renderAdmin();
-      if (k === 'labels' && G.ready) requestAnimationFrame(() => G.remeasure());
+      if ((k === 'labels' || k === 'lblSize') && G.ready) requestAnimationFrame(() => G.remeasure());
       return;
     }
     const b = e.target.closest('[data-act]'); if (!b) return;
@@ -2389,11 +2629,24 @@ function initAdmin() {
     else if (A.sub === 'media') { setPath(A.md, f, e.target.value); if (f === 'url') { const k = $('#aKind'); if (k) k.innerHTML = kindPill(normalizeLink(e.target.value)); } }
   });
   body.addEventListener('change', e => {
+    if (e.target.dataset && e.target.dataset.cfgsel) { CFG[e.target.dataset.cfgsel] = e.target.value; saveCfg(); return; }
     if (e.target.dataset && e.target.dataset.file) { onFile(e.target); return; }
     if (A.sub === 'dest' && e.target.dataset && e.target.dataset.f === 'cover.url') { const n = normalizeLink(e.target.value); e.target.value = n; if (n) A.draft.cover = { url: n, credit: '', legende: '' }; if (!A.isNew) commitDraft(); const st = body.scrollTop; renderAdmin(); body.scrollTop = st; return; }
     /* un lien collé est nettoyé dès qu'on quitte le champ (https, Dropbox…) */
     if (A.sub === 'media' && e.target.dataset && e.target.dataset.f === 'url') { const n = normalizeLink(e.target.value); e.target.value = n; A.md.url = n; const k = $('#aKind'); if (k) k.innerHTML = kindPill(n); }
   });
+}
+
+
+/* ---------- aperçu du globe : l'espace équipe se retire, un bouton ramène aux réglages ---------- */
+function startPreview() {
+  A.prev = true; hidePanel($('#admin'));
+  setMode('explore'); touchAct(); closeFiche(true);
+  if (G.ready) { G.applyCfg(); resetView(900); }
+  $('#prevBack').classList.add('on');
+}
+function endPreview() {
+  A.prev = false; $('#prevBack').classList.remove('on'); showPanel($('#admin')); setMode('settings'); touchAct(); renderAdmin();
 }
 
 /* =====================================================================
@@ -2577,7 +2830,7 @@ function colMap(headers, keys) {
 }
 function sheetKind(rows, name) {
   const h = (rows[0] || []).map(nrm), n = nrm(name);
-  if (h.indexOf('lienvideo') > -1 || h.indexOf('prenom') > -1 || /temoignage|video/.test(n)) return 'videos';
+  if (h.indexOf('lienvideo') > -1 || h.indexOf('prenom') > -1 || /temoignage|video|profil/.test(n)) return 'videos';
   if (h.indexOf('lienphoto') > -1 || (h.indexOf('legende') > -1 && h.indexOf('prenom') < 0) || /photo/.test(n)) return 'photos';
   if (h.indexOf('ville') > -1 || h.indexOf('city') > -1) return 'dests';
   return null;
@@ -2621,13 +2874,14 @@ function buildImport(sheets, existing) {
   names.filter(n => kinds[n] === 'videos').forEach(n => {
     const rows = sheets[n], m = colMap(rows[0], ['ville', 'pays', 'titre', 'prenom', 'programme', 'annee', 'citation', 'video', 'poster', 'avatar', 'format', 'duree', 'sejour', 'bio', 'conseil', 'tags']);
     rows.slice(1).forEach((r, i) => {
-      const ville = cell(r, m, 'ville'), link = normalizeLink(cell(r, m, 'video')); if (!ville && !link) return;
-      if (!ville) { warn.push(`Ligne ${i + 2} (témoignages) : ville manquante, ligne ignorée.`); return; }
-      if (!link) { warn.push(`Ligne ${i + 2} (témoignages, ${ville}) : pas de lien vidéo, ligne ignorée.`); return; }
-      if (!/^https?:\/\//i.test(link)) { warn.push(`Ligne ${i + 2} (témoignages, ${ville}) : lien vidéo invalide, ligne ignorée.`); return; }
-      const d = attach(ville, cell(r, m, 'pays'), i + 2, 'témoignages');
-      d.videos.push({ id: uid('v'), titre: cell(r, m, 'titre'), etudiant: { prenom: cell(r, m, 'prenom'), programme: cell(r, m, 'programme'), annee: cell(r, m, 'annee'), sejour: cell(r, m, 'sejour'), bio: cell(r, m, 'bio'), conseil: cell(r, m, 'conseil'), tags: cell(r, m, 'tags') },
-        citation: cell(r, m, 'citation'), url: link, poster: normalizeLink(cell(r, m, 'poster')), avatar: normalizeLink(cell(r, m, 'avatar')),
+      const ville = cell(r, m, 'ville'), link = normalizeLink(cell(r, m, 'video')), prenom = cell(r, m, 'prenom');
+      if (!ville && !link && !prenom) return;
+      if (!ville) { warn.push(`Ligne ${i + 2} (profils) : ville manquante, ligne ignorée.`); return; }
+      if (!link && !prenom) { warn.push(`Ligne ${i + 2} (profils, ${ville}) : ni prénom ni vidéo, ligne ignorée.`); return; }
+      if (link && !/^https?:\/\//i.test(link)) { warn.push(`Ligne ${i + 2} (profils, ${ville}) : lien vidéo invalide, ligne ignorée.`); return; }
+      const d = attach(ville, cell(r, m, 'pays'), i + 2, 'profils');
+      d.videos.push({ id: uid('v'), titre: cell(r, m, 'titre'), etudiant: { prenom, programme: cell(r, m, 'programme'), annee: cell(r, m, 'annee'), sejour: cell(r, m, 'sejour'), bio: cell(r, m, 'bio'), conseil: cell(r, m, 'conseil'), tags: cell(r, m, 'tags') },
+        citation: cell(r, m, 'citation'), url: link || '', poster: normalizeLink(cell(r, m, 'poster')), avatar: normalizeLink(cell(r, m, 'avatar')),
         ratio: ratioOfTxt(cell(r, m, 'format')), duree: parseFloat(cell(r, m, 'duree').replace(',', '.')) || 0 });
       cnt.videos++;
     });
@@ -2926,7 +3180,7 @@ function hideBoot() { const b = $('#boot'); b.classList.add('off'); setTimeout((
 
   bootStep(74, 'Construction du globe…');
   const ok = initGlobe(terre, S.lieux);
-  initUI(); initAdmin(); loadLogo();
+  initUI(); initAdmin(); loadLogo(); G.applyCfg(true);
   if (!ok) { toast('Le rendu 3D n’est pas disponible : choisissez une destination dans la liste', 5000); openList(); }
   setMode('attract');
   checkNews();
