@@ -25,12 +25,6 @@
       ],
       "medias": [
         {
-          "id": "p1",
-          "type": "photo",
-          "url": "photos/montreal-1.jpg",
-          "legende": "Montréal — photo de démonstration 1"
-        },
-        {
           "id": "v1",
           "type": "video",
           "url": "videos/montreal.mp4",
@@ -54,7 +48,12 @@
           "legende": "Ce que j’ai retenu de mon échange",
           "etu": "e2"
         }
-      ]
+      ],
+      "cover": {
+        "url": "photos/montreal-1.jpg",
+        "credit": "",
+        "legende": "Montréal"
+      }
     },
     {
       "id": "sao-paulo",
@@ -75,12 +74,6 @@
       ],
       "medias": [
         {
-          "id": "p1",
-          "type": "photo",
-          "url": "photos/sao-paulo-1.jpg",
-          "legende": "São Paulo — photo de démonstration 1"
-        },
-        {
           "id": "v1",
           "type": "video",
           "url": "videos/sao-paulo.mp4",
@@ -95,7 +88,12 @@
           "url": "photos/sao-paulo-2.jpg",
           "legende": "São Paulo — photo de démonstration 2"
         }
-      ]
+      ],
+      "cover": {
+        "url": "photos/sao-paulo-1.jpg",
+        "credit": "",
+        "legende": "São Paulo"
+      }
     },
     {
       "id": "dublin",
@@ -116,12 +114,6 @@
       ],
       "medias": [
         {
-          "id": "p1",
-          "type": "photo",
-          "url": "photos/dublin-1.jpg",
-          "legende": "Dublin — photo de démonstration 1"
-        },
-        {
           "id": "v1",
           "type": "video",
           "url": "videos/dublin.mp4",
@@ -136,7 +128,12 @@
           "url": "photos/dublin-2.jpg",
           "legende": "Dublin — photo de démonstration 2"
         }
-      ]
+      ],
+      "cover": {
+        "url": "photos/dublin-1.jpg",
+        "credit": "",
+        "legende": "Dublin"
+      }
     },
     {
       "id": "madrid",
@@ -162,12 +159,6 @@
       ],
       "medias": [
         {
-          "id": "p1",
-          "type": "photo",
-          "url": "photos/madrid-1.jpg",
-          "legende": "Madrid — photo de démonstration 1"
-        },
-        {
           "id": "v1",
           "type": "video",
           "url": "videos/madrid.mp4",
@@ -191,7 +182,12 @@
           "legende": "Ce que j’ai retenu de mon échange",
           "etu": "e2"
         }
-      ]
+      ],
+      "cover": {
+        "url": "photos/madrid-1.jpg",
+        "credit": "",
+        "legende": "Madrid"
+      }
     },
     {
       "id": "barcelone",
@@ -212,12 +208,6 @@
       ],
       "medias": [
         {
-          "id": "p1",
-          "type": "photo",
-          "url": "photos/barcelone-1.jpg",
-          "legende": "Barcelone — photo de démonstration 1"
-        },
-        {
           "id": "v1",
           "type": "video",
           "url": "videos/barcelone.mp4",
@@ -232,7 +222,12 @@
           "url": "photos/barcelone-2.jpg",
           "legende": "Barcelone — photo de démonstration 2"
         }
-      ]
+      ],
+      "cover": {
+        "url": "photos/barcelone-1.jpg",
+        "credit": "",
+        "legende": "Barcelone"
+      }
     },
     {
       "id": "le-cap",
@@ -253,12 +248,6 @@
       ],
       "medias": [
         {
-          "id": "p1",
-          "type": "photo",
-          "url": "photos/le-cap-1.jpg",
-          "legende": "Le Cap — photo de démonstration 1"
-        },
-        {
           "id": "v1",
           "type": "video",
           "url": "videos/le-cap.mp4",
@@ -273,7 +262,12 @@
           "url": "photos/le-cap-2.jpg",
           "legende": "Le Cap — photo de démonstration 2"
         }
-      ]
+      ],
+      "cover": {
+        "url": "photos/le-cap-1.jpg",
+        "credit": "",
+        "legende": "Le Cap"
+      }
     },
     {
       "id": "shanghai",
@@ -294,12 +288,6 @@
       ],
       "medias": [
         {
-          "id": "p1",
-          "type": "photo",
-          "url": "photos/shanghai-1.jpg",
-          "legende": "Shanghai — photo de démonstration 1"
-        },
-        {
           "id": "v1",
           "type": "video",
           "url": "videos/shanghai.mp4",
@@ -314,7 +302,12 @@
           "url": "photos/shanghai-2.jpg",
           "legende": "Shanghai — photo de démonstration 2"
         }
-      ]
+      ],
+      "cover": {
+        "url": "photos/shanghai-1.jpg",
+        "credit": "",
+        "legende": "Shanghai"
+      }
     },
     {
       "id": "tokyo",
@@ -340,12 +333,6 @@
       ],
       "medias": [
         {
-          "id": "p1",
-          "type": "photo",
-          "url": "photos/tokyo-1.jpg",
-          "legende": "Tokyo — photo de démonstration 1"
-        },
-        {
           "id": "v1",
           "type": "video",
           "url": "videos/tokyo.mp4",
@@ -369,7 +356,12 @@
           "legende": "Ce que j’ai retenu de mon échange",
           "etu": "e2"
         }
-      ]
+      ],
+      "cover": {
+        "url": "photos/tokyo-1.jpg",
+        "credit": "",
+        "legende": "Tokyo"
+      }
     },
     {
       "id": "sydney",
@@ -390,12 +382,6 @@
       ],
       "medias": [
         {
-          "id": "p1",
-          "type": "photo",
-          "url": "photos/sydney-1.jpg",
-          "legende": "Sydney — photo de démonstration 1"
-        },
-        {
           "id": "v1",
           "type": "video",
           "url": "videos/sydney.mp4",
@@ -410,7 +396,12 @@
           "url": "photos/sydney-2.jpg",
           "legende": "Sydney — photo de démonstration 2"
         }
-      ]
+      ],
+      "cover": {
+        "url": "photos/sydney-1.jpg",
+        "credit": "",
+        "legende": "Sydney"
+      }
     }
   ]
 }
