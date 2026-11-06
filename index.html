@@ -206,7 +206,9 @@ body.vplay #prof{visibility:hidden}
 /* ---------- visionneuse photo ---------- */
 #lb{position:absolute;inset:0;z-index:25;background:rgba(2,8,18,.97);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .25s;touch-action:none}
 #lb.on{opacity:1}
-#lbImg{max-width:100%;max-height:100%;object-fit:contain;display:block}
+#lb{box-sizing:border-box;padding:calc(var(--sat) + 10px) calc(var(--sar) + 10px) calc(var(--sab) + 10px) calc(var(--sal) + 10px)}
+/* la photo occupe tout l'écran disponible avec SES proportions (jamais rognée, jamais déformée) */
+#lbImg{width:100%;height:100%;max-width:none;max-height:none;object-fit:contain;display:block}
 #lb .vclose{position:absolute;left:calc(var(--sal) + 24px);top:calc(var(--sat) + 20px)}
 .lbnav{position:absolute;top:50%;width:64px;height:64px;margin-top:-32px;border-radius:50%;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.28);display:grid;place-items:center}
 .lbnav.prev{left:calc(var(--sal) + 24px)}
@@ -581,7 +583,7 @@ body.upgrading #stage,body.upgrading #labels,body.upgrading #top,body.upgrading 
 #list.pre{transform:translateX(60px) scale(.94)}
 @media (orientation:portrait){#fiche.pre{transform:translateY(80px) scale(.95)}#list.pre{transform:translateY(70px) scale(.96)}}
 /* la carte reprend un reflet flou de SA photo : la photo se fond dans son propre halo */
-#fBack{position:absolute;inset:-8%;z-index:0;background:center/cover no-repeat;filter:blur(30px) saturate(1.6);transform:scale(1.18);opacity:.55;pointer-events:none;
+#fBack{position:absolute;inset:-8%;z-index:0;background:center/cover no-repeat;transform:scale(1.18);opacity:.55;pointer-events:none;
   -webkit-mask-image:linear-gradient(180deg,#000 0%,#000 38%,rgba(0,0,0,.4) 100%);mask-image:linear-gradient(180deg,#000 0%,#000 38%,rgba(0,0,0,.4) 100%)}
 #fiche .fscroll{position:relative;z-index:2}
 /* verre liquide : arêtes lumineuses, reflet en haut à gauche, passage de lumière */
@@ -592,7 +594,7 @@ body.upgrading #stage,body.upgrading #labels,body.upgrading #top,body.upgrading 
   background:radial-gradient(85% 36% at 8% 0%,rgba(255,255,255,.22),rgba(255,255,255,0) 62%),radial-gradient(60% 28% at 100% 100%,rgba(255,255,255,.07),rgba(255,255,255,0) 70%)}
 #fiche .xbtn,#fiche .editbtn{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.28);box-shadow:inset 0 1px 0 rgba(255,255,255,.35);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
 /* arrivée en cascade : la photo se pose, le titre monte, les cartes glissent l'une après l'autre */
-#fiche.rv #fHeroImg{animation:heroSettle 1.9s cubic-bezier(.16,.8,.2,1) .05s both,heroDrift 24s ease-in-out 2s infinite alternate}
+#fiche.rv #fHeroImg{animation:heroSettle 1.9s cubic-bezier(.16,.8,.2,1) .05s both}
 @keyframes heroSettle{from{transform:scale(1.18) translateY(10px)}to{transform:none}}
 @keyframes heroDrift{from{transform:none}to{transform:scale(1.05) translate(-8px,-5px)}}
 #fiche.rv #fVille{animation:liftIn .85s cubic-bezier(.2,.9,.25,1.05) .28s both}
@@ -624,6 +626,35 @@ body.upgrading #stage,body.upgrading #labels,body.upgrading #top,body.upgrading 
 .dline.ko i{background:rgba(255,120,120,.2);color:#ff9a9a}.dline.ko i::before{content:"✕"}
 .dline.wait i{background:rgba(255,255,255,.12)}.dline.wait i::before{content:"…"}
 a.btn{text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
+
+/* ---------- effets allégés (appareils lents, détectés automatiquement ou choisis dans Réglages › Affichage) ---------- */
+html.lite #fiche.glass{-webkit-backdrop-filter:none;backdrop-filter:none;background:radial-gradient(125% 62% at 50% 44%,var(--tg),rgba(0,0,0,0) 72%),linear-gradient(180deg,var(--t1),var(--t2));box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 18px 44px rgba(0,8,24,.5)}
+html.lite #fiche::before,html.lite #fiche::after{display:none}
+html.lite #fBack{display:none}
+html.lite .abtn,html.lite #fiche .xbtn,html.lite #fiche .editbtn{-webkit-backdrop-filter:none;backdrop-filter:none;background:rgba(255,255,255,.18)}
+html.lite #fiche.rv #fHeroImg,html.lite #fiche.rv #fVille,html.lite #fiche.rv #fPays,html.lite #fiche.rv .sl,html.lite #fiche.rv #fDots i{animation:none}
+html.lite #fiche .sl{--p:0!important}
+
+/* ---------- cartes recadrées à la main ---------- */
+.sl img[data-cz]{inset:auto;max-width:none;object-fit:fill}
+/* ---------- éditeur de recadrage d'une carte (Données › ville › Recadrer) ---------- */
+#ccrop{position:absolute;inset:0;z-index:40;background:rgba(3,10,24,.97);display:flex;flex-direction:column;align-items:center;padding:calc(var(--sat) + 14px) 16px calc(var(--sab) + 14px);gap:12px;overflow:auto}
+#ccrop[hidden]{display:none}
+#ccrop .cc-top{width:100%;max-width:640px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px}
+#ccrop .cc-top b{font-family:var(--f-title);font-size:17px;text-align:center}
+#ccrop .cc-top .btn{justify-self:start;padding-left:18px;padding-right:18px}
+#ccrop .cc-top .btn.r{justify-self:end}
+#ccFrame{position:relative;overflow:hidden;border-radius:10px;background:#000;touch-action:none;flex:none;box-shadow:0 0 0 1px rgba(255,255,255,.2)}
+#ccImg{position:absolute;max-width:none;object-fit:fill;pointer-events:none;-webkit-user-drag:none;transform:scale(1.14);transform-origin:50% 50%}
+#ccrop .cc-bar{display:flex;align-items:center;gap:12px;width:100%;max-width:420px}
+#ccrop .cc-bar input{flex:1}
+#ccrop .cc-code{font-family:ui-monospace,Menlo,monospace;font-size:17px;padding:8px 14px;border-radius:10px;background:rgba(255,255,255,.1);user-select:all}
+#ccrop .cc-hint{max-width:520px;text-align:center;font-size:14px;opacity:.78;line-height:1.4}
+.cth{width:54px;height:68px;border-radius:7px;object-fit:cover;flex:none;background:#0b2a4a}
+
+/* la légende de la visionneuse ne recouvre jamais la photo : absente si vide, sinon la photo se place au-dessus */
+#lbCap:empty{display:none}
+#lb.hascap{padding-bottom:calc(var(--sab) + 62px)}
 
 </style>
 </head>
@@ -725,6 +756,13 @@ a.btn{text-decoration:none;display:inline-flex;align-items:center;justify-conten
 
   <div id="dl"></div>
   <div id="toast" role="status"></div>
+  <div id="ccrop" hidden>
+    <div class="cc-top"><button class="btn ghost" id="ccNo">Fermer</button><b id="ccTitle">Recadrer la carte</b><button class="btn primary r" id="ccCopy">Copier le code</button></div>
+    <div id="ccFrame"><img id="ccImg" alt="" draggable="false"></div>
+    <div class="cc-bar"><span>−</span><input type="range" id="ccZ" min="1" max="3" step="0.01" value="1" aria-label="Zoom"><span>+</span><button class="mini" id="ccReset">Centrer</button></div>
+    <div class="cc-code" id="ccCode">50.0;50.0;1.00</div>
+    <div class="cc-hint" id="ccHint">Glissez la photo pour choisir la partie visible, zoomez avec le curseur. Ce que vous voyez est ce qu’affichera la carte.</div>
+  </div>
   <div id="crop" hidden>
     <div class="crop-top"><button class="btn ghost" id="cropNo">Annuler</button><b>Recadrer la photo</b><button class="btn primary" id="cropOk">Valider</button></div>
     <canvas id="cropC"></canvas>
@@ -786,8 +824,21 @@ a.btn{text-decoration:none;display:inline-flex;align-items:center;justify-conten
    APP_VERSION est comparée par le système de mise à jour :
    à chaque livraison elle doit augmenter (build.py s'en charge).
 ===================================================================== */
-const APP_VERSION = "1.7.3";
+const APP_VERSION = "1.7.6";
 const CHANGELOG = [
+  { v: "1.7.6", d: "17 octobre 2026", t: [
+    "Toutes les applications sont synchronisées d’office avec le Google Sheet de l’ISG (plus rien à saisir)",
+    "Cartes du carrousel : la photo remplit toujours le cadre, avec un recadrage au choix (colonne Recadrage du tableau, éditeur visuel dans Données)",
+    "Visionneuse : la photo s’affiche en grand avec ses proportions d’origine, jamais recadrée",
+    "Correction : l’interrupteur « Utiliser le Google Sheet comme source » reflète enfin l’état réel"
+  ]},
+  { v: "1.7.5", d: "17 octobre 2026", t: [
+    "Ouverture des cartes beaucoup plus fluide sur iPad : fond de fiche allégé, globe qui se repose derrière la carte, photos réduites à la bonne taille",
+    "Effets allégés détectés automatiquement sur les appareils lents (Réglages › Affichage › Effets visuels : Auto, Complets ou Allégés)"
+  ]},
+  { v: "1.7.4", d: "17 octobre 2026", t: [
+    "Source Google Sheet : un tableau resté au format Excel (.xlsx) est signalé clairement dans les réglages, avec la marche à suivre pour le convertir en vrai Google Sheet"
+  ]},
   { v: "1.7.3", d: "17 octobre 2026", t: [
     "Source Google Sheet : beaucoup moins de requêtes (une seule vérification légère quand le tableau n’a pas changé)",
     "Erreurs Google expliquées précisément (quota, clé restreinte, réseau lent ou filtré) avec attente progressive entre les essais",
@@ -952,13 +1003,14 @@ const CFG = (() => {
   if (saved.v !== 3 && saved.v !== 4 && saved.v !== 5) { delete saved.labels; }
   saved.v = 5; delete saved.arcs;
   if (saved.spin === undefined) saved.spin = 'normal';
-  return Object.assign({ v: 5, idleSec: 60, spin: 'normal', autoUpdate: true, labels: 'text', breathe: true, hideUi: true, logo: true }, GLOBE_DEFAULTS, saved);
+  return Object.assign({ v: 5, fx: 'auto', idleSec: 60, spin: 'normal', autoUpdate: true, labels: 'text', breathe: true, hideUi: true, logo: true }, GLOBE_DEFAULTS, saved);
 })();
 function saveCfg() { store.set('cfg', CFG); applyCfg(); }
 function applyCfg() {
   const b = document.body;
   b.dataset.labels = CFG.labels; b.dataset.bg = CFG.bg; document.documentElement.dataset.bg = CFG.bg;
   document.documentElement.classList.toggle('dbg', !!CFG.debugFrame);
+  document.documentElement.classList.toggle('lite', typeof Perf !== 'undefined' && Perf.lite());
   b.classList.toggle('hide-ui', !!CFG.hideUi);
   b.classList.toggle('no-logo', !CFG.logo);
   b.style.setProperty('--lblsz', { s: '13px', m: '15px', l: '18px' }[CFG.lblSize] || '15px');
@@ -1020,7 +1072,28 @@ const S = {
 function uid(p) { return (p || 'x') + Math.random().toString(36).slice(2, 7) + Date.now().toString(36).slice(-3); }
 function normMedia(m) {
   return { id: m.id || uid(m.type === 'video' ? 'v' : 'p'), type: m.type === 'video' ? 'video' : 'photo', url: m.url || '', poster: m.poster || '',
-    legende: m.legende || '', credit: m.credit || '', ratio: +m.ratio || 0, duree: +m.duree || 0, sous_titres: m.sous_titres || '', etu: m.etu || '', rev: m.rev || '' };
+    legende: m.legende || '', credit: m.credit || '', ratio: +m.ratio || 0, duree: +m.duree || 0, sous_titres: m.sous_titres || '', etu: m.etu || '', rev: m.rev || '', crop: normCrop(m.crop), row: +m.row || 0 };
+}
+/* recadrage d'une carte : centre de la partie visible (x, y en % de la photo) et zoom z (1 = la carte est juste remplie) */
+function normCrop(c) {
+  if (typeof c === 'string') c = parseCrop(c);
+  if (!c || !isFinite(+c.x) || !isFinite(+c.y)) return null;
+  const x = Math.max(0, Math.min(100, +c.x)), y = Math.max(0, Math.min(100, +c.y)), z = Math.max(1, Math.min(3, +c.z || 1));
+  return (Math.abs(x - 50) < 0.05 && Math.abs(y - 50) < 0.05 && Math.abs(z - 1) < 0.005) ? null : { x: +x.toFixed(1), y: +y.toFixed(1), z: +z.toFixed(2) };
+}
+/* « 52.3;40;1.25 » (virgule décimale ou espaces acceptés) -> { x, y, z } ou null */
+function parseCrop(s) {
+  s = String(s == null ? '' : s).trim(); if (!s) return null;
+  const parts = (s.indexOf(';') > -1 ? s.split(';') : s.split(/[\s/|]+/)).map(t => parseFloat(String(t).replace(',', '.')));
+  if (parts.length < 2 || parts.length > 3 || parts.some(v => !isFinite(v))) return null;
+  return { x: parts[0], y: parts[1], z: parts.length > 2 ? parts[2] : 1 };
+}
+const cropCode = c => `${(+c.x).toFixed(1)};${(+c.y).toFixed(1)};${(+c.z).toFixed(2)}`;
+/* position de la photo dans une carte W x H (en px) pour un recadrage donné : la photo remplit toujours la carte */
+function cropBox(iw, ih, W, H, c) {
+  const z = c ? Math.max(1, +c.z || 1) : 1, x = c ? +c.x : 50, y = c ? +c.y : 50, s = Math.max(W / iw, H / ih) * z, w = iw * s, h = ih * s;
+  const left = Math.max(W - w, Math.min(0, W / 2 - x / 100 * w)), top = Math.max(H - h, Math.min(0, H / 2 - y / 100 * h));
+  return { left, top, width: w, height: h };
 }
 function normEtudiant(e) { return { id: e.id || uid('e'), prenom: String(e.prenom || '').trim(), photo: e.photo || '' }; }
 /* Lit le nouveau format (medias, etudiants) et migre l'ancien (cover, photos, videos avec profil détaillé) */
@@ -1103,12 +1176,12 @@ function normalizeLink(u) {
 /* adresse utilisable dans <img> (photos Drive → miniature publique) */
 /* fichier Drive lu par l'API (source Google Sheet) : identifiant du fichier */
 function driveApiId(u) { const m = /googleapis\.com\/drive\/v3\/files\/([\w-]+)\?alt=media/.exec(String(u || '')); return m ? m[1] : ''; }
-function srcOf(u) {
+function srcOf(u, w) {
   if (mediaKind(u) === 'drive') return `https://drive.google.com/thumbnail?id=${driveId(u)}&sz=w1600`;
   /* photo Drive pas encore copiée sur l'appareil : on affiche la vignette réduite de Google (légère) au lieu de l'original (souvent 5 à 15 Mo) ;
      une fois copiée, l'appareil sert sa propre copie */
   const g = driveApiId(u);
-  if (g && typeof MEDIA !== 'undefined' && !MEDIA.have.has(absUrl(u)) && navigator.onLine) return `https://drive.google.com/thumbnail?id=${g}&sz=w1400`;
+  if (g && typeof MEDIA !== 'undefined' && !MEDIA.have.has(absUrl(u)) && navigator.onLine) return `https://drive.google.com/thumbnail?id=${g}&sz=w${w || 1400}`;
   return u;
 }
 function absUrl(u) { try { return new URL(u, location.href).href; } catch (e) { return u; } }
@@ -1285,6 +1358,7 @@ function initGlobe(terre, lieux) {
 }
 
 function onResize() {
+  S.ficheAt = now();   // le globe se redessine après un changement de taille ou d'orientation
   if (!G.renderer) return;
   const st = $('#stage'); const w = st.clientWidth || innerWidth, h = st.clientHeight || innerHeight;
   if (w < 2 || h < 2) return;   // jamais de taille nulle : cela effacerait le globe
@@ -1520,6 +1594,8 @@ function frame(t) {
   const slow = (S.mode === 'fiche' || S.mode === 'list' || S.mode === 'settings');
   /* panneau ouvert : 30 images/s suffisent (moins de travail pour l'iPad) */
   if (lastT && slow && t - lastT < 30) return;
+  /* fiche ouverte et globe immobile : le verre flou recalcule son fond à chaque image, donc on ne redessine presque plus (10 images/s, ou plus du tout en effets allégés) */
+  if (S.mode === 'fiche' && !G.fly && !G.drag && Math.abs(G.vel.x) < 0.01 && Math.abs(G.vel.y) < 0.01 && now() - (S.ficheAt || 0) > 1800) { if (lastT && t - lastT < (Perf.lite() ? 1e9 : 100)) return; }
   if (!lastT) lastT = t;
   let dt = Math.min(0.05, (t - lastT) / 1000); lastT = t; tNow += dt;
   if (!slow) { ema = ema * 0.96 + dt * 1000 * 0.04; frames++; } else { ema = 16; }
@@ -1626,8 +1702,17 @@ function slideHtml(l, m, i, pi, n) {
     const po = posterOf(m), d = fmtDur(m.duree);
     return `<div class="sl vid" data-t="video" data-id="${esc(m.id)}" style="--i:${i};background-image:${po ? cssUrl(po) : 'none'}"><span class="play">${ICON_PLAY}</span>${d ? `<span class="dur">${esc(d)}</span>` : ''}${byHtml(l, m)}</div>`;
   }
-  return `<div class="sl" data-t="photo" data-pi="${pi}" style="--i:${i}"><img src="${esc(srcOf(m.url))}" alt="${esc(m.legende || '')}" draggable="false" decoding="async">${byHtml(l, m)}</div>`;
+  const cr = m.crop ? ` data-cx="${m.crop.x}" data-cy="${m.crop.y}" data-cz="${m.crop.z}"` : '';
+  return `<div class="sl" data-t="photo" data-pi="${pi}" style="--i:${i}"><img src="${esc(srcOf(m.url))}" alt="${esc(m.legende || '')}" draggable="false" decoding="async"${i > 2 ? ' loading="lazy"' : ''}${cr}>${byHtml(l, m)}</div>`;
 }
+/* recadrage manuel d'une carte : la photo garde ses proportions, remplit toujours la carte, et se place selon le code du tableau */
+function applyCrop(img) {
+  if (!img || !img.dataset || !img.dataset.cz) return;
+  const f = img.parentElement, W = f.offsetWidth, H = f.offsetHeight, iw = img.naturalWidth, ih = img.naturalHeight; if (!W || !H || !iw || !ih) return;
+  const b = cropBox(iw, ih, W, H, { x: +img.dataset.cx, y: +img.dataset.cy, z: +img.dataset.cz }), st = img.style;
+  st.left = b.left.toFixed(1) + 'px'; st.top = b.top.toFixed(1) + 'px'; st.width = b.width.toFixed(1) + 'px'; st.height = b.height.toFixed(1) + 'px';
+}
+function applyCrops() { $$('#fTrack .sl img[data-cz]').forEach(applyCrop); }
 function buildDots() {
   const d = $('#fDots'), n = CAR.n;
   d.innerHTML = n < 2 ? '' : (n > 9 ? `<span id="fCnt">1 / ${n}</span>` : Array.from({ length: n }, (_, k) => `<i class="${k ? '' : 'on'}" style="--i:${k}"></i>`).join(''));
@@ -1643,13 +1728,51 @@ function carSync() {
 function parallax() {
   const t = $('#fTrack'); if (!t || !CAR.n) return;
   const tr = t.getBoundingClientRect(), mid = tr.left + tr.width / 2, st = carStep();
-  $$('#fTrack .sl').forEach(s => { const r = s.getBoundingClientRect(); s.style.setProperty('--p', clamp((r.left + r.width / 2 - mid) / st, -1.6, 1.6).toFixed(3)); });
+  const sl = $$('#fTrack .sl'), pv = sl.map(s => { const r = s.getBoundingClientRect(); return clamp((r.left + r.width / 2 - mid) / st, -1.6, 1.6).toFixed(3); });
+  sl.forEach((s, i) => s.style.setProperty('--p', pv[i]));
 }
 function curSlide() { $$('#fTrack .sl').forEach((e, k) => e.classList.toggle('cur', k === CAR.i)); }
 function carGo(i, smooth) { const t = $('#fTrack'); t.scrollTo({ left: i * carStep(), behavior: smooth ? 'smooth' : 'auto' }); }
 const lbList = l => photosOf(l);   // la photo d'ambiance (en haut) n'est jamais dans la visionneuse
+/* ---------- fluidité : effets allégés sur les appareils lents ----------
+   Pendant l'ouverture d'une fiche, on mesure le temps entre deux images. Si c'est lent deux fois de suite (plus que rapide),
+   l'appareil passe en effets allégés (pas de flou de verre, pas d'animations d'entrée, globe au repos derrière la fiche). */
+const Perf = {
+  lite() { return CFG.fx === 'lite' || (CFG.fx !== 'full' && store.get('perf.lite', 0) === 1); },
+  verdict(dts) {
+    if (!dts || dts.length < 8) return null;
+    const s = dts.slice().sort((a, b) => a - b), med = s[s.length >> 1], p80 = s[Math.floor(s.length * 0.8)];
+    return (med > 36 || p80 > 60) ? 'slow' : 'ok';
+  },
+  decide(dts) {
+    const v = Perf.verdict(dts); if (!v) return v;
+    const n = store.get('perf.n', { slow: 0, ok: 0 }); n[v]++; store.set('perf.n', n);
+    if (n.slow >= 2 && n.slow > n.ok) { store.set('perf.lite', 1); applyCfg(); }
+    return v;
+  },
+  watch() {
+    if (CFG.fx !== 'auto' || store.get('perf.lite', 0) === 1) return;
+    const dts = []; let last = 0; const t0 = performance.now();
+    const step = t => { if (document.hidden) return; if (last) dts.push(t - last); last = t; if (t - t0 < 1500 && dts.length < 70) requestAnimationFrame(step); else Perf.decide(dts); };
+    requestAnimationFrame(step);
+  }
+};
 /* ---------- couleurs de la photo d'ambiance → teinte discrète de la fiche ---------- */
 const PAL = {}, Tint = { tok: 0 };
+/* copie minuscule (40 px) de la photo, floutée et un peu plus saturée : agrandie derrière la fiche, elle remplace un flou CSS de 30 px */
+function softBg(im) {
+  try {
+    const W = 40, H = 40, cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+    const x = cv.getContext('2d'); x.drawImage(im, 0, 0, W, H);
+    const img = x.getImageData(0, 0, W, H), d = img.data, tmp = new Uint8ClampedArray(d.length);
+    for (let pass = 0; pass < 2; pass++) {
+      for (let y = 0; y < H; y++) for (let xx = 0; xx < W; xx++) for (let ch = 0; ch < 3; ch++) { let s = 0, n = 0; for (let k = -2; k <= 2; k++) { const nx = xx + k; if (nx >= 0 && nx < W) { s += d[(y * W + nx) * 4 + ch]; n++; } } tmp[(y * W + xx) * 4 + ch] = s / n; }
+      for (let y = 0; y < H; y++) for (let xx = 0; xx < W; xx++) for (let ch = 0; ch < 3; ch++) { let s = 0, n = 0; for (let k = -2; k <= 2; k++) { const ny = y + k; if (ny >= 0 && ny < H) { s += tmp[(ny * W + xx) * 4 + ch]; n++; } } d[(y * W + xx) * 4 + ch] = s / n; }
+    }
+    for (let k = 0; k < d.length; k += 4) { const m = (d[k] + d[k + 1] + d[k + 2]) / 3; d[k] = Math.max(0, Math.min(255, m + (d[k] - m) * 1.6)); d[k + 1] = Math.max(0, Math.min(255, m + (d[k + 1] - m) * 1.6)); d[k + 2] = Math.max(0, Math.min(255, m + (d[k + 2] - m) * 1.6)); d[k + 3] = 255; }
+    x.putImageData(img, 0, 0); return cv.toDataURL('image/jpeg', 0.8);
+  } catch (e) { return ''; }
+}
 function palette(url) {
   if (PAL[url] !== undefined) return Promise.resolve(PAL[url]);
   return new Promise(res => {
@@ -1665,7 +1788,7 @@ function palette(url) {
           const w = (0.12 + sat * sat * 1.6) * ((lum < 16 || lum > 242) ? 0.15 : 1);
           sr += r * w; sg += g * w; sb += b * w; sw += w; if (y >= H * 0.55) { br += r; bg += g; bb += b; bw++; }
         }
-        out = { dom: [sr / sw, sg / sw, sb / sw].map(Math.round), bot: [br / bw, bg / bw, bb / bw].map(Math.round) };
+        out = { dom: [sr / sw, sg / sw, sb / sw].map(Math.round), bot: [br / bw, bg / bw, bb / bw].map(Math.round), bg: softBg(im) };
       } catch (e) { out = null; }   // image d'un autre site sans autorisation : on garde les couleurs d'origine
       PAL[url] = out; res(out);
     };
@@ -1678,6 +1801,7 @@ async function tintFiche(l) {
   const clear = () => keys.forEach(k => f.style.removeProperty(k));
   if (!url) { clear(); return; }
   const p = await palette(url); if (tok !== Tint.tok) return;
+  { const fb = $('#fBack'); fb.style.backgroundImage = p && p.bg ? cssUrl(p.bg) : 'none'; }
   if (!p) { clear(); return; }
   const mix = (c, b, t) => c.map((v, i) => Math.max(0, Math.min(255, Math.round(b[i] + (v - b[i]) * t))));
   const c1 = mix(p.bot, [14, 38, 68], 0.34), c2 = mix(p.dom, [8, 26, 50], 0.27), cb = mix(p.dom, [255, 255, 255], 0.55);
@@ -1687,22 +1811,23 @@ async function tintFiche(l) {
 function fillFiche(l) {
   $('#fVille').textContent = l.ville;
   $('#fPays').textContent = [l.pays, l.etablissement].filter(Boolean).join(' · ');
-  const hc = coverOf(l); $('#fHeroImg').style.backgroundImage = hc ? cssUrl(hc) : 'none'; $('#fBack').style.backgroundImage = hc ? cssUrl(hc) : 'none';
+  const hc = coverOf(l); $('#fHeroImg').style.backgroundImage = hc ? cssUrl(hc) : 'none'; $('#fBack').style.backgroundImage = 'none';
   { const f = $('#fiche'); f.classList.remove('rv'); void f.offsetWidth; f.classList.add('rv'); }
   const ms = medias(l); let pi = 0;
   $('#fCar').hidden = !ms.length;
   $('#fTrack').innerHTML = ms.map((m, i) => slideHtml(l, m, i, m.type === 'photo' ? pi++ : 0, ms.length)).join('');
   $('#fTrack').scrollLeft = 0; CAR.n = ms.length; CAR.i = 0; buildDots(); curSlide();
-  tintFiche(l); requestAnimationFrame(parallax);
+  tintFiche(l); requestAnimationFrame(parallax); requestAnimationFrame(applyCrops);
 }
 function openFiche(id) {
   const l = S.byId[id]; if (!l) return;
-  const f = $('#fiche'); S.current = l;
+  const f = $('#fiche'); S.current = l; S.ficheAt = now();
   fillFiche(l); $('#fScroll').scrollTop = 0; Stats.open(l.id);
   if (!$('#list').hidden) hidePanel($('#list'));
   showPanel(f); setMode('fiche');
   const m = G.markers.find(k => k.lieu === l); selectMarker(m);
   if (G.ready) { const fo = panelFocus(f); flyToLieu(l, { zoom: fo.zoom, sx: fo.sx, sy: fo.sy }); }
+  Perf.watch();
 }
 function closeFiche(keepView) {
   closeLightbox(true);
@@ -1835,10 +1960,11 @@ function lbShow(dir) {
   const p = LB.list[LB.i]; if (!p) return;
   const im = $('#lbImg');
   if (dir) { im.style.transition = 'none'; im.style.transform = `translateX(${dir * 70}px) scale(.96)`; im.style.opacity = '.15'; void im.offsetWidth; im.style.transition = ''; im.style.transform = ''; im.style.opacity = ''; }
-  im.src = srcOf(p.url);
+  im.src = srcOf(p.url, 2000);
   const cap = p.legende || '';
   $('#lbCap').textContent = cap + (LB.list.length > 1 ? `${cap ? '  ·  ' : ''}${LB.i + 1} / ${LB.list.length}` : '');
   $('#lbPrev').hidden = $('#lbNext').hidden = LB.list.length < 2;
+  $('#lb').classList.toggle('hascap', !!$('#lbCap').textContent.trim());   // légende présente : la photo se place au-dessus d'elle, jamais dessous
 }
 function openLightbox(i) {
   const l = S.current, ph = l ? lbList(l) : []; if (!ph.length) return;
@@ -1941,6 +2067,8 @@ function initUI() {
     const s = e.target.closest('.sl'); if (!s || s.classList.contains('empty')) return; touchAct();
     if (s.dataset.t === 'video') openVideo(s.dataset.id); else openLightbox(+s.dataset.pi);
   });
+  $('#fTrack').addEventListener('load', e => { if (e.target && e.target.tagName === 'IMG') applyCrop(e.target); }, true);
+  addEventListener('resize', () => requestAnimationFrame(applyCrops)); addEventListener('orientationchange', () => setTimeout(applyCrops, 300));
   $('#fTrack').addEventListener('scroll', () => { touchAct(); if (!CAR.raf) CAR.raf = requestAnimationFrame(carSync); }, { passive: true });
   onTap($('#btnList'), () => { touchAct(); S.mode === 'list' ? closeList() : openList(); });
   onTap($('#lClose'), () => closeList());
@@ -2126,7 +2254,7 @@ const SWATCH = {
 };
 function swatches(key) { return `<div class="swatches">${SWATCH[key].map(c => `<button class="swt ${String(CFG[key]).toLowerCase() === c ? 'on' : ''}" data-ck="${key}" data-col="${c}" style="background:${c}" aria-label="${c}"></button>`).join('')}</div>`; }
 const grow = (t, s, ctrl) => `<div class="grow col"><div class="t">${t}</div>${s ? `<div class="s">${s}</div>` : ''}${ctrl}</div>`;
-const srow = (t, s, key) => `<div class="grow"><div class="m"><div class="t">${t}</div>${s ? `<div class="s">${s}</div>` : ''}</div><div class="r">${sw(key, CFG[key])}</div></div>`;
+const srow = (t, s, key) => `<div class="grow"><div class="m"><div class="t">${t}</div>${s ? `<div class="s">${s}</div>` : ''}</div><div class="r">${sw(key, key === 'srcOn' ? SRC.on : CFG[key])}</div></div>`;
 /* Réglages « comme sur iPadOS » : une liste de rubriques (icône, titre, résumé, chevron) ; chaque rubrique s'ouvre à son tour */
 const SET_SECTIONS = {
   maj: { t: 'Mise à jour', c: '#0a84ff', i: '<path d="M20 12a8 8 0 1 1-2.6-5.9"/><path d="M20 4v5h-5"/>', sum: () => `v${APP_VERSION}${UPD.state === 'available' ? ' · mise à jour disponible' : ''}`, v: () => sMaj() },
@@ -2134,7 +2262,7 @@ const SET_SECTIONS = {
   source: { t: 'Source des données', c: '#ff9f0a', i: '<path d="M7 18a4 4 0 0 1-.6-7.96A5.5 5.5 0 0 1 17.2 8.6 4.5 4.5 0 0 1 17.5 18z"/>', sum: () => SRC.on ? ('Google Sheet · ' + srcAgo()) : 'Désactivée (données de cet appareil)', v: () => sSource() },
   interface: { t: 'Interface', c: '#5e5ce6', i: '<path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/>', sum: () => `Logo, boutons ${CFG.hideUi ? 'invisibles' : 'visibles'}, inactivité`, v: () => sInterface() },
   globe: { t: 'Globe', c: '#32ade6', i: '<circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c3 3.2 3 13.8 0 17M12 3.5c-3 3.2-3 13.8 0 17"/>', sum: () => `${(GLOBE_THEMES[CFG.globeTheme] || { label: 'Personnalisé' }).label} · fond ${{ bleu: 'bleu', nuit: 'nuit', sombre: 'très sombre', noir: 'noir' }[CFG.bg] || ''}`, v: () => sGlobe() },
-  affichage: { t: 'Affichage', c: '#30d158', i: '<rect x="3" y="5" width="18" height="12" rx="2"/><path d="M8 21h8M12 17v4"/>', sum: () => 'Diagnostic de l’écran', v: () => sAffichage() }
+  affichage: { t: 'Affichage', c: '#30d158', i: '<rect x="3" y="5" width="18" height="12" rx="2"/><path d="M8 21h8M12 17v4"/>', sum: () => 'Effets visuels : ' + ({ auto: 'automatique', full: 'complets', lite: 'allégés' }[CFG.fx] || 'automatique'), v: () => sAffichage() }
 };
 function secRow(k) {
   const s = SET_SECTIONS[k];
@@ -2166,7 +2294,13 @@ function sSecu() {
     </div>`;
 }
 function sAffichage() {
+  const auto = CFG.fx === 'auto', on = Perf.lite();
   return `
+    <div class="gl">FLUIDITÉ</div>
+    <div class="group">
+      ${grow('Effets visuels', auto ? (on ? 'Automatique : cet appareil est lent, les effets sont allégés.' : 'Automatique : effets complets (ils s’allègent seuls si l’appareil est lent).') : (on ? 'Allégés : pas de flou de verre, pas d’animations d’entrée.' : 'Complets : verre flou et animations.'), seg('fx', [['auto', 'Auto'], ['full', 'Complets'], ['lite', 'Allégés']], CFG.fx))}
+    </div>
+    <div class="gl">DIAGNOSTIC</div>
     <div class="group">
       ${srow('Contour de l’écran', 'Fond rose et contour vert : si une bande rose apparaît en bas, elle n’est pas couverte par l’application.', 'debugFrame')}
       <div class="grow"><div class="m"><div class="t">Zone d’affichage</div><div class="s" id="sDiag">${esc(diagText())}</div></div></div>
@@ -2298,9 +2432,9 @@ function vData() {
 function dData() {
   const arr = S.lieux.slice().sort((x, y) => x.ville.localeCompare(y.ville, 'fr'));
   if (SRC.on) {
-    return `<div class="note good mt"><b>Données gérées par le Google Sheet</b><br>Pour ajouter ou modifier une destination, une photo ou une vidéo, modifiez le tableau : les écrans se mettent à jour seuls (${esc(srcAgo())}).</div>
+    return `<div class="note good mt"><b>Données gérées par le Google Sheet</b><br>Pour ajouter ou modifier une destination, une photo ou une vidéo, modifiez le tableau : les écrans se mettent à jour seuls (${esc(srcAgo())}). Touchez une ville pour recadrer ses photos.</div>
       <div class="btnrow">${sheetUrl() ? `<a class="btn primary" href="${esc(sheetUrl())}" target="_blank" rel="noopener">Ouvrir le tableau</a>` : ''}<button class="btn ghost" data-act="srcSync">Synchroniser maintenant</button></div>
-      <div class="group mt">${arr.map(l => { const np = photosOf(l).length + (l.cover && l.cover.url ? 1 : 0), nv = videosOf(l).length, ne = (l.etudiants || []).length; return `<div class="grow"><div class="m"><div class="t cn">${esc(l.ville)}</div><div class="s">${esc(l.pays)} · ${np} photo${np > 1 ? 's' : ''} · ${nv} vidéo${nv > 1 ? 's' : ''} · ${ne} étudiant${ne > 1 ? 's' : ''}</div></div></div>`; }).join('') || '<div class="grow"><div class="m"><div class="t">Aucune destination</div></div></div>'}</div>`;
+      <div class="group mt">${arr.map(l => { const np = photosOf(l).length + (l.cover && l.cover.url ? 1 : 0), nv = videosOf(l).length, ne = (l.etudiants || []).length; return `<button class="grow" data-act="srcCity" data-id="${esc(l.id)}"><div class="m"><div class="t cn">${esc(l.ville)}</div><div class="s">${esc(l.pays)} · ${np} photo${np > 1 ? 's' : ''} · ${nv} vidéo${nv > 1 ? 's' : ''} · ${ne} étudiant${ne > 1 ? 's' : ''}</div></div>${CHEV}</button>`; }).join('') || '<div class="grow"><div class="m"><div class="t">Aucune destination</div></div></div>'}</div>`;
   }
   const nocov = S.lieux.filter(l => !(l.cover && l.cover.url)).length;
   return `<div class="dhead"><h3>Destinations</h3><div class="btnrow" style="margin:0"><button class="btn primary" data-act="newDest">+ Ajouter une destination</button>${nocov ? `<button class="btn ghost" data-act="autoCovers">Photos automatiques (${nocov})</button>` : ''}</div></div><div id="aAutoMsg"></div>
@@ -2591,11 +2725,11 @@ function vEtu() {
 
 /* ====================== RENDU ====================== */
 const PAGE_VIEWS = { hub: vHub, settings: vSettings, stats: vStats, data: vData };
-const SUB_VIEWS = { dest: vDest, media: vMedia, etu: vEtu, code: vCode };
+const SUB_VIEWS = { dest: vDest, media: vMedia, etu: vEtu, code: vCode, scity: vSCity };
 function renderAdmin(top) {
   const body = $('#aBody'), st = body.scrollTop;
   let title = PAGE_TITLE[A.page], prev = 'Espace équipe';
-  if (A.sub) { title = { dest: 'Destination', media: A.md && A.md.type === 'video' ? 'Vidéo' : 'Photo', etu: 'Étudiant', code: 'Code d’accès' }[A.sub]; prev = (A.sub === 'media' || A.sub === 'etu') ? 'Destination' : (A.sub === 'dest' ? 'Destinations' : PAGE_TITLE[A.page]); }
+  if (A.sub) { title = { dest: 'Destination', media: A.md && A.md.type === 'video' ? 'Vidéo' : 'Photo', etu: 'Étudiant', code: 'Code d’accès', scity: (S.byId[A.cid] && S.byId[A.cid].ville) || 'Photos' }[A.sub]; prev = (A.sub === 'media' || A.sub === 'etu') ? 'Destination' : (A.sub === 'dest' ? 'Destinations' : PAGE_TITLE[A.page]); }
   if (!A.sub && A.page === 'settings' && SET_SECTIONS[A.stab]) { title = SET_SECTIONS[A.stab].t; prev = 'Espace équipe'; }
   if (A.sub === 'code') prev = 'Sécurité';
   $('#admin').dataset.space = A.page;
@@ -2860,6 +2994,8 @@ async function onAct(b) {
     case 'reload': location.reload(); break;
     case 'lock': S.unlockUntil = 0; closeAdmin(); break;
     case 'resetCat': store.del('cat'); location.reload(); break;
+    case 'srcCity': A.cid = b.dataset.id; A.sub = 'scity'; renderAdmin(true); break;
+    case 'srcCrop': openCardCrop(b.dataset.mid); break;
     case 'srcSync': { const st = await Sync.run({ manual: true, force: true }); refreshSourceUi(); if (st) toast(st.ok ? st.msg : 'Échec : ' + st.msg, 4200); if ($('#aBody') && A.page === 'data') renderAdmin(); break; }
     case 'srcTest': { A.srcRep = [{ ok: null, t: 'Test en cours…' }]; refreshSourceUi(); const lines = []; await Sync.test(l => { lines.push(l); A.srcRep = lines.concat([{ ok: null, t: 'Vérification…' }]); refreshSourceUi(); }); A.srcRep = lines; refreshSourceUi(); break; }
     case 'globeReset': Object.assign(CFG, GLOBE_DEFAULTS, { spin: 'normal', labels: 'text', breathe: true }); saveCfg(); renderAdmin(); toast('Globe réinitialisé'); break;
@@ -3005,6 +3141,7 @@ function refreshSourceUi() {
 function sSource() {
   return `
     <div class="lsub" style="margin:6px 4px 0">Les écrans lisent un Google Sheet où l’équipe colle des liens Google Drive. Chaque écran se met à jour tout seul et garde son contenu hors-ligne.</div>
+    ${store.get('sync.office', false) ? '<div class="note bad mt"><b>Votre tableau est un fichier Excel (.xlsx)</b><br>Il est lu, mais c’est le maillon fragile. Pour un fonctionnement fiable : dans Google Sheets, <b>Fichier › Enregistrer en tant que feuille de calcul Google Sheets</b>, puis collez ici l’adresse de la nouvelle feuille.</div>' : ''}
     ${SRC.fromFile ? '<div class="note good mt">Cet appareil suit la <b>configuration centrale</b> (fichier data/source.json) : le lien et la clé viennent du site.</div>' : ''}
     <div class="group mt">
       ${srow('Utiliser le Google Sheet comme source', 'Activé : le tableau remplace les destinations de cet appareil (elles ne sont plus modifiables ici).', 'srcOn')}
@@ -3015,6 +3152,63 @@ function sSource() {
     <div class="btnrow"><button class="btn primary" id="srcSyncBtn" data-act="srcSync">Synchroniser maintenant</button><button class="btn ghost" data-act="srcTest">Tester la connexion</button>${sheetUrl() ? `<a class="btn ghost" href="${esc(sheetUrl())}" target="_blank" rel="noopener">Ouvrir le tableau</a>` : ''}</div>
     <div id="srcStatus" class="mt">${srcStatusHtml()}</div>
     <div id="srcReport" class="mt">${srcReportHtml()}</div>`;
+}
+
+
+/* ---------- Données (source Google Sheet) › ville : recadrer les cartes photo ---------- */
+function vSCity() {
+  const l = S.byId[A.cid]; if (!l) return '<div class="note bad mt">Destination introuvable : elle a peut-être disparu du tableau.</div>';
+  const ph = photosOf(l);
+  return `<div class="note good mt">La carte remplit toujours le cadre. Pour choisir la partie visible, touchez <b>Recadrer</b>, puis collez le code obtenu dans la colonne <b>Recadrage</b> de l’onglet Médias (ligne indiquée) : tous les écrans le reprennent à la prochaine synchronisation.</div>
+    <div class="group mt">${ph.map(m => `<div class="grow"><img class="cth" src="${esc(srcOf(m.url, 400))}" alt=""><div class="m"><div class="t">${esc(m.legende || 'Photo')}</div><div class="s">${m.row ? 'Onglet Médias, ligne ' + m.row + ' · ' : ''}${m.crop ? 'Recadrage : ' + esc(cropCode(m.crop)) : 'Centrée (automatique)'}</div></div><button class="mini" data-act="srcCrop" data-mid="${esc(m.id)}">Recadrer</button></div>`).join('') || '<div class="grow"><div class="m"><div class="t">Aucune photo dans cette ville</div></div></div>'}</div>`;
+}
+const CC = {
+  m: null, x: 50, y: 50, z: 1, W: 0, H: 0, ptrs: new Map(), pd: 0, wired: false,
+  open(m) {
+    this.m = m; const c = m.crop; this.x = c ? c.x : 50; this.y = c ? c.y : 50; this.z = c ? c.z : 1; this.ptrs.clear();
+    const H = Math.round(Math.min(innerHeight * 0.52, 520)); this.H = H; this.W = Math.round(H * 0.8);
+    const fr = $('#ccFrame'); fr.style.width = this.W + 'px'; fr.style.height = this.H + 'px';
+    const im = $('#ccImg'); im.onload = () => this.draw(); im.src = srcOf(m.url, 1400); if (im.complete && im.naturalWidth) this.draw();
+    $('#ccZ').value = this.z; $('#ccTitle').textContent = (m.legende || 'Recadrer la carte');
+    $('#ccHint').textContent = (m.row ? `Collez le code dans la colonne Recadrage, onglet Médias, ligne ${m.row}. ` : 'Collez le code dans la colonne Recadrage de l’onglet Médias. ') + 'Ce que vous voyez est ce qu’affichera la carte.';
+    $('#ccrop').hidden = false; this.wire(); this.draw();
+  },
+  box() { const im = $('#ccImg'); return im.naturalWidth ? cropBox(im.naturalWidth, im.naturalHeight, this.W, this.H, { x: this.x, y: this.y, z: this.z }) : null; },
+  limits(b) { const w = b ? b.width : this.W, h = b ? b.height : this.H; return { xl: this.W / 2 / w * 100, yl: this.H / 2 / h * 100 }; },
+  norm() { const b = this.box(); if (!b) return null; const { xl, yl } = this.limits(b); this.x = Math.max(xl, Math.min(100 - xl, this.x)); this.y = Math.max(yl, Math.min(100 - yl, this.y)); return this.box(); },
+  draw() {
+    const b = this.norm(), im = $('#ccImg'); if (!b) return;
+    im.style.left = b.left.toFixed(1) + 'px'; im.style.top = b.top.toFixed(1) + 'px'; im.style.width = b.width.toFixed(1) + 'px'; im.style.height = b.height.toFixed(1) + 'px';
+    $('#ccCode').textContent = this.code(); $('#ccZ').value = this.z;
+  },
+  code() { return cropCode({ x: this.x, y: this.y, z: this.z }); },
+  pan(dx, dy) { const b = this.box(); if (!b) return; this.x -= dx / 1.14 / b.width * 100; this.y -= dy / 1.14 / b.height * 100; this.draw(); },
+  zoom(z) { this.z = Math.max(1, Math.min(3, z)); this.draw(); },
+  wire() {
+    if (this.wired) return; this.wired = true; const fr = $('#ccFrame'), self = this;
+    fr.addEventListener('pointerdown', e => { fr.setPointerCapture(e.pointerId); self.ptrs.set(e.pointerId, [e.clientX, e.clientY]); self.pd = 0; });
+    fr.addEventListener('pointermove', e => {
+      if (!self.ptrs.has(e.pointerId)) return; const p = self.ptrs.get(e.pointerId);
+      if (self.ptrs.size === 1) { self.ptrs.set(e.pointerId, [e.clientX, e.clientY]); self.pan(e.clientX - p[0], e.clientY - p[1]); }
+      else { self.ptrs.set(e.pointerId, [e.clientX, e.clientY]); const [a, b2] = [...self.ptrs.values()], d = Math.hypot(a[0] - b2[0], a[1] - b2[1]); if (self.pd) self.zoom(self.z * d / self.pd); self.pd = d; }
+    });
+    const up = e => { self.ptrs.delete(e.pointerId); self.pd = 0; }; fr.addEventListener('pointerup', up); fr.addEventListener('pointercancel', up);
+    fr.addEventListener('wheel', e => { e.preventDefault(); self.zoom(self.z * Math.exp(-e.deltaY * 0.002)); }, { passive: false });
+    $('#ccZ').addEventListener('input', e => self.zoom(+e.target.value));
+    $('#ccReset').onclick = () => { self.x = 50; self.y = 50; self.z = 1; self.draw(); };
+    $('#ccNo').onclick = () => self.close();
+    $('#ccCopy').onclick = () => self.copy();
+  },
+  async copy() {
+    const t = this.code();
+    try { await navigator.clipboard.writeText(t); toast('Code copié : ' + t, 3200); }
+    catch (e) { const ta = document.createElement('textarea'); ta.value = t; ta.style.cssText = 'position:fixed;opacity:0'; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); toast('Code copié : ' + t, 3200); } catch (er) { toast('Copiez le code affiché : ' + t, 4200); } ta.remove(); }
+  },
+  close() { $('#ccrop').hidden = true; this.ptrs.clear(); this.m = null; }
+};
+function openCardCrop(mid) {
+  const l = S.byId[A.cid], m = l && (l.medias || []).find(x => x.id === mid && x.type === 'photo'); if (!m) { toast('Photo introuvable'); return; }
+  CC.open(m);
 }
 
 /* =====================================================================
@@ -3466,12 +3660,12 @@ async function registerSW() {
 const MEDIA_FAIL_KEY = 'mfail';
 function mediaItems() {
   const out = [], seen = new Set();
-  const add = (u, vid) => {
+  const add = (u, vid, max) => {
     if (!u || mediaKind(u) !== 'direct') return;
     const a = absUrl(u); if (seen.has(a)) return; seen.add(a);
-    out.push({ url: u, abs: a, same: new URL(a).origin === location.origin, vid: !!vid });
+    out.push({ url: u, abs: a, same: new URL(a).origin === location.origin, vid: !!vid, max: max || 0 });
   };
-  S.lieux.forEach(l => { if (l.cover) add(l.cover.url); (l.medias || []).forEach(m => { if (m.type === 'photo') add(m.url); else { add(m.poster); add(m.sous_titres); } }); (l.etudiants || []).forEach(e => add(e.photo)); });
+  S.lieux.forEach(l => { if (l.cover) add(l.cover.url, false, 1600); (l.medias || []).forEach(m => { if (m.type === 'photo') add(m.url, false, 1400); else { add(m.poster, false, 900); add(m.sous_titres); } }); (l.etudiants || []).forEach(e => add(e.photo, false, 480)); });
   S.lieux.forEach(l => (l.medias || []).forEach(m => { if (m.type === 'video') add(m.url, true); }));
   return out;
 }
@@ -3502,17 +3696,27 @@ async function mediaScan() {
   refreshSettingsUpd();
 }
 /* photo trop lourde (iPhone : 4000 px, 5 à 15 Mo) : copie réduite (2000 px, JPEG) stockée sur l'appareil, bien plus rapide à décoder et à afficher */
-async function shrinkImage(blob) {
+async function shrinkImage(blob, max) {
   try {
-    const t = blob.type || '';
-    if (!/^image\/(jpeg|webp|png)$/.test(t) || blob.size < (t === 'image/png' ? 2500 : 700) * 1024 || typeof createImageBitmap !== 'function') return blob;
-    const bm = await createImageBitmap(blob), k = Math.min(1, 2000 / Math.max(bm.width, bm.height));
-    if (k >= 1 && blob.size < 1500 * 1024) { if (bm.close) bm.close(); return blob; }
+    const t = blob.type || ''; max = max || 2000;
+    if (!/^image\/(jpeg|webp|png)$/.test(t) || typeof createImageBitmap !== 'function') return blob;
+    const bm = await createImageBitmap(blob), k = Math.min(1, max / Math.max(bm.width, bm.height));
+    if (k >= 1 && blob.size < (t === 'image/png' ? 2500 : 1500) * 1024) { if (bm.close) bm.close(); return blob; }
     const c = document.createElement('canvas'); c.width = Math.max(2, Math.round(bm.width * k)); c.height = Math.max(2, Math.round(bm.height * k));
     c.getContext('2d').drawImage(bm, 0, 0, c.width, c.height); if (bm.close) bm.close();
     const out = await new Promise(res => c.toBlob(res, 'image/jpeg', 0.86));
     return out && out.size && out.size < blob.size ? out : blob;
   } catch (e) { return blob; }
+}
+/* copies déjà stockées (versions précédentes : 2000 px) : on les ramène à la taille utile, sans réseau, en arrière-plan */
+async function reshrink(c, it, shr) {
+  try {
+    const r = await c.match(it.abs); if (!r) return;
+    const blob = await r.blob(), out = await shrinkImage(blob, it.max);
+    if (out !== blob) await c.put(it.abs, new Response(out, { headers: { 'Content-Type': out.type || 'image/jpeg', 'Content-Length': String(out.size) } }));
+    shr[it.abs] = it.max; store.set('media.shr', shr);
+  } catch (e) { }
+  await new Promise(r => setTimeout(r, 60));
 }
 async function downloadMedia(force) {
   if (!window.caches) return;
@@ -3534,9 +3738,13 @@ async function downloadMedia(force) {
     MEDIA.fail = items.filter(i => fails.has(i.abs)).length;
     refreshSettingsUpd();
     const bar = $('#dl'); let shown = false;
-    const failT = store.get('media.failT', {}), retryNow = MEDIA.retryNow; MEDIA.retryNow = false;
+    const failT = store.get('media.failT', {}), shr = store.get('media.shr', {}), retryNow = MEDIA.retryNow; MEDIA.retryNow = false;
     for (const it of items) {
-      if (await hasItem(c, it)) { MEDIA.have.add(it.abs); continue; }
+      if (await hasItem(c, it)) {
+        MEDIA.have.add(it.abs);
+        if (!it.same && !it.vid && it.max && shr[it.abs] !== it.max && (S.mode === 'attract' || S.mode === 'explore')) await reshrink(c, it, shr);
+        continue;
+      }
       if (S.mode === 'video' || !navigator.onLine) break;
       /* un fichier qui vient d'échouer n'est pas retéléchargé en boucle : nouvel essai après 30 min (ou tout de suite sur « Synchroniser ») */
       if (!it.same && !retryNow && failT[it.abs] && Date.now() - failT[it.abs] < 30 * 60000) continue;
@@ -3547,7 +3755,7 @@ async function downloadMedia(force) {
         if (r.ok && r.status === 200) {
           if (it.vid) await FS.put(it.abs, await r.blob());
           else if (it.same) await c.put(it.abs, r);
-          else { const b = await shrinkImage(await r.blob()); await c.put(it.abs, new Response(b, { headers: { 'Content-Type': b.type || 'image/jpeg', 'Content-Length': String(b.size) } })); }
+          else { const b = await shrinkImage(await r.blob(), it.max); shr[it.abs] = it.max; await c.put(it.abs, new Response(b, { headers: { 'Content-Type': b.type || 'image/jpeg', 'Content-Length': String(b.size) } })); }
           done++; MEDIA.done = done; fails.delete(it.abs); delete failT[it.abs]; MEDIA.have.add(it.abs);
         } else if (!it.same) { fails.add(it.abs); failT[it.abs] = Date.now(); }
       } catch (e) { if (it.same) { clearTimeout(to); break; } fails.add(it.abs); failT[it.abs] = Date.now(); }
@@ -3556,7 +3764,7 @@ async function downloadMedia(force) {
       bar.style.width = (MEDIA.total ? MEDIA.done / MEDIA.total * 100 : 0) + '%';
       refreshSettingsUpd();
     }
-    store.set('media.failT', failT);
+    store.set('media.failT', failT); store.set('media.shr', shr);
     store.set(MEDIA_FAIL_KEY, Array.from(fails));
     /* supprime ce qui n'est plus utilisé par le catalogue (hors fichiers de l'iPad : voir purgeLocal) */
     const keep = new Set(items.map(i => i.abs));
@@ -3565,7 +3773,9 @@ async function downloadMedia(force) {
     setTimeout(() => { bar.style.opacity = 0; setTimeout(() => { bar.style.width = '0'; }, 500); }, 600);
   } catch (e) { }
   MEDIA.running = false; refreshSettingsUpd();
-  if (MEDIA.again) { MEDIA.again = false; setTimeout(() => downloadMedia(false), 400); }
+  /* une demande est arrivée pendant ce téléchargement : on rejoue (le drapeau reste levé jusqu'au redémarrage, pour que les attentes ne croient pas que tout est fini) */
+  if (MEDIA.again) { setTimeout(() => { MEDIA.again = false; downloadMedia(false); }, 400); return; }
+  if (typeof Sync !== 'undefined' && typeof SRC !== 'undefined' && SRC.on) Sync.posters().catch(() => { });   // vidéos tout juste arrivées : on fabrique leur vignette
 }
 
 /* supprime les fichiers de l'iPad qui ne sont plus utilisés par aucune destination
@@ -3586,6 +3796,17 @@ async function purgeLocal(extra) {
    En cas d'erreur, le contenu précédent reste affiché. */
 const SRC = Object.assign({ on: false, sheet: '', key: '', every: 10 }, store.get('src', {}));
 function saveSrc() { store.set('src', SRC); }
+/* Configuration d'origine : toutes les applications se synchronisent d'office avec ce tableau.
+   Elle s'applique une fois par appareil (puis un réglage manuel est respecté) ; ?nosrc=1 dans l'adresse l'ignore (diagnostic). */
+const SRC_DEFAULT = {
+  ver: 1,
+  sheet: 'https://docs.google.com/spreadsheets/d/1Yk-HyUD_y5G3yr78vml6AVSt982qH7LqOm398fIM-GI/edit?usp=sharing',
+  key: 'AIzaSyAFyvPuJwNSFysMbJRrXQxwoER_-L9Rqbo', every: 10
+};
+if (!/[?&]nosrc\b/.test(location.search) && store.get('src.defVer', 0) < SRC_DEFAULT.ver) {
+  Object.assign(SRC, { on: true, sheet: SRC_DEFAULT.sheet, key: SRC_DEFAULT.key, fromFile: false }); if (!SRC.every) SRC.every = SRC_DEFAULT.every;
+  store.set('src.defVer', SRC_DEFAULT.ver); saveSrc();
+}
 const sheetIdOf = u => { const t = String(u || '').trim(), m = /\/spreadsheets\/d\/([\w-]{20,})/.exec(t) || /^([\w-]{25,})$/.exec(t); return m ? m[1] : ''; };
 const sheetUrl = () => SRC.sheet && sheetIdOf(SRC.sheet) ? `https://docs.google.com/spreadsheets/d/${sheetIdOf(SRC.sheet)}/edit` : '';
 const driveFileId = u => { const t = String(u || '').trim(); const m = /drive\.google\.com\/(?:file\/d\/|open\?(?:.*&)?id=|uc\?(?:.*&)?id=|thumbnail\?(?:.*&)?id=)([\w-]{15,})/.exec(t) || /docs\.google\.com\/(?:document|presentation|spreadsheets)\/d\/([\w-]{15,})/.exec(t) || (/^[\w-]{25,}$/.test(t) ? [0, t] : null); return m ? m[1] : ''; };
@@ -3642,7 +3863,7 @@ const Sync = {
   },
   /* ---- lecture du tableau (liens compris, y compris les « puces » Drive et les formules HYPERLINK) ---- */
   async readSheet() {
-    try { return await Sync.readSheetApi(); }
+    try { const r = await Sync.readSheetApi(); if (store.get('sync.office', false)) store.set('sync.office', false); return r; }
     catch (e) { if (e.kind === 'office') return Sync.readOffice(); throw e; }
   },
   tabsOf(titles) {
@@ -3665,14 +3886,21 @@ const Sync = {
   },
   /* repli : le « tableau » est un fichier Excel déposé dans Drive. On le télécharge (API Drive) et on le lit nous-mêmes. */
   async readOffice() {
-    const id = sheetIdOf(SRC.sheet), k = encodeURIComponent(SRC.key);
-    const meta = await Sync.api(`https://www.googleapis.com/drive/v3/files/${id}?fields=id,name,mimeType&supportsAllDrives=true&key=${k}`);
-    if (!/spreadsheetml|ms-excel/.test(meta.mimeType || '')) throw new SyncError('Ce document n’est pas un tableau lisible (type : ' + (meta.mimeType || 'inconnu') + '). Utilisez un Google Sheet ou un fichier Excel.', 'office');
-    let buf; try { buf = await Sync.api(`https://www.googleapis.com/drive/v3/files/${id}?alt=media&supportsAllDrives=true&key=${k}`, 40000, true); } catch (e) { throw e; }
-    let sheets; try { sheets = readXlsx(buf); } catch (e) { throw new SyncError('Le fichier Excel est illisible (' + (e.message || 'format inattendu') + ')', 'office'); }
-    const tabs = Sync.tabsOf(Object.keys(sheets));
-    const toRows = t => (sheets[t] || []).map(r => r.map(v => ({ t: String(v == null ? '' : v).trim(), l: '' })));
-    return { title: meta.name || '', dest: toRows(tabs.dest), med: toRows(tabs.med), etu: toRows(tabs.etu), tabs, office: true };
+    store.set('sync.office', true);
+    const hint = ' — Rappel : le tableau est un fichier Excel (.xlsx), moins fiable qu’un vrai Google Sheet. Dans Google Sheets : Fichier › Enregistrer en tant que feuille de calcul Google Sheets, puis utilisez la nouvelle adresse.';
+    try {
+      const id = sheetIdOf(SRC.sheet), k = encodeURIComponent(SRC.key);
+      const meta = await Sync.api(`https://www.googleapis.com/drive/v3/files/${id}?fields=id,name,mimeType&supportsAllDrives=true&key=${k}`);
+      if (!/spreadsheetml|ms-excel/.test(meta.mimeType || '')) throw new SyncError('Ce document n’est pas un tableau lisible (type : ' + (meta.mimeType || 'inconnu') + '). Utilisez un Google Sheet ou un fichier Excel.', 'office');
+      const buf = await Sync.api(`https://www.googleapis.com/drive/v3/files/${id}?alt=media&supportsAllDrives=true&key=${k}`, 40000, true);
+      let sheets; try { sheets = readXlsx(buf); } catch (e) { throw new SyncError('Le fichier Excel est illisible (' + (e.message || 'format inattendu') + ')', 'office'); }
+      const tabs = Sync.tabsOf(Object.keys(sheets));
+      const toRows = t => (sheets[t] || []).map(r => r.map(v => ({ t: String(v == null ? '' : v).trim(), l: '' })));
+      return { title: meta.name || '', dest: toRows(tabs.dest), med: toRows(tabs.med), etu: toRows(tabs.etu), tabs, office: true };
+    } catch (e) {
+      if (e && ['net', 'timeout', 'blocked', 'http403', 'http429', 'http500', 'http503'].includes(e.kind)) e.message += hint;
+      throw e;
+    }
   },
   /* tableau de lignes -> objets, colonnes reconnues par plusieurs noms (sans accents ni majuscules) */
   table(rows, alias) {
@@ -3709,7 +3937,7 @@ const Sync = {
     const sh = await Sync.readSheet();
     if (sh.office) warn.push('Le tableau est un fichier Excel (.xlsx) : il est lu, mais un lien collé avec un texte d’affichage n’est pas reconnu. Pour plus de fiabilité : dans Google Sheets, Fichier › Enregistrer en tant que feuille de calcul Google Sheets, puis utilisez le nouveau lien.');
     const D = Sync.table(sh.dest, { ville: ['ville', 'city', 'destination'], pays: ['pays', 'country'], code: ['code', 'codepays', 'codeiso', 'iso'], lat: ['latitude', 'lat'], lon: ['longitude', 'lon', 'lng'], etab: ['etablissement', 'universite', 'ecole', 'etablissementdaccueil'], photo: ['photodambiance', 'photoambiance', 'ambiance', 'photodelaville', 'photo', 'image', 'lienphoto', 'lien'], show: ['afficher', 'actif', 'visible'] });
-    const M = Sync.table(sh.med, { ville: ['ville', 'city', 'destination'], lien: ['liendrive', 'lien', 'liendumedia', 'lienphotovideo', 'photovideo', 'url', 'fichier', 'media'], par: ['prispar', 'par', 'prenom', 'etudiant', 'auteur', 'photographe'], legende: ['legende', 'titre', 'description'], vignette: ['vignette', 'poster', 'couverture', 'lienvignette'], type: ['type'] });
+    const M = Sync.table(sh.med, { ville: ['ville', 'city', 'destination'], lien: ['liendrive', 'lien', 'liendumedia', 'lienphotovideo', 'photovideo', 'url', 'fichier', 'media'], par: ['prispar', 'par', 'prenom', 'etudiant', 'auteur', 'photographe'], legende: ['legende', 'titre', 'description'], vignette: ['vignette', 'poster', 'couverture', 'lienvignette'], type: ['type'], crop: ['recadrage', 'cadrage', 'crop'] });
     const E = Sync.table(sh.etu, { ville: ['ville', 'city', 'destination'], prenom: ['prenom', 'nom', 'etudiant'], photo: ['photo', 'lienphoto', 'liendrive', 'lien', 'image'] });
     const skip = o => /^(non|no|0|faux|false|masque|cache)$/.test(nrm(o.show || ''));
     const dests = D.filter(o => o.ville.trim());
@@ -3758,8 +3986,9 @@ const Sync = {
         if (par) { let e = l.etudiants.find(x => nrm(x.prenom) === nrm(par)); if (!e) { e = { id: 'e-' + slug(par), prenom: par, photo: '' }; l.etudiants.push(e); } eid = e.id; }
         let poster = ''; const vl = Sync.link(r, 'vignette');
         if (vl) { const vid = driveFileId(vl); if (vid) { if (okFile(vid, `Médias ligne ${r._row} (${ville}) vignette`)) poster = driveApiUrl(vid); } else poster = vl; }
+        let crop = null; if ((r.crop || '').trim()) { crop = parseCrop(r.crop); if (!crop) warn.push(`Médias ligne ${r._row} (${ville}) : recadrage illisible « ${String(r.crop).slice(0, 24)} » (attendu : 52.3;40;1.25)`); }
         let mid = 'm-' + (id || slug(lk).slice(0, 24)); if (used[mid]) mid += '-' + (used[mid]++); else used[mid] = 1;
-        l.medias.push({ id: mid, type, url, poster, legende: (r.legende || '').trim(), etu: eid, rev: nameHint });
+        l.medias.push({ id: mid, type, url, poster, legende: (r.legende || '').trim(), etu: eid, rev: nameHint, crop, row: r._row });
       });
       lieux.push(l);
     }
@@ -3842,6 +4071,10 @@ const Sync = {
   },
   /* vignette automatique des vidéos qui n'en ont pas : image de la vidéo déjà téléchargée */
   async posters() {
+    if (Sync.postBusy) return; Sync.postBusy = true;
+    try { await Sync.postersRun(); } finally { Sync.postBusy = false; }
+  },
+  async postersRun() {
     const posters = store.get('sync.posters', {}); let n = 0;
     for (const l of S.lieux) for (const m of l.medias || []) {
       if (m.type !== 'video' || m.poster || mediaKind(m.url) !== 'direct') continue;
@@ -3871,7 +4104,7 @@ const Sync = {
   async loadFileConfig() {
     try {
       const j = await getJson('data/source.json'); if (!j || !j.sheet) return;
-      const fv = store.get('src.fileVer', 0), v = +j.version || 1;
+      const fv = Math.max(store.get('src.fileVer', 1), 1), v = +j.version || 1;   // version 1 = valeurs d'origine intégrées : seul un numéro plus récent s'impose
       const follows = SRC.fromFile && (String(j.sheet).trim() !== SRC.sheet || String(j.key || '').trim() !== SRC.key);
       if (!SRC.sheet || v > fv || follows) {
         SRC.sheet = String(j.sheet).trim(); SRC.key = String(j.key || SRC.key || '').trim(); SRC.every = [5, 10, 30, 60].includes(+j.every) ? +j.every : (SRC.every || 10); SRC.on = j.on !== false; SRC.fromFile = true;
