@@ -210,10 +210,10 @@ body.vplay #prof{visibility:hidden}
 /* la photo occupe tout l'écran disponible avec SES proportions (jamais rognée, jamais déformée) */
 #lbImg{width:100%;height:100%;max-width:none;max-height:none;object-fit:contain;display:block}
 #lb .vclose{position:absolute;left:calc(var(--sal) + 24px);top:calc(var(--sat) + 20px)}
-.lbnav{position:absolute;top:50%;width:64px;height:64px;margin-top:-32px;border-radius:50%;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.28);display:grid;place-items:center}
+.lbnav{position:absolute;top:50%;width:64px;height:64px;margin-top:-32px;padding:0;border-radius:50%;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.28);display:grid;place-items:center;box-sizing:border-box}
 .lbnav.prev{left:calc(var(--sal) + 24px)}
 .lbnav.next{right:calc(var(--sar) + 24px)}
-.lbnav svg{width:28px;height:28px;stroke:#fff;stroke-width:2.4;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.lbnav svg{display:block;width:28px;height:28px;margin:0;stroke:#fff;stroke-width:2.4;fill:none;stroke-linecap:round;stroke-linejoin:round}
 #lbCap{position:absolute;left:0;right:0;bottom:0;padding:46px 24px calc(var(--sab) + 22px);text-align:center;font-size:18px;line-height:1.35;background:linear-gradient(0deg,rgba(0,0,0,.88),rgba(0,0,0,0));pointer-events:none}
 /* ---------- code d'accès ---------- */
 #gate{position:absolute;inset:0;z-index:40;display:flex;align-items:center;justify-content:center;background:rgba(2,10,22,.72)}
@@ -314,10 +314,10 @@ button.grow:active{background:rgba(255,255,255,.1)}
 .hrow .tr i{display:block;height:100%;background:linear-gradient(90deg,#1d78c0,#7fe0ff);border-radius:5px}
 .hrow .v{min-width:96px;text-align:right;font-size:15px;opacity:.85;flex:none}
 /* import Excel, vignettes, photos Wikimedia */
-.prev{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
-.prev div{padding:14px;border-radius:18px;background:rgba(255,255,255,.07);text-align:center}
-.prev b{display:block;font-family:var(--f-title);font-size:28px}
-.prev small{opacity:.75;font-size:14px}
+.pvw{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
+.pvw div{padding:14px;border-radius:18px;background:rgba(255,255,255,.07);text-align:center}
+.pvw b{display:block;font-family:var(--f-title);font-size:28px}
+.pvw small{opacity:.75;font-size:14px}
 .warns{margin:10px 0 0;padding-left:20px;font-size:14.5px;opacity:.85;line-height:1.45}
 .frames{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
 .frames button,
@@ -355,7 +355,7 @@ button.grow:active{background:rgba(255,255,255,.1)}
   .hcard b{margin-top:0;font-size:22px}
   .hcard i{margin-top:0;margin-left:auto}
   .kpis{grid-template-columns:repeat(2,1fr)}
-  .prev,
+  .pvw,
 .frames,
 .wgrid{grid-template-columns:repeat(2,1fr)}
 }
@@ -472,6 +472,8 @@ body.split #admin{right:auto;width:min(48vw,540px);border-right:1px solid var(--
 #fDots{display:flex;justify-content:center;align-items:center;gap:6px;padding:8px 0 0;min-height:10px}
 #fDots i{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.3);transition:background .25s}
 #fDots i.on{background:var(--sky)}
+#fDots i.hide{display:none}
+#fDots i.sm{width:4px;height:4px}
 .sec{font-size:15px;margin:24px 26px 12px;opacity:.7;font-family:var(--f-text);font-weight:500;letter-spacing:.05em;text-transform:uppercase}
 .etus{display:flex;flex-wrap:wrap;gap:10px;padding:0 26px}
 .etu{display:flex;align-items:center;gap:10px;padding:6px 18px 6px 6px;border-radius:999px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);font-family:var(--f-title);font-weight:700;font-size:16px;color:#fff}
@@ -579,17 +581,23 @@ body.upgrading #stage,body.upgrading #labels,body.upgrading #top,body.upgrading 
 :root{--liquid:cubic-bezier(.2,.95,.25,1.08)}
 /* les panneaux se déplacent avec du ressort ; l'opacité ne fait que suivre (plus d'effet « fondu ») */
 .panel{transition:opacity .22s ease-out,transform .62s var(--liquid)}
-#fiche.pre{transform:translateX(70px) scale(.93) rotate(.8deg)}
-#list.pre{transform:translateX(60px) scale(.94)}
-@media (orientation:portrait){#fiche.pre{transform:translateY(80px) scale(.95)}#list.pre{transform:translateY(70px) scale(.96)}}
+/* arrivée par simple glissement (avec le ressort) : une rotation ou une mise à l'échelle obligeait à redessiner tout le panneau à chaque image */
+#fiche.pre{transform:translateX(70px)}
+#list.pre{transform:translateX(60px)}
+@media (orientation:portrait){#fiche.pre{transform:translateY(80px)}#list.pre{transform:translateY(70px)}}
 /* la carte reprend un reflet flou de SA photo : la photo se fond dans son propre halo */
 #fBack{position:absolute;inset:-8%;z-index:0;background:center/cover no-repeat;transform:scale(1.18);opacity:.55;pointer-events:none;
   -webkit-mask-image:linear-gradient(180deg,#000 0%,#000 38%,rgba(0,0,0,.4) 100%);mask-image:linear-gradient(180deg,#000 0%,#000 38%,rgba(0,0,0,.4) 100%)}
 #fiche .fscroll{position:relative;z-index:2}
 /* verre liquide : arêtes lumineuses, reflet en haut à gauche, passage de lumière */
-#fiche.glass{-webkit-backdrop-filter:blur(16px) saturate(1.55);backdrop-filter:blur(16px) saturate(1.55);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.42),inset 1px 0 0 rgba(255,255,255,.14),inset 0 -1px 0 rgba(255,255,255,.07),inset 0 0 38px rgba(255,255,255,.035),0 34px 80px rgba(0,8,24,.5);
+#fiche.glass{-webkit-backdrop-filter:none;backdrop-filter:none;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.42),inset 1px 0 0 rgba(255,255,255,.14),inset 0 -1px 0 rgba(255,255,255,.07),inset 0 0 38px rgba(255,255,255,.035),0 14px 34px rgba(0,8,24,.46);
   transition:opacity .22s ease-out,transform .62s var(--liquid),--t1 .9s,--t2 .9s,--tg .9s,--tb .9s}
+/* le flou de verre n'est activé qu'après l'arrivée du panneau (classe .settled) ; pendant l'arrivée, ni flou ni dégradé animé : seul le déplacement est animé */
+/* le flou ne s'active qu'en mode « Complets » (Réglages › Affichage) : le panneau est déjà opaque à 90 %, le flou y est presque invisible mais coûte la moitié de la fluidité */
+html.fxfull #fiche.glass.settled{-webkit-backdrop-filter:blur(16px) saturate(1.55);backdrop-filter:blur(16px) saturate(1.55)}
+#fiche.glass:not(.settled){transition:opacity .22s ease-out,transform .62s var(--liquid)}
+#fCar.ld{visibility:hidden}
 #fiche::before{content:"";position:absolute;inset:0;z-index:4;pointer-events:none;border-radius:inherit;
   background:radial-gradient(85% 36% at 8% 0%,rgba(255,255,255,.22),rgba(255,255,255,0) 62%),radial-gradient(60% 28% at 100% 100%,rgba(255,255,255,.07),rgba(255,255,255,0) 70%)}
 #fiche .xbtn,#fiche .editbtn{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.28);box-shadow:inset 0 1px 0 rgba(255,255,255,.35);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
@@ -600,8 +608,8 @@ body.upgrading #stage,body.upgrading #labels,body.upgrading #top,body.upgrading 
 #fiche.rv #fVille{animation:liftIn .85s cubic-bezier(.2,.9,.25,1.05) .28s both}
 #fiche.rv #fPays{animation:liftIn .85s cubic-bezier(.2,.9,.25,1.05) .38s both}
 @keyframes liftIn{from{transform:translateY(22px);opacity:0}to{transform:none;opacity:1}}
-#fiche.rv .sl{animation:cardIn .8s cubic-bezier(.2,.9,.25,1.1) calc(.36s + var(--i,0) * 70ms) both}
-@keyframes cardIn{from{transform:translateX(72px) scale(.95);opacity:0}to{transform:none;opacity:1}}
+#fiche.rv .sl:nth-child(-n+3){animation:cardIn .7s cubic-bezier(.2,.9,.25,1.1) calc(.1s + var(--i,0) * 70ms) both}
+@keyframes cardIn{from{transform:translateX(72px);opacity:0}to{transform:none;opacity:1}}
 #fiche.rv #fDots i{animation:popIn .55s var(--liquid) calc(.75s + var(--i,0) * 60ms) both}
 @keyframes popIn{from{transform:scale(0)}to{transform:none}}
 /* petit parallaxe : l'image glisse légèrement dans sa carte pendant le défilement (la carte ne change pas de taille) */
@@ -628,7 +636,7 @@ body.upgrading #stage,body.upgrading #labels,body.upgrading #top,body.upgrading 
 a.btn{text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
 
 /* ---------- effets allégés (appareils lents, détectés automatiquement ou choisis dans Réglages › Affichage) ---------- */
-html.lite #fiche.glass{-webkit-backdrop-filter:none;backdrop-filter:none;background:radial-gradient(125% 62% at 50% 44%,var(--tg),rgba(0,0,0,0) 72%),linear-gradient(180deg,var(--t1),var(--t2));box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 18px 44px rgba(0,8,24,.5)}
+html.lite #fiche.glass,html.lite #fiche.glass.settled{-webkit-backdrop-filter:none;backdrop-filter:none;background:radial-gradient(125% 62% at 50% 44%,var(--tg),rgba(0,0,0,0) 72%),linear-gradient(180deg,var(--t1),var(--t2));box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 18px 44px rgba(0,8,24,.5)}
 html.lite #fiche::before,html.lite #fiche::after{display:none}
 html.lite #fBack{display:none}
 html.lite .abtn,html.lite #fiche .xbtn,html.lite #fiche .editbtn{-webkit-backdrop-filter:none;backdrop-filter:none;background:rgba(255,255,255,.18)}
@@ -726,8 +734,8 @@ html.lite #fiche .sl{--p:0!important}
     <img id="lbImg" alt="" draggable="false">
     <button class="vclose" id="lbClose"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>Retour</button>
     <button class="vbtn lbx" id="lbX" aria-label="Fermer la photo"><svg viewBox="0 0 24 24" style="fill:none;stroke:#fff;stroke-width:2.4;stroke-linecap:round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
-    <button class="lbnav prev" id="lbPrev" aria-label="Photo précédente"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
-    <button class="lbnav next" id="lbNext" aria-label="Photo suivante"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>
+    <button class="lbnav prev" id="lbPrev" aria-label="Photo précédente"><svg viewBox="0 0 24 24"><path d="M15.5 5l-7 7 7 7"/></svg></button>
+    <button class="lbnav next" id="lbNext" aria-label="Photo suivante"><svg viewBox="0 0 24 24"><path d="M8.5 5l7 7-7 7"/></svg></button>
     <div id="lbCap"></div>
   </section>
 
@@ -824,8 +832,14 @@ html.lite #fiche .sl{--p:0!important}
    APP_VERSION est comparée par le système de mise à jour :
    à chaque livraison elle doit augmenter (build.py s'en charge).
 ===================================================================== */
-const APP_VERSION = "1.7.6";
+const APP_VERSION = "1.7.7";
 const CHANGELOG = [
+  { v: "1.7.7", d: "17 octobre 2026", t: [
+    "Ouverture des cartes plus fluide sur iPad sans passer en effets allégés : flou de verre activé une fois la carte posée, arrivée simplifiée, couleurs préparées à l’avance",
+    "Carrousel : toujours des points (fenêtre glissante au-delà de 7 photos) et ouverture systématique sur la première photo",
+    "Visionneuse : flèches parfaitement centrées",
+    "Le logo peut venir du tableau : onglet Réglages, ligne Logo, lien Drive"
+  ]},
   { v: "1.7.6", d: "17 octobre 2026", t: [
     "Toutes les applications sont synchronisées d’office avec le Google Sheet de l’ISG (plus rien à saisir)",
     "Cartes du carrousel : la photo remplit toujours le cadre, avec un recadrage au choix (colonne Recadrage du tableau, éditeur visuel dans Données)",
@@ -1011,6 +1025,7 @@ function applyCfg() {
   b.dataset.labels = CFG.labels; b.dataset.bg = CFG.bg; document.documentElement.dataset.bg = CFG.bg;
   document.documentElement.classList.toggle('dbg', !!CFG.debugFrame);
   document.documentElement.classList.toggle('lite', typeof Perf !== 'undefined' && Perf.lite());
+  document.documentElement.classList.toggle('fxfull', CFG.fx === 'full');
   b.classList.toggle('hide-ui', !!CFG.hideUi);
   b.classList.toggle('no-logo', !CFG.logo);
   b.style.setProperty('--lblsz', { s: '13px', m: '15px', l: '18px' }[CFG.lblSize] || '15px');
@@ -1200,6 +1215,8 @@ function posterOf(v) {
   return '';
 }
 /* photo principale d'une ville : celle choisie pour le haut de la fiche, sinon la 1re photo, sinon une vignette de vidéo */
+/* adresse d'origine de la photo d'ambiance (stable, contrairement à l'adresse affichée qui change selon que la copie est sur l'appareil) */
+function coverRaw(l) { if (l.cover && l.cover.url) return l.cover.url; const p = photosOf(l)[0]; if (p) return p.url; const v = videosOf(l).find(x => x.poster); return v ? v.poster : ''; }
 function coverOf(l) {
   if (l.cover && l.cover.url) return srcOf(l.cover.url);
   const p = photosOf(l)[0]; if (p) return srcOf(p.url);
@@ -1713,23 +1730,39 @@ function applyCrop(img) {
   st.left = b.left.toFixed(1) + 'px'; st.top = b.top.toFixed(1) + 'px'; st.width = b.width.toFixed(1) + 'px'; st.height = b.height.toFixed(1) + 'px';
 }
 function applyCrops() { $$('#fTrack .sl img[data-cz]').forEach(applyCrop); }
+/* indicateur du carrousel : toujours des points (comme Instagram) ; au-delà de 7 cartes, une fenêtre glissante de 7 points avec des bouts plus petits */
+function setDots(i) {
+  const ds = $$('#fDots i'), n = ds.length; if (!n) return;
+  const W = 7, st = n <= W ? 0 : clamp(i - 3, 0, n - W);
+  ds.forEach((e, k) => {
+    const vis = n <= W || (k >= st && k < st + W);
+    e.classList.toggle('on', k === i); e.classList.toggle('hide', !vis);
+    e.classList.toggle('sm', n > W && vis && ((k === st && st > 0) || (k === st + W - 1 && st + W < n)));
+  });
+}
 function buildDots() {
   const d = $('#fDots'), n = CAR.n;
-  d.innerHTML = n < 2 ? '' : (n > 9 ? `<span id="fCnt">1 / ${n}</span>` : Array.from({ length: n }, (_, k) => `<i class="${k ? '' : 'on'}" style="--i:${k}"></i>`).join(''));
+  d.innerHTML = n < 2 ? '' : Array.from({ length: n }, (_, k) => `<i style="--i:${k}"></i>`).join('');
+  setDots(0);
 }
 function carStep() { const s = $('#fTrack .sl'), t = $('#fTrack'); return s ? s.offsetWidth + (parseFloat(getComputedStyle(t).columnGap) || 12) : Math.max(1, t.clientWidth); }
 function carSync() {
   CAR.raf = 0; parallax(); const t = $('#fTrack'); if (CAR.n < 2) return;
   /* carte courante = celle qui touche le bord gauche ; au bout du défilement, la dernière (même si toutes les cartes tiennent presque à l'écran) */
   const mx = t.scrollWidth - t.clientWidth; let i = clamp(Math.round(t.scrollLeft / carStep()), 0, CAR.n - 1); if (mx > 4 && t.scrollLeft >= mx - 3) i = CAR.n - 1; if (i === CAR.i) return; CAR.i = i; curSlide();
-  if (CAR.n > 9) { const c = $('#fCnt'); if (c) c.textContent = `${i + 1} / ${CAR.n}`; }
-  else $$('#fDots i').forEach((e, k) => e.classList.toggle('on', k === i));
+  setDots(i);
 }
 function parallax() {
   const t = $('#fTrack'); if (!t || !CAR.n) return;
   const tr = t.getBoundingClientRect(), mid = tr.left + tr.width / 2, st = carStep();
   const sl = $$('#fTrack .sl'), pv = sl.map(s => { const r = s.getBoundingClientRect(); return clamp((r.left + r.width / 2 - mid) / st, -1.6, 1.6).toFixed(3); });
   sl.forEach((s, i) => s.style.setProperty('--p', pv[i]));
+}
+/* retour sur la première photo (à l'ouverture d'une fiche, sans animation) ; ne touche plus à rien dès que l'utilisateur fait défiler */
+function resetCar() {
+  const t = $('#fTrack'); if (!t) return;
+  t.style.scrollBehavior = 'auto'; t.scrollLeft = 0; try { t.scrollTo({ left: 0, behavior: 'instant' }); } catch (e) { }
+  CAR.i = 0; curSlide(); setDots(0); parallax();
 }
 function curSlide() { $$('#fTrack .sl').forEach((e, k) => e.classList.toggle('cur', k === CAR.i)); }
 function carGo(i, smooth) { const t = $('#fTrack'); t.scrollTo({ left: i * carStep(), behavior: smooth ? 'smooth' : 'auto' }); }
@@ -1773,8 +1806,12 @@ function softBg(im) {
     x.putImageData(img, 0, 0); return cv.toDataURL('image/jpeg', 0.8);
   } catch (e) { return ''; }
 }
-function palette(url) {
-  if (PAL[url] !== undefined) return Promise.resolve(PAL[url]);
+const PALC = store.get('pal.v1', {});
+function palSave() { try { const k = Object.keys(PALC); if (k.length > 60) k.slice(0, k.length - 60).forEach(x => delete PALC[x]); store.set('pal.v1', PALC); } catch (e) { } }
+function palette(url, key) {
+  key = key || url;
+  if (PAL[key] !== undefined) return Promise.resolve(PAL[key]);
+  if (PALC[key]) { PAL[key] = PALC[key]; return Promise.resolve(PAL[key]); }
   return new Promise(res => {
     const im = new Image(); im.crossOrigin = 'anonymous';
     im.onload = () => {
@@ -1790,17 +1827,17 @@ function palette(url) {
         }
         out = { dom: [sr / sw, sg / sw, sb / sw].map(Math.round), bot: [br / bw, bg / bw, bb / bw].map(Math.round), bg: softBg(im) };
       } catch (e) { out = null; }   // image d'un autre site sans autorisation : on garde les couleurs d'origine
-      PAL[url] = out; res(out);
+      PAL[key] = out; if (out) { PALC[key] = out; palSave(); } res(out);
     };
-    im.onerror = () => { PAL[url] = null; res(null); };
+    im.onerror = () => { PAL[key] = null; res(null); };
     im.src = url;
   });
 }
 async function tintFiche(l) {
-  const f = $('#fiche'), url = coverOf(l), tok = ++Tint.tok, keys = ['--t1', '--t2', '--tg', '--tb'];
+  const f = $('#fiche'), url = coverOf(l), key = coverRaw(l), tok = ++Tint.tok, keys = ['--t1', '--t2', '--tg', '--tb'];
   const clear = () => keys.forEach(k => f.style.removeProperty(k));
   if (!url) { clear(); return; }
-  const p = await palette(url); if (tok !== Tint.tok) return;
+  const p = await palette(url, key); if (tok !== Tint.tok) return;
   { const fb = $('#fBack'); fb.style.backgroundImage = p && p.bg ? cssUrl(p.bg) : 'none'; }
   if (!p) { clear(); return; }
   const mix = (c, b, t) => c.map((v, i) => Math.max(0, Math.min(255, Math.round(b[i] + (v - b[i]) * t))));
@@ -1808,29 +1845,56 @@ async function tintFiche(l) {
   f.style.setProperty('--t1', `rgba(${c1.join(',')},.9)`); f.style.setProperty('--t2', `rgba(${c2.join(',')},.93)`);
   f.style.setProperty('--tg', `rgba(${p.dom.join(',')},.2)`); f.style.setProperty('--tb', `rgba(${cb.join(',')},.3)`);
 }
-function fillFiche(l) {
+/* préchauffage : couleurs et fond flou de chaque photo d'ambiance, calculés une fois en tâche de fond puis gardés */
+const Pal = {
+  running: false,
+  async warm() {
+    if (Pal.running) return; Pal.running = true;
+    try {
+      for (const l of S.lieux) {
+        if (document.hidden || (S.mode !== 'attract' && S.mode !== 'explore')) { await new Promise(r => setTimeout(r, 4000)); continue; }
+        const raw = coverRaw(l), u = raw && coverOf(l);
+        if (!u || PAL[raw] !== undefined || PALC[raw]) continue;
+        if (driveApiId(raw) && !MEDIA.have.has(absUrl(raw))) continue;   // pas encore copiée sur l'appareil : plus tard
+        await palette(u, raw); await new Promise(r => setTimeout(r, 400));
+      }
+    } finally { Pal.running = false; }
+  }
+};
+function fillFiche(l, defer) {
   $('#fVille').textContent = l.ville;
   $('#fPays').textContent = [l.pays, l.etablissement].filter(Boolean).join(' · ');
   const hc = coverOf(l); $('#fHeroImg').style.backgroundImage = hc ? cssUrl(hc) : 'none'; $('#fBack').style.backgroundImage = 'none';
   { const f = $('#fiche'); f.classList.remove('rv'); void f.offsetWidth; f.classList.add('rv'); }
-  const ms = medias(l); let pi = 0;
+  const ms = medias(l);
   $('#fCar').hidden = !ms.length;
-  $('#fTrack').innerHTML = ms.map((m, i) => slideHtml(l, m, i, m.type === 'photo' ? pi++ : 0, ms.length)).join('');
-  $('#fTrack').scrollLeft = 0; CAR.n = ms.length; CAR.i = 0; buildDots(); curSlide();
-  tintFiche(l); requestAnimationFrame(parallax); requestAnimationFrame(applyCrops);
+  clearTimeout(S.bodyT);
+  const body = () => {
+    let pi = 0;
+    $('#fTrack').innerHTML = ms.map((m, i) => slideHtml(l, m, i, m.type === 'photo' ? pi++ : 0, ms.length)).join('');
+    $('#fTrack').scrollLeft = 0; CAR.n = ms.length; CAR.i = 0; buildDots(); curSlide();
+    tintFiche(l); requestAnimationFrame(parallax); requestAnimationFrame(applyCrops);
+    $('#fCar').classList.remove('ld');
+  };
+  if (defer) { $('#fTrack').innerHTML = ''; CAR.n = 0; $('#fDots').innerHTML = ''; $('#fCar').classList.add('ld'); S.bodyT = setTimeout(() => { if (S.current === l) { body(); resetCar(); } }, 70); }
+  else body();
 }
 function openFiche(id) {
   const l = S.byId[id]; if (!l) return;
   const f = $('#fiche'); S.current = l; S.ficheAt = now();
-  fillFiche(l); $('#fScroll').scrollTop = 0; Stats.open(l.id);
+  f.classList.remove('settled'); clearTimeout(S.setT); CAR.touched = false;
+  fillFiche(l, true); $('#fScroll').scrollTop = 0; Stats.open(l.id);
   if (!$('#list').hidden) hidePanel($('#list'));
   showPanel(f); setMode('fiche');
+  resetCar(); [120, 320, 800].forEach(ms => setTimeout(() => { if (S.current === l && !CAR.touched) resetCar(); }, ms));
+  /* le flou de verre ne s'active qu'une fois le panneau posé et le globe immobile : pendant l'arrivée, il serait recalculé à chaque image */
+  S.setT = setTimeout(() => { if (S.current === l) f.classList.add('settled'); }, 2100);
   const m = G.markers.find(k => k.lieu === l); selectMarker(m);
   if (G.ready) { const fo = panelFocus(f); flyToLieu(l, { zoom: fo.zoom, sx: fo.sx, sy: fo.sy }); }
   Perf.watch();
 }
 function closeFiche(keepView) {
-  closeLightbox(true);
+  closeLightbox(true); clearTimeout(S.setT); clearTimeout(S.bodyT); $('#fiche').classList.remove('settled');
   hidePanel($('#fiche')); S.current = null; selectMarker(null);
   if (S.mode === 'fiche') setMode('explore');
   if (!keepView && G.ready) animateTo({ z: G.home.zoom, sx: 0, sy: 0 }, 700);
@@ -2037,8 +2101,10 @@ function loadLogo() {
     t.onload = () => { img.src = u; img.hidden = false; };
     t.onerror = next; t.src = u;
   };
+  const sl = (typeof SRC !== 'undefined' && SRC.on) ? store.get('sync.logo', '') : '';   // logo fourni par le tableau (onglet Réglages)
   img.hidden = true;
-  tryUrl(LOGO_KEY + '?v=' + (store.get('logov', 0)), () => tryUrl('logo-isg.png', () => { img.hidden = true; }));
+  const local = () => tryUrl(LOGO_KEY + '?v=' + (store.get('logov', 0)), () => tryUrl('logo-isg.png', () => { img.hidden = true; img.removeAttribute('src'); }));
+  if (sl) tryUrl(sl, local); else local();
 }
 
 /* ---------- branchements ---------- */
@@ -2067,6 +2133,7 @@ function initUI() {
     const s = e.target.closest('.sl'); if (!s || s.classList.contains('empty')) return; touchAct();
     if (s.dataset.t === 'video') openVideo(s.dataset.id); else openLightbox(+s.dataset.pi);
   });
+  ['pointerdown', 'touchstart', 'wheel'].forEach(ev => $('#fTrack').addEventListener(ev, () => { CAR.touched = true; }, { passive: true, capture: true }));
   $('#fTrack').addEventListener('load', e => { if (e.target && e.target.tagName === 'IMG') applyCrop(e.target); }, true);
   addEventListener('resize', () => requestAnimationFrame(applyCrops)); addEventListener('orientationchange', () => setTimeout(applyCrops, 300));
   $('#fTrack').addEventListener('scroll', () => { touchAct(); if (!CAR.raf) CAR.raf = requestAnimationFrame(carSync); }, { passive: true });
@@ -2298,7 +2365,7 @@ function sAffichage() {
   return `
     <div class="gl">FLUIDITÉ</div>
     <div class="group">
-      ${grow('Effets visuels', auto ? (on ? 'Automatique : cet appareil est lent, les effets sont allégés.' : 'Automatique : effets complets (ils s’allègent seuls si l’appareil est lent).') : (on ? 'Allégés : pas de flou de verre, pas d’animations d’entrée.' : 'Complets : verre flou et animations.'), seg('fx', [['auto', 'Auto'], ['full', 'Complets'], ['lite', 'Allégés']], CFG.fx))}
+      ${grow('Effets visuels', auto ? (on ? 'Automatique : cet appareil est lent, les effets sont allégés.' : 'Automatique : fluide et soigné (ils s’allègent seuls si l’appareil est lent).') : (on ? 'Allégés : pas d’animations d’entrée, fond simplifié.' : 'Complets : ajoute le flou de verre (plus gourmand, à réserver aux appareils puissants).'), seg('fx', [['auto', 'Auto'], ['full', 'Complets'], ['lite', 'Allégés']], CFG.fx))}
     </div>
     <div class="gl">DIAGNOSTIC</div>
     <div class="group">
@@ -2311,6 +2378,7 @@ function sInterface() {
   const hasLogo = !$('#logoImg').hidden;
   return `
     <div class="gl">LOGO</div>
+    ${SRC.on && store.get('sync.logo', '') ? '<div class="note good">Le logo vient du tableau (onglet Réglages, ligne Logo) : tous les écrans l’affichent. Retirez la ligne pour revenir au logo de cet appareil.</div>' : ''}
     <div class="group">
       ${srow('Logo ISG en haut à gauche', 'Toujours en blanc, sur fond transparent.', 'logo')}
       <div class="grow col"><div class="logoprev">${hasLogo ? `<img src="${esc($('#logoImg').src)}" alt="">` : '<span>ISG</span>'}</div>
@@ -2469,7 +2537,7 @@ function dImport() {
       <div class="btnrow" style="margin-top:0"><label class="btn primary filebtn">Choisir le fichier<input type="file" data-file="import" accept=".xlsx,.csv,.txt,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv"></label></div><div id="aImpMsg"></div></div></div>`;
   if (im && im.built) {
     const b = im.built, miss = b.dests.filter(d => d.lat === '' || d.lon === '').length;
-    html += `<div class="gl">APERÇU · ${esc(im.name)}</div><div class="prev"><div><b>${b.dests.length}</b><small>destination${b.dests.length > 1 ? 's' : ''}</small></div><div><b>${b.cnt.videos}</b><small>vidéo${b.cnt.videos > 1 ? 's' : ''}</small></div><div><b>${b.cnt.etus || 0}</b><small>étudiant${b.cnt.etus > 1 ? 's' : ''}</small></div><div><b>${b.cnt.photos}</b><small>photo${b.cnt.photos > 1 ? 's' : ''}</small></div></div>
+    html += `<div class="gl">APERÇU · ${esc(im.name)}</div><div class="pvw"><div><b>${b.dests.length}</b><small>destination${b.dests.length > 1 ? 's' : ''}</small></div><div><b>${b.cnt.videos}</b><small>vidéo${b.cnt.videos > 1 ? 's' : ''}</small></div><div><b>${b.cnt.etus || 0}</b><small>étudiant${b.cnt.etus > 1 ? 's' : ''}</small></div><div><b>${b.cnt.photos}</b><small>photo${b.cnt.photos > 1 ? 's' : ''}</small></div></div>
       ${miss ? `<div class="note">${miss} destination${miss > 1 ? 's' : ''} sans coordonnées : l’app les cherchera automatiquement (Internet nécessaire).</div>` : ''}
       ${b.warn.length ? `<ul class="warns">${b.warn.slice(0, 12).map(w => `<li>${esc(w)}</li>`).join('')}${b.warn.length > 12 ? `<li>… et ${b.warn.length - 12} autre${b.warn.length - 12 > 1 ? 's' : ''}.</li>` : ''}</ul>` : ''}
       <div class="btnrow">${seg('impMode', [['merge', 'Ajouter / mettre à jour'], ['replace', 'Tout remplacer']], im.mode)}</div>
@@ -3665,6 +3733,7 @@ function mediaItems() {
     const a = absUrl(u); if (seen.has(a)) return; seen.add(a);
     out.push({ url: u, abs: a, same: new URL(a).origin === location.origin, vid: !!vid, max: max || 0 });
   };
+  { const lg = (typeof SRC !== 'undefined' && SRC.on) ? store.get('sync.logo', '') : ''; if (lg) add(lg, false, 700); }   // logo fourni par le tableau
   S.lieux.forEach(l => { if (l.cover) add(l.cover.url, false, 1600); (l.medias || []).forEach(m => { if (m.type === 'photo') add(m.url, false, 1400); else { add(m.poster, false, 900); add(m.sous_titres); } }); (l.etudiants || []).forEach(e => add(e.photo, false, 480)); });
   S.lieux.forEach(l => (l.medias || []).forEach(m => { if (m.type === 'video') add(m.url, true); }));
   return out;
@@ -3704,7 +3773,7 @@ async function shrinkImage(blob, max) {
     if (k >= 1 && blob.size < (t === 'image/png' ? 2500 : 1500) * 1024) { if (bm.close) bm.close(); return blob; }
     const c = document.createElement('canvas'); c.width = Math.max(2, Math.round(bm.width * k)); c.height = Math.max(2, Math.round(bm.height * k));
     c.getContext('2d').drawImage(bm, 0, 0, c.width, c.height); if (bm.close) bm.close();
-    const out = await new Promise(res => c.toBlob(res, 'image/jpeg', 0.86));
+    const out = await new Promise(res => (t === 'image/png' ? c.toBlob(res, 'image/png') : c.toBlob(res, 'image/jpeg', 0.86)));   // un PNG (logo, transparence) reste un PNG
     return out && out.size && out.size < blob.size ? out : blob;
   } catch (e) { return blob; }
 }
@@ -3871,18 +3940,19 @@ const Sync = {
     const tabs = { dest: find(/^destination/), med: find(/^media|^medias/), etu: find(/^etudiant|^eleve/) };
     const missing = Object.keys(tabs).filter(x => !tabs[x]).map(x => ({ dest: 'Destinations', med: 'Médias', etu: 'Étudiants' }[x]));
     if (missing.length) throw new SyncError('Onglet(s) introuvable(s) : ' + missing.join(', ') + '. Onglets trouvés : ' + (titles.join(', ') || 'aucun'), 'tabs');
+    tabs.set = find(/^reglage|^parametre|^config|^setting/);   // facultatif : logo, etc.
     return tabs;
   },
   async readSheetApi() {
     const id = sheetIdOf(SRC.sheet), k = encodeURIComponent(SRC.key), base = `https://sheets.googleapis.com/v4/spreadsheets/${id}`;
     const meta = await Sync.api(`${base}?fields=properties.title,sheets.properties.title&key=${k}`);
     const titles = (meta.sheets || []).map(s => s.properties.title), tabs = Sync.tabsOf(titles);
-    const order = ['dest', 'med', 'etu'], ranges = order.map(x => 'ranges=' + encodeURIComponent(tabs[x])).join('&');
+    const order = ['dest', 'med', 'etu'].concat(tabs.set ? ['set'] : []), ranges = order.map(x => 'ranges=' + encodeURIComponent(tabs[x])).join('&');
     const fields = encodeURIComponent('sheets(properties.title,data.rowData.values(formattedValue,hyperlink,chipRuns.chip.richLinkProperties.uri))');
     const grid = await Sync.api(`${base}?${ranges}&includeGridData=true&fields=${fields}&key=${k}`, 30000);
     const byTitle = {}; (grid.sheets || []).forEach(s => { byTitle[s.properties.title] = s; });
     const toRows = t => { const s = byTitle[t], rd = s && s.data && s.data[0] && s.data[0].rowData || []; return rd.map(r => (r.values || []).map(c => ({ t: c && c.formattedValue != null ? String(c.formattedValue).trim() : '', l: c ? (c.hyperlink || (c.chipRuns && c.chipRuns[0] && c.chipRuns[0].chip && c.chipRuns[0].chip.richLinkProperties && c.chipRuns[0].chip.richLinkProperties.uri) || '') : '' }))); };
-    return { title: meta.properties && meta.properties.title || '', dest: toRows(tabs.dest), med: toRows(tabs.med), etu: toRows(tabs.etu), tabs };
+    return { title: meta.properties && meta.properties.title || '', dest: toRows(tabs.dest), med: toRows(tabs.med), etu: toRows(tabs.etu), set: tabs.set ? toRows(tabs.set) : [], tabs };
   },
   /* repli : le « tableau » est un fichier Excel déposé dans Drive. On le télécharge (API Drive) et on le lit nous-mêmes. */
   async readOffice() {
@@ -3896,7 +3966,7 @@ const Sync = {
       let sheets; try { sheets = readXlsx(buf); } catch (e) { throw new SyncError('Le fichier Excel est illisible (' + (e.message || 'format inattendu') + ')', 'office'); }
       const tabs = Sync.tabsOf(Object.keys(sheets));
       const toRows = t => (sheets[t] || []).map(r => r.map(v => ({ t: String(v == null ? '' : v).trim(), l: '' })));
-      return { title: meta.name || '', dest: toRows(tabs.dest), med: toRows(tabs.med), etu: toRows(tabs.etu), tabs, office: true };
+      return { title: meta.name || '', dest: toRows(tabs.dest), med: toRows(tabs.med), etu: toRows(tabs.etu), set: tabs.set ? toRows(tabs.set) : [], tabs, office: true };
     } catch (e) {
       if (e && ['net', 'timeout', 'blocked', 'http403', 'http429', 'http500', 'http503'].includes(e.kind)) e.message += hint;
       throw e;
@@ -3942,14 +4012,24 @@ const Sync = {
     const skip = o => /^(non|no|0|faux|false|masque|cache)$/.test(nrm(o.show || ''));
     const dests = D.filter(o => o.ville.trim());
     if (!dests.length) throw new SyncError('Aucune destination dans l’onglet Destinations', 'empty');
+    /* onglet facultatif « Réglages » : deux colonnes (réglage, valeur) ; pour l'instant : Logo */
+    const SET = {}; (sh.set || []).forEach(r => { const k = nrm(r[0] && r[0].t), c = r[1]; if (k && c && k !== 'reglage' && k !== 'parametre') SET[k] = (c.l || c.t || '').trim(); });
+    let logoLink = SET.logo || SET.logoisg || SET.logoblanc || '';
+    if (/^(collez|\(|exemple)/i.test(logoLink.trim())) logoLink = '';   // texte d'exemple du modèle : ignoré sans avertissement
     /* liens Drive à vérifier */
-    const ids = [];
+    const ids = []; if (driveFileId(logoLink)) ids.push(driveFileId(logoLink));
     dests.forEach(o => { const l = Sync.link(o, 'photo'); if (driveFileId(l)) ids.push(driveFileId(l)); });
     M.forEach(o => { ['lien', 'vignette'].forEach(k => { const l = Sync.link(o, k); if (driveFileId(l)) ids.push(driveFileId(l)); }); });
     E.forEach(o => { const l = Sync.link(o, 'photo'); if (driveFileId(l)) ids.push(driveFileId(l)); });
     say(`Vérification de ${new Set(ids).size} fichier(s) Drive…`);
     const meta = await Sync.driveMeta(ids, warn);
     const okFile = (id, ctx) => { const m = meta[id]; if (!m || m.error) { warn.push(`${ctx} : fichier Drive inaccessible (${(m && m.error) || 'erreur'})`); return null; } return m; };
+    let logo = '';
+    if (logoLink) {
+      const lid = driveFileId(logoLink);
+      if (lid) { const m = okFile(lid, 'Réglages logo'); if (m && !/^image\//.test(m.mimeType || '')) warn.push(`Réglages logo : « ${m.name} » n’est pas une image (${m.mimeType})`); else if (m) logo = driveApiUrl(lid); }
+      else if (/^https?:\/\//i.test(logoLink)) logo = logoLink; else warn.push('Réglages logo : lien illisible');
+    }
     const lieux = [];
     for (const o of dests) {
       if (skip(o)) continue;
@@ -3996,19 +4076,20 @@ const Sync = {
     const cat = lieux.map(normLieu).filter(l => isFinite(l.lat) && isFinite(l.lon));
     const nMed = cat.reduce((a, l) => a + l.medias.length, 0), nEtu = cat.reduce((a, l) => a + l.etudiants.length, 0);
     const mt = {}; Object.keys(meta).forEach(id => { if (meta[id] && meta[id].modifiedTime) mt[id] = meta[id].modifiedTime; });
-    return { lieux: cat, warn, mt, counts: { dests: cat.length, medias: nMed, etus: nEtu, files: new Set(ids).size, title: sh.title } };
+    return { lieux: cat, warn, mt, logo, counts: { dests: cat.length, medias: nMed, etus: nEtu, files: new Set(ids).size, title: sh.title, logo: !!logo } };
   },
   /* ---- applique un catalogue construit ---- */
+  sigOf(b) { return JSON.stringify({ l: b.lieux, g: b.logo || '' }); },
   apply(b) {
     /* la signature compare le contenu du TABLEAU : les vignettes fabriquées par l'appareil n'en font pas partie */
-    const sig = JSON.stringify(b.lieux), prev = store.get('sync.sig', '');
+    const sig = Sync.sigOf(b), prev = store.get('sync.sig', '');
     const posters = store.get('sync.posters', {});
     b.lieux.forEach(l => l.medias.forEach(m => { if (m.type === 'video' && !m.poster && posters[m.id] && posters[m.id].rev === m.rev && posters[m.id].key) m.poster = posters[m.id].key; }));
     const prevMt = store.get('sync.mt', {}); Sync.stale = Object.keys(b.mt || {}).filter(id => prevMt[id] && prevMt[id] !== b.mt[id]); store.set('sync.mt', b.mt || {});
     const changed = sig !== prev || !S.fromSheet;
     if (changed) {
-      store.set('sync.cat', { version: 2, lieux: b.lieux }); store.set('sync.sig', sig);
-      S.lieux = b.lieux.map(normLieu); S.fromSheet = true; S.isLocal = true; applyCatalog();
+      store.set('sync.cat', { version: 2, lieux: b.lieux }); store.set('sync.sig', sig); store.set('sync.logo', b.logo || '');
+      S.lieux = b.lieux.map(normLieu); S.fromSheet = true; S.isLocal = true; applyCatalog(); loadLogo();
     }
     return changed;
   },
@@ -4060,6 +4141,7 @@ const Sync = {
     if (typeof downloadMedia === 'function') { try { await downloadMedia(false); } catch (e) { } }
     for (let i = 0; i < 900 && (MEDIA.running || MEDIA.again); i++) await new Promise(r => setTimeout(r, 1000));
     await Sync.posters();
+    if (typeof Pal !== 'undefined') Pal.warm().catch(() => { });
     if (typeof purgeLocal === 'function') { try { await purgeLocal(); } catch (e) { } }
   },
   /* un fichier remplacé dans Drive garde son identifiant : on efface sa copie pour la retélécharger */
@@ -4117,7 +4199,7 @@ const Sync = {
     Sync.busy = true;
     try {
       const b = await Sync.build();
-      store.set('sync.cat', { version: 2, lieux: b.lieux }); store.set('sync.sig', JSON.stringify(b.lieux)); store.set('sync.mt', b.mt || {}); store.set('sync.okAt', Date.now());
+      store.set('sync.cat', { version: 2, lieux: b.lieux }); store.set('sync.sig', Sync.sigOf(b)); store.set('sync.logo', b.logo || ''); store.set('sync.mt', b.mt || {}); store.set('sync.okAt', Date.now());
       Sync.last = { at: Date.now(), ok: true, msg: 'Catalogue mis à jour', warn: b.warn, counts: b.counts, changed: true }; store.set('sync.st', Sync.last);
       Sync.busy = false;
       if (!S.fromSheet && window.__booted) Sync.applyStored();
@@ -4136,6 +4218,7 @@ const Sync = {
     addEventListener('online', () => { if (SRC.on) setTimeout(() => Sync.run(), 1500); });
     document.addEventListener('visibilitychange', () => { if (!document.hidden && SRC.on && Sync.due()) Sync.run(); });
     if (SRC.on) setTimeout(() => { if (Sync.due() || !S.fromSheet) Sync.run(); else Sync.afterApply(); }, 4000);
+    setTimeout(() => { if (typeof Pal !== 'undefined') Pal.warm().catch(() => { }); }, 9000);
   },
   /* test pas à pas pour l'écran des réglages */
   async test(log) {
