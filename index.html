@@ -786,8 +786,11 @@ a.btn{text-decoration:none;display:inline-flex;align-items:center;justify-conten
    APP_VERSION est comparée par le système de mise à jour :
    à chaque livraison elle doit augmenter (build.py s'en charge).
 ===================================================================== */
-const APP_VERSION = "1.7.0";
+const APP_VERSION = "1.7.1";
 const CHANGELOG = [
+  { v: "1.7.1", d: "17 octobre 2026", t: [
+    "Source Google Sheet : les photos et vidéos ajoutées depuis l’iPad restent conservées (elles réapparaissent si la source est désactivée)"
+  ]},
   { v: "1.7.0", d: "17 octobre 2026", t: [
     "Nouvelle source : un Google Sheet où l’équipe colle des liens Google Drive, synchronisé sur tous les écrans",
     "Synchronisation automatique (toutes les 5 à 60 minutes, au retour du réseau) avec bouton « Synchroniser maintenant »",
@@ -3457,7 +3460,11 @@ function mediaItems() {
 }
 function localKeys() {
   const out = new Set(), add = u => { if (mediaKind(u) === 'local') out.add(absUrl(u)); };
-  S.lieux.forEach(l => { if (l.cover) add(l.cover.url); (l.medias || []).forEach(m => { add(m.url); add(m.poster); }); (l.etudiants || []).forEach(e => add(e.photo)); });
+  const refs = l => { if (l.cover) add(l.cover.url); (l.medias || []).forEach(m => { add(m.url); add(m.poster); }); (l.etudiants || []).forEach(e => add(e.photo)); };
+  S.lieux.forEach(refs);
+  /* les données propres à l'appareil restent protégées même quand le Google Sheet est la source affichée :
+     on les retrouve intactes si la source est désactivée */
+  ['cat', 'sync.cat'].forEach(k => { const c = store.get(k, null); if (c && Array.isArray(c.lieux)) c.lieux.map(normLieu).forEach(refs); });
   out.add(absUrl(LOGO_KEY));   // le logo ISG ajouté dans les réglages n'est jamais purgé
   return out;
 }
