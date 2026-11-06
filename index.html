@@ -786,8 +786,14 @@ a.btn{text-decoration:none;display:inline-flex;align-items:center;justify-conten
    APP_VERSION est comparée par le système de mise à jour :
    à chaque livraison elle doit augmenter (build.py s'en charge).
 ===================================================================== */
-const APP_VERSION = "1.7.2";
+const APP_VERSION = "1.7.3";
 const CHANGELOG = [
+  { v: "1.7.3", d: "17 octobre 2026", t: [
+    "Source Google Sheet : beaucoup moins de requêtes (une seule vérification légère quand le tableau n’a pas changé)",
+    "Erreurs Google expliquées précisément (quota, clé restreinte, réseau lent ou filtré) avec attente progressive entre les essais",
+    "Photos Drive : vignette légère affichée tout de suite, copie réduite (2000 px) stockée sur l’appareil, téléchargements avec délai maximum",
+    "Une clé d’API changée dans data/source.json est reprise automatiquement par les écrans"
+  ]},
   { v: "1.7.2", d: "17 octobre 2026", t: [
     "Source Google Sheet : un tableau au format Excel (.xlsx) déposé dans Drive est maintenant lu directement",
     "Messages d’erreur plus clairs quand le tableau n’est pas un vrai Google Sheet"
@@ -1095,8 +1101,14 @@ function normalizeLink(u) {
   return u;
 }
 /* adresse utilisable dans <img> (photos Drive → miniature publique) */
+/* fichier Drive lu par l'API (source Google Sheet) : identifiant du fichier */
+function driveApiId(u) { const m = /googleapis\.com\/drive\/v3\/files\/([\w-]+)\?alt=media/.exec(String(u || '')); return m ? m[1] : ''; }
 function srcOf(u) {
   if (mediaKind(u) === 'drive') return `https://drive.google.com/thumbnail?id=${driveId(u)}&sz=w1600`;
+  /* photo Drive pas encore copiée sur l'appareil : on affiche la vignette réduite de Google (légère) au lieu de l'original (souvent 5 à 15 Mo) ;
+     une fois copiée, l'appareil sert sa propre copie */
+  const g = driveApiId(u);
+  if (g && typeof MEDIA !== 'undefined' && !MEDIA.have.has(absUrl(u)) && navigator.onLine) return `https://drive.google.com/thumbnail?id=${g}&sz=w1400`;
   return u;
 }
 function absUrl(u) { try { return new URL(u, location.href).href; } catch (e) { return u; } }
@@ -1110,6 +1122,7 @@ function ratioOf(v) { if (v.ratio) return v.ratio; const r = store.get('ratios',
 function rememberRatio(url, r) { const m = store.get('ratios', {}); if (!m[url]) { m[url] = Math.round(r * 1000) / 1000; store.set('ratios', m); } }
 function posterOf(v) {
   if (v.poster) return v.poster;
+  if (driveApiId(v.url) && navigator.onLine) return `https://drive.google.com/thumbnail?id=${driveApiId(v.url)}&sz=w800`;
   if (mediaKind(v.url) === 'youtube') return `https://i.ytimg.com/vi/${ytId(v.url)}/hqdefault.jpg`;
   return '';
 }
@@ -2957,7 +2970,7 @@ function initAdmin() {
     else if (A.sub === 'media') { setPath(A.md, f, e.target.value); if (f === 'url') { const k = $('#aKind'); if (k) k.innerHTML = kindPill(normalizeLink(e.target.value)); } }
   });
   body.addEventListener('change', e => {
-    if (e.target.dataset && e.target.dataset.src) { const k = e.target.dataset.src; SRC[k] = e.target.value.trim(); saveSrc(); if (k === 'sheet' || k === 'key') { A.srcRep = null; setTimeout(refreshSourceUi, 0); } return; }
+    if (e.target.dataset && e.target.dataset.src) { const k = e.target.dataset.src; SRC[k] = e.target.value.trim(); SRC.fromFile = false; saveSrc(); if (k === 'sheet' || k === 'key') { A.srcRep = null; setTimeout(refreshSourceUi, 0); } return; }
     if (e.target.dataset && e.target.dataset.cfgsel) { CFG[e.target.dataset.cfgsel] = e.target.value; saveCfg(); return; }
     if (e.target.dataset && e.target.dataset.file) { onFile(e.target); return; }
     if (A.sub === 'dest' && e.target.dataset && e.target.dataset.f === 'cover.url') { const n = normalizeLink(e.target.value); e.target.value = n; if (n) A.draft.cover = { url: n, credit: '', legende: '' }; if (!A.isNew) commitDraft(); e.target.blur(); const st = body.scrollTop; setTimeout(() => { renderAdmin(); body.scrollTop = st; }, 0); return; }
@@ -3296,7 +3309,7 @@ function applyImport(list, mode) {
      réessaie plus tard (pause de 5 min) : jamais de boucle de rechargement.
 ===================================================================== */
 const UPD = { state: 'idle', remote: null, checkedAt: 0 };
-const MEDIA = { total: 0, done: 0, fail: 0, localMissing: 0, running: false };
+const MEDIA = { total: 0, done: 0, fail: 0, localMissing: 0, running: false, have: new Set(), retryNow: false };
 const MEDIA_CACHE = 'isg-media-v1';
 const CHECK_EVERY = 10 * 60 * 1000, BACKOFF = 5 * 60 * 1000;
 
@@ -3483,13 +3496,28 @@ async function mediaScan() {
   if (!window.caches) return;
   const c = await caches.open(MEDIA_CACHE);
   let done = 0, missing = 0;
-  for (const it of items) { if (await hasItem(c, it)) done++; }
+  for (const it of items) { if (await hasItem(c, it)) { done++; MEDIA.have.add(it.abs); } }
   for (const k of localKeys()) { if (!(await FS.has(k)) && !(await c.match(k))) missing++; }
   MEDIA.done = done; MEDIA.localMissing = Math.max(0, missing - (store.get('logov', 0) ? 0 : 1));
   refreshSettingsUpd();
 }
+/* photo trop lourde (iPhone : 4000 px, 5 à 15 Mo) : copie réduite (2000 px, JPEG) stockée sur l'appareil, bien plus rapide à décoder et à afficher */
+async function shrinkImage(blob) {
+  try {
+    const t = blob.type || '';
+    if (!/^image\/(jpeg|webp|png)$/.test(t) || blob.size < (t === 'image/png' ? 2500 : 700) * 1024 || typeof createImageBitmap !== 'function') return blob;
+    const bm = await createImageBitmap(blob), k = Math.min(1, 2000 / Math.max(bm.width, bm.height));
+    if (k >= 1 && blob.size < 1500 * 1024) { if (bm.close) bm.close(); return blob; }
+    const c = document.createElement('canvas'); c.width = Math.max(2, Math.round(bm.width * k)); c.height = Math.max(2, Math.round(bm.height * k));
+    c.getContext('2d').drawImage(bm, 0, 0, c.width, c.height); if (bm.close) bm.close();
+    const out = await new Promise(res => c.toBlob(res, 'image/jpeg', 0.86));
+    return out && out.size && out.size < blob.size ? out : blob;
+  } catch (e) { return blob; }
+}
 async function downloadMedia(force) {
-  if (!window.caches || MEDIA.running) return;
+  if (!window.caches) return;
+  /* un téléchargement est déjà en cours (ex. contenus précédents) : on rejoue dès qu'il est fini, avec le catalogue à jour */
+  if (MEDIA.running) { MEDIA.again = true; return; }
   MEDIA.running = true;
   try {
     const c = await caches.open(MEDIA_CACHE);
@@ -3506,21 +3534,29 @@ async function downloadMedia(force) {
     MEDIA.fail = items.filter(i => fails.has(i.abs)).length;
     refreshSettingsUpd();
     const bar = $('#dl'); let shown = false;
+    const failT = store.get('media.failT', {}), retryNow = MEDIA.retryNow; MEDIA.retryNow = false;
     for (const it of items) {
-      if (await hasItem(c, it)) continue;
+      if (await hasItem(c, it)) { MEDIA.have.add(it.abs); continue; }
       if (S.mode === 'video' || !navigator.onLine) break;
+      /* un fichier qui vient d'échouer n'est pas retéléchargé en boucle : nouvel essai après 30 min (ou tout de suite sur « Synchroniser ») */
+      if (!it.same && !retryNow && failT[it.abs] && Date.now() - failT[it.abs] < 30 * 60000) continue;
       if (!shown) { bar.style.opacity = 1; shown = true; }
+      const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), it.vid ? 15 * 60000 : 90000);
       try {
-        const r = it.same ? await fetch(it.abs + '?_=' + Date.now(), { cache: 'no-store' }) : await fetch(it.abs, { mode: 'cors', cache: 'no-store' });
+        const r = it.same ? await fetch(it.abs + '?_=' + Date.now(), { cache: 'no-store', signal: ctl.signal }) : await fetch(it.abs, { mode: 'cors', cache: 'no-store', signal: ctl.signal });
         if (r.ok && r.status === 200) {
-          if (it.vid) await FS.put(it.abs, await r.blob()); else await c.put(it.abs, r);
-          done++; MEDIA.done = done; fails.delete(it.abs);
-        } else if (!it.same) fails.add(it.abs);
-      } catch (e) { if (it.same) break; fails.add(it.abs); }
+          if (it.vid) await FS.put(it.abs, await r.blob());
+          else if (it.same) await c.put(it.abs, r);
+          else { const b = await shrinkImage(await r.blob()); await c.put(it.abs, new Response(b, { headers: { 'Content-Type': b.type || 'image/jpeg', 'Content-Length': String(b.size) } })); }
+          done++; MEDIA.done = done; fails.delete(it.abs); delete failT[it.abs]; MEDIA.have.add(it.abs);
+        } else if (!it.same) { fails.add(it.abs); failT[it.abs] = Date.now(); }
+      } catch (e) { if (it.same) { clearTimeout(to); break; } fails.add(it.abs); failT[it.abs] = Date.now(); }
+      clearTimeout(to);
       MEDIA.fail = items.filter(i => fails.has(i.abs)).length;
       bar.style.width = (MEDIA.total ? MEDIA.done / MEDIA.total * 100 : 0) + '%';
       refreshSettingsUpd();
     }
+    store.set('media.failT', failT);
     store.set(MEDIA_FAIL_KEY, Array.from(fails));
     /* supprime ce qui n'est plus utilisé par le catalogue (hors fichiers de l'iPad : voir purgeLocal) */
     const keep = new Set(items.map(i => i.abs));
@@ -3529,6 +3565,7 @@ async function downloadMedia(force) {
     setTimeout(() => { bar.style.opacity = 0; setTimeout(() => { bar.style.width = '0'; }, 500); }, 600);
   } catch (e) { }
   MEDIA.running = false; refreshSettingsUpd();
+  if (MEDIA.again) { MEDIA.again = false; setTimeout(() => downloadMedia(false), 400); }
 }
 
 /* supprime les fichiers de l'iPad qui ne sont plus utilisés par aucune destination
@@ -3555,24 +3592,53 @@ const driveFileId = u => { const t = String(u || '').trim(); const m = /drive\.g
 const driveApiUrl = id => `https://www.googleapis.com/drive/v3/files/${id}?alt=media&key=${encodeURIComponent(SRC.key)}`;
 
 const Sync = {
-  busy: false, timer: 0, pending: null, last: store.get('sync.st', null), geo: store.get('sync.geo', {}),
+  fails: store.get('sync.fails', 0), busy: false, timer: 0, pending: null, last: store.get('sync.st', null), geo: store.get('sync.geo', {}),
   say() { try { if (typeof refreshSourceUi === 'function') refreshSourceUi(); } catch (e) { } },
   /* appel d'une API Google avec délai maximum ; les erreurs sont traduites en français */
-  async api(url, ms, binary) {
-    const ctl = new AbortController(), t = setTimeout(() => ctl.abort(), ms || 20000);
-    let r; try { r = await fetch(url, { signal: ctl.signal, cache: 'no-store' }); } catch (e) { clearTimeout(t); throw new SyncError(navigator.onLine ? 'Pas de réponse de Google (connexion lente, blocage du navigateur ou clé restreinte)' : 'Pas de connexion Internet', 'net'); }
-    clearTimeout(t);
-    if (r.ok) return binary ? r.arrayBuffer() : r.json();
-    let msg = ''; try { const j = await r.json(); msg = (j.error && j.error.message) || ''; } catch (e) { }
-    throw new SyncError(Sync.explain(r.status, msg), r.status === 400 && /not supported for this document/i.test(msg) ? 'office' : 'http' + r.status);
+  timeoutK: 1,
+  sleep: ms => new Promise(r => setTimeout(r, ms)),
+  /* appel d'une API Google : 2 tentatives (réseau, délai, quota passager), erreurs traduites en français avec le motif exact de Google */
+  async api(url, ms, binary, tries) {
+    let last;
+    for (let a = 0; a < (tries || 2); a++) {
+      const ctl = new AbortController(), t0 = Date.now(), to = setTimeout(() => ctl.abort(), (ms || 20000) * Sync.timeoutK * (a ? 1.5 : 1));
+      try {
+        const r = await fetch(url, { signal: ctl.signal, cache: 'no-store' });
+        if (r.ok) { const out = binary ? await r.arrayBuffer() : await r.json(); clearTimeout(to); return out; }
+        clearTimeout(to);
+        let msg = '', why = ''; try { const j = await r.json(); msg = (j.error && j.error.message) || ''; why = (j.error && ((j.error.errors && j.error.errors[0] && j.error.errors[0].reason) || (j.error.details && j.error.details[0] && j.error.details[0].reason) || j.error.status)) || ''; } catch (e) { }
+        const err = new SyncError(Sync.explain(r.status, msg, why), r.status === 400 && /not supported for this document/i.test(msg) ? 'office' : 'http' + r.status);
+        err.status = r.status; err.why = why;
+        if ((r.status === 429 || r.status >= 500) && a < (tries || 2) - 1) { last = err; await Sync.sleep(1500 * Sync.timeoutK); continue; }
+        throw err;
+      } catch (e) {
+        clearTimeout(to);
+        if (e instanceof SyncError) throw e;
+        last = await Sync.netDiag(url, Date.now() - t0, ctl.signal.aborted);
+        if (a < (tries || 2) - 1) await Sync.sleep(1200 * Sync.timeoutK);
+      }
+    }
+    throw last;
   },
-  explain(code, msg) {
+  /* aucune réponse lisible : on cherche pourquoi (délai ? réseau coupé ? réponse bloquée par le navigateur ?) */
+  async netDiag(url, ms, timedOut) {
+    const s = Math.max(1, Math.round(ms / 1000));
+    if (navigator.onLine === false) return new SyncError('Pas de connexion Internet', 'net');
+    if (timedOut) return new SyncError(`Pas de réponse de Google en ${s} s : connexion trop lente ou saturée`, 'timeout');
+    let reached = false;
+    try { const c = new AbortController(), t = setTimeout(() => c.abort(), 8000 * Sync.timeoutK); await fetch(url, { mode: 'no-cors', cache: 'no-store', signal: c.signal }); clearTimeout(t); reached = true; } catch (e) { }
+    return reached
+      ? new SyncError('Pas de réponse lisible de Google : la requête arrive mais le navigateur bloque la réponse. Cause probable : quota dépassé ou clé d’API restreinte à d’autres adresses (ouvrez l’adresse de test du guide pour voir le message exact de Google)', 'blocked')
+      : new SyncError('Pas de réponse de Google : réseau injoignable (Wi-Fi filtré, pare-feu, VPN ou bloqueur de contenu ?)', 'net');
+  },
+  explain(code, msg, why) {
+    const tail = ` [HTTP ${code}${why ? ' · ' + why : ''}]`;
+    if (code === 429 || /rateLimit|RATE_LIMIT|quotaExceeded|RESOURCE_EXHAUSTED/i.test(why || '')) return 'Quota Google dépassé (trop de synchronisations en peu de temps) : patientez quelques minutes, ça repart tout seul' + tail;
     if (code === 400 && /not supported for this document/i.test(msg)) return 'Le tableau est un fichier Excel (.xlsx) ouvert dans Google Sheets';
-    if (code === 400) return /API key/i.test(msg) ? 'Clé d’API invalide' : 'Requête refusée par Google (' + msg.slice(0, 80) + ')';
-    if (code === 403) return /not been used|disabled|SERVICE_DISABLED/i.test(msg) ? 'API non activée dans Google Cloud (activez « Google Sheets API » et « Google Drive API »)' : (/referer|referrer/i.test(msg) ? 'Clé d’API restreinte : l’adresse de ce site n’est pas autorisée' : 'Accès refusé (le fichier ou le tableau n’est pas partagé en « toute personne disposant du lien », ou quota dépassé)');
-    if (code === 404) return 'Introuvable (mauvais lien, ou non partagé en « toute personne disposant du lien »)';
-    if (code === 429) return 'Trop de requêtes : Google demande d’attendre un peu';
-    return 'Erreur Google ' + code;
+    if (code === 400) return (/API key/i.test(msg) || /API_KEY_INVALID/i.test(why || '') ? 'Clé d’API invalide (supprimée, modifiée ou mal copiée)' : 'Requête refusée par Google (' + msg.slice(0, 80) + ')') + tail;
+    if (code === 403) return (/not been used|disabled|SERVICE_DISABLED/i.test(msg + why) ? 'API non activée dans Google Cloud (activez « Google Sheets API » et « Google Drive API »)' : (/referer|referrer|REFERRER/i.test(msg + why) ? 'Clé d’API restreinte : l’adresse de ce site n’est pas autorisée' : 'Accès refusé (le fichier ou le tableau n’est pas partagé en « toute personne disposant du lien », ou quota dépassé)')) + tail;
+    if (code === 404) return 'Introuvable (mauvais lien, ou non partagé en « toute personne disposant du lien »)' + tail;
+    return 'Erreur Google ' + code + tail;
   },
   /* ---- lecture du tableau (liens compris, y compris les « puces » Drive et les formules HYPERLINK) ---- */
   async readSheet() {
@@ -3631,7 +3697,7 @@ const Sync = {
         catch (e) { out[id] = { error: e.message, kind: e.kind }; }
       }
     };
-    await Promise.all(Array.from({ length: Math.min(6, list.length) }, worker));
+    await Promise.all(Array.from({ length: Math.min(4, list.length) }, worker));
     return out;
   },
   /* ---- construit le catalogue (sans rien appliquer) ---- */
@@ -3705,10 +3771,11 @@ const Sync = {
   },
   /* ---- applique un catalogue construit ---- */
   apply(b) {
+    /* la signature compare le contenu du TABLEAU : les vignettes fabriquées par l'appareil n'en font pas partie */
+    const sig = JSON.stringify(b.lieux), prev = store.get('sync.sig', '');
     const posters = store.get('sync.posters', {});
     b.lieux.forEach(l => l.medias.forEach(m => { if (m.type === 'video' && !m.poster && posters[m.id] && posters[m.id].rev === m.rev && posters[m.id].key) m.poster = posters[m.id].key; }));
     const prevMt = store.get('sync.mt', {}); Sync.stale = Object.keys(b.mt || {}).filter(id => prevMt[id] && prevMt[id] !== b.mt[id]); store.set('sync.mt', b.mt || {});
-    const sig = JSON.stringify(b.lieux), prev = store.get('sync.sig', '');
     const changed = sig !== prev || !S.fromSheet;
     if (changed) {
       store.set('sync.cat', { version: 2, lieux: b.lieux }); store.set('sync.sig', sig);
@@ -3716,24 +3783,41 @@ const Sync = {
     }
     return changed;
   },
+  /* une seule requête légère : le tableau a-t-il été modifié depuis la dernière lecture ? */
+  async modTime() {
+    const id = sheetIdOf(SRC.sheet); if (!id) return '';
+    const m = await Sync.api(`https://www.googleapis.com/drive/v3/files/${id}?fields=modifiedTime&supportsAllDrives=true&key=${encodeURIComponent(SRC.key)}`, 12000, false, 1);
+    return m.modifiedTime || '';
+  },
   /* ---- une synchronisation complète ---- */
   async run(opt) {
     opt = opt || {};
     if (Sync.busy) return Sync.last;
     if (!SRC.on && !opt.force) return null;
     if (!opt.manual && (S.mode === 'video')) return null;
-    Sync.busy = true; Sync.say();
+    Sync.busy = true; Sync.say(); if (opt.manual) MEDIA.retryNow = true;
     const st = { at: Date.now(), ok: false, warn: [], msg: '' };
     try {
+      /* tableau inchangé et lecture complète récente : on s'arrête là (1 requête au lieu de 30, et pas de risque de quota) */
+      let smt = ''; try { smt = await Sync.modTime(); } catch (e) { smt = ''; }
+      const fresh = Date.now() - store.get('sync.fullAt', 0) < 60 * 60000;
+      if (!opt.manual && smt && smt === store.get('sync.smt', '') && fresh && S.fromSheet) {
+        st.ok = true; st.msg = 'Déjà à jour (tableau inchangé)'; st.counts = Sync.last && Sync.last.counts; st.warn = Sync.last && Sync.last.warn || [];
+        setTimeout(() => { if (typeof downloadMedia === 'function') downloadMedia(false); }, 600);   // des médias manquants ? (ne fait rien si tout est déjà copié)
+        Sync.fails = 0; store.set('sync.fails', 0); Sync.busy = false; Sync.step = ''; Sync.last = st; store.set('sync.st', st); store.set('sync.okAt', st.at); Sync.say(); return st;
+      }
       const b = await Sync.build(t => { Sync.step = t; Sync.say(); });
+      store.set('sync.smt', smt); store.set('sync.fullAt', Date.now());
       st.warn = b.warn; st.counts = b.counts;
       const quiet = !opt.manual && !['attract', 'explore'].includes(S.mode);
       if (quiet) { Sync.pending = b; st.msg = 'Nouveautés prêtes (affichées au retour sur le globe)'; }
       else { const ch = Sync.apply(b); Sync.pending = null; st.msg = ch ? 'Catalogue mis à jour' : 'Déjà à jour'; st.changed = ch; }
-      st.ok = true;
+      st.ok = true; Sync.fails = 0; store.set('sync.fails', 0);
     } catch (e) {
       st.msg = e.message || 'Erreur'; st.err = e.kind || 'x'; if (e.warn) st.warn = e.warn;
-      if (e.kind === 'net' && !opt.manual) st.msg += ' · contenu précédent conservé';
+      Sync.fails = (Sync.fails || 0) + 1; store.set('sync.fails', Sync.fails);
+      if (['net', 'timeout', 'blocked'].includes(e.kind) && !opt.manual) st.msg += ' · contenu précédent conservé';
+      if (!opt.manual && Sync.fails > 1) st.msg += ` · nouvelle tentative dans ${Math.round(Sync.wait() / 60000)} min`;
     }
     Sync.busy = false; Sync.step = ''; Sync.last = st; store.set('sync.st', st);
     if (st.ok) { store.set('sync.okAt', st.at); setTimeout(() => Sync.afterApply(), 800); }
@@ -3745,7 +3829,7 @@ const Sync = {
   async afterApply() {
     await Sync.invalidate();
     if (typeof downloadMedia === 'function') { try { await downloadMedia(false); } catch (e) { } }
-    for (let i = 0; i < 600 && MEDIA.running; i++) await new Promise(r => setTimeout(r, 1000));
+    for (let i = 0; i < 900 && (MEDIA.running || MEDIA.again); i++) await new Promise(r => setTimeout(r, 1000));
     await Sync.posters();
     if (typeof purgeLocal === 'function') { try { await purgeLocal(); } catch (e) { } }
   },
@@ -3788,7 +3872,8 @@ const Sync = {
     try {
       const j = await getJson('data/source.json'); if (!j || !j.sheet) return;
       const fv = store.get('src.fileVer', 0), v = +j.version || 1;
-      if (!SRC.sheet || v > fv) {
+      const follows = SRC.fromFile && (String(j.sheet).trim() !== SRC.sheet || String(j.key || '').trim() !== SRC.key);
+      if (!SRC.sheet || v > fv || follows) {
         SRC.sheet = String(j.sheet).trim(); SRC.key = String(j.key || SRC.key || '').trim(); SRC.every = [5, 10, 30, 60].includes(+j.every) ? +j.every : (SRC.every || 10); SRC.on = j.on !== false; SRC.fromFile = true;
         store.set('src.fileVer', v); saveSrc();
       }
@@ -3810,7 +3895,8 @@ const Sync = {
   },
   applyStored() { const sy = store.get('sync.cat', null); if (!sy || !sy.lieux) return; S.lieux = sy.lieux.map(normLieu); S.fromSheet = true; S.isLocal = true; applyCatalog(); setTimeout(() => Sync.afterApply(), 800); },
   /* planification : au démarrage, toutes les N minutes, au retour du réseau et de l'écran */
-  due() { const t = store.get('sync.okAt', 0), tr = Sync.last ? Sync.last.at : 0; return Date.now() - Math.max(t, tr) >= SRC.every * 60000 - 2000; },
+  wait() { return SRC.every * 60000 * Math.min(4, Math.pow(2, Math.max(0, (Sync.fails || 0) - 1))); },
+  due() { const t = store.get('sync.okAt', 0), tr = Sync.last ? Sync.last.at : 0; return Date.now() - Math.max(t, tr) >= Sync.wait() - 2000; },
   init() {
     clearInterval(Sync.timer);
     Sync.timer = setInterval(() => { if (SRC.on && !Sync.busy && Sync.due()) Sync.run(); Sync.flush(); }, 20000);
