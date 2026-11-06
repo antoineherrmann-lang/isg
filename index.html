@@ -616,6 +616,15 @@ body.upgrading #stage,body.upgrading #labels,body.upgrading #top,body.upgrading 
 #admin[data-space=hub] .ltitle{display:none}
 #admin[data-space=hub] .wrap{padding-top:16px}
 
+/* ---------- source Google Sheet : lignes de contrôle ---------- */
+.dline{display:flex;align-items:flex-start;gap:10px;padding:10px 16px;font-size:15px;line-height:1.35;border-top:1px solid rgba(255,255,255,.08)}
+.dline:first-child{border-top:0}
+.dline i{flex:none;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font-style:normal;font-size:13px;font-weight:700;margin-top:1px}
+.dline.ok i{background:rgba(60,210,130,.2);color:#6be29b}.dline.ok i::before{content:"✓"}
+.dline.ko i{background:rgba(255,120,120,.2);color:#ff9a9a}.dline.ko i::before{content:"✕"}
+.dline.wait i{background:rgba(255,255,255,.12)}.dline.wait i::before{content:"…"}
+a.btn{text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
+
 </style>
 </head>
 <body>
@@ -777,8 +786,14 @@ body.upgrading #stage,body.upgrading #labels,body.upgrading #top,body.upgrading 
    APP_VERSION est comparée par le système de mise à jour :
    à chaque livraison elle doit augmenter (build.py s'en charge).
 ===================================================================== */
-const APP_VERSION = "1.6.8";
+const APP_VERSION = "1.7.0";
 const CHANGELOG = [
+  { v: "1.7.0", d: "17 octobre 2026", t: [
+    "Nouvelle source : un Google Sheet où l’équipe colle des liens Google Drive, synchronisé sur tous les écrans",
+    "Synchronisation automatique (toutes les 5 à 60 minutes, au retour du réseau) avec bouton « Synchroniser maintenant »",
+    "Test de connexion pas à pas et rapport des liens à corriger (Réglages › Source des données)",
+    "Photos et vidéos Drive téléchargées pour le mode hors-ligne, vignettes de vidéos automatiques"
+  ]},
   { v: "1.6.8", d: "17 octobre 2026", t: [
     "Fiche ville : le passage de lumière à l’ouverture est retiré",
     "Espace équipe en une seule liste façon iPadOS : réglages, Données et Statistiques (qui ouvrent leur propre page)",
@@ -992,7 +1007,7 @@ const S = {
 function uid(p) { return (p || 'x') + Math.random().toString(36).slice(2, 7) + Date.now().toString(36).slice(-3); }
 function normMedia(m) {
   return { id: m.id || uid(m.type === 'video' ? 'v' : 'p'), type: m.type === 'video' ? 'video' : 'photo', url: m.url || '', poster: m.poster || '',
-    legende: m.legende || '', credit: m.credit || '', ratio: +m.ratio || 0, duree: +m.duree || 0, sous_titres: m.sous_titres || '', etu: m.etu || '' };
+    legende: m.legende || '', credit: m.credit || '', ratio: +m.ratio || 0, duree: +m.duree || 0, sous_titres: m.sous_titres || '', etu: m.etu || '', rev: m.rev || '' };
 }
 function normEtudiant(e) { return { id: e.id || uid('e'), prenom: String(e.prenom || '').trim(), photo: e.photo || '' }; }
 /* Lit le nouveau format (medias, etudiants) et migre l'ancien (cover, photos, videos avec profil détaillé) */
@@ -1028,6 +1043,9 @@ function normLieu(l) {
 }
 
 function loadCatalog(base) {
+  /* source Google Sheet activée : on repart du dernier catalogue synchronisé (disponible hors-ligne) */
+  const sy = (typeof SRC !== 'undefined' && SRC.on) ? store.get('sync.cat', null) : null;
+  if (sy && Array.isArray(sy.lieux) && sy.lieux.length) { S.fromSheet = true; return { lieux: sy.lieux.map(normLieu).filter(l => isFinite(l.lat) && isFinite(l.lon)), isLocal: true }; }
   const local = store.get('cat', null);
   const useLocal = !!(local && Array.isArray(local.lieux));
   const src = useLocal ? local : base;
@@ -2017,6 +2035,7 @@ const CHEV = '<svg class="chev" viewBox="0 0 10 16"><path d="M2 2l6 6-6 6"/></sv
 function openAdmin() { A.open = true; A.page = 'hub'; A.sub = null; A.draft = null; A.imp = null; A.frames = null; renderAdmin(true); showPanel($('#admin')); setMode('settings'); touchAct(); }
 /* raccourci depuis une fiche ouverte : ouvre directement l'éditeur de la destination */
 function openAdminAt(id) {
+  if (SRC.on) { A.open = true; A.page = 'settings'; A.stab = 'source'; A.sub = null; A.draft = null; renderAdmin(true); showPanel($('#admin')); setMode('settings'); touchAct(); return; }
   const l = S.byId[id]; if (!l) { openAdmin(); return; }
   A.open = true; A.page = 'data'; A.dtab = 'dests'; A.draft = clone(l); A.isNew = false; A.imp = null; A.frames = null; A.cp = null; A.sub = 'dest';
   renderAdmin(true); showPanel($('#admin')); setMode('settings'); touchAct();
@@ -2069,9 +2088,9 @@ function vHub() {
   const row = (k, t, col, ic, sum) => `<button class="grow" data-page="${k}"><i class="sic" style="background:${col}"><svg viewBox="0 0 24 24">${ic}</svg></i><div class="m"><div class="t">${t}</div><div class="s">${esc(sum)}</div></div>${CHEV}</button>`;
   return `
     <div class="group">${secRow('maj')}${secRow('securite')}</div>
-    <div class="group mt">${['interface', 'globe', 'affichage'].map(secRow).join('')}</div>
+    <div class="group mt">${['source', 'interface', 'globe', 'affichage'].map(secRow).join('')}</div>
     <div class="group mt">
-      ${row('data', 'Données', '#7b8cff', '<ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v6c0 1.7 3.1 3 7 3s7-1.3 7-3V6M5 12v6c0 1.7 3.1 3 7 3s7-1.3 7-3v-6"/>', `${S.lieux.length} destination${S.lieux.length > 1 ? 's' : ''} · ${nM} média${nM > 1 ? 's' : ''}`)}
+      ${row('data', 'Données', '#7b8cff', '<ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v6c0 1.7 3.1 3 7 3s7-1.3 7-3V6M5 12v6c0 1.7 3.1 3 7 3s7-1.3 7-3v-6"/>', `${S.lieux.length} destination${S.lieux.length > 1 ? 's' : ''} · ${nM} média${nM > 1 ? 's' : ''}${SRC.on ? ' · Google Sheet' : ''}`)}
       ${row('stats', 'Statistiques', '#2fcfa5', '<path d="M5 20V10M12 20V4M19 20v-7"/>', `Aujourd’hui : ${td.s} visiteur${td.s > 1 ? 's' : ''}`)}
     </div>
     <div class="group mt"><button class="grow" data-act="lock"><div class="m"><div class="t">Verrouiller et fermer</div></div>${CHEV}</button></div>
@@ -2092,6 +2111,7 @@ const srow = (t, s, key) => `<div class="grow"><div class="m"><div class="t">${t
 const SET_SECTIONS = {
   maj: { t: 'Mise à jour', c: '#0a84ff', i: '<path d="M20 12a8 8 0 1 1-2.6-5.9"/><path d="M20 4v5h-5"/>', sum: () => `v${APP_VERSION}${UPD.state === 'available' ? ' · mise à jour disponible' : ''}`, v: () => sMaj() },
   securite: { t: 'Sécurité', c: '#8e8e93', i: '<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>', sum: () => 'Code d’accès de l’espace équipe', v: () => sSecu() },
+  source: { t: 'Source des données', c: '#ff9f0a', i: '<path d="M7 18a4 4 0 0 1-.6-7.96A5.5 5.5 0 0 1 17.2 8.6 4.5 4.5 0 0 1 17.5 18z"/>', sum: () => SRC.on ? ('Google Sheet · ' + srcAgo()) : 'Désactivée (données de cet appareil)', v: () => sSource() },
   interface: { t: 'Interface', c: '#5e5ce6', i: '<path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/>', sum: () => `Logo, boutons ${CFG.hideUi ? 'invisibles' : 'visibles'}, inactivité`, v: () => sInterface() },
   globe: { t: 'Globe', c: '#32ade6', i: '<circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c3 3.2 3 13.8 0 17M12 3.5c-3 3.2-3 13.8 0 17"/>', sum: () => `${(GLOBE_THEMES[CFG.globeTheme] || { label: 'Personnalisé' }).label} · fond ${{ bleu: 'bleu', nuit: 'nuit', sombre: 'très sombre', noir: 'noir' }[CFG.bg] || ''}`, v: () => sGlobe() },
   affichage: { t: 'Affichage', c: '#30d158', i: '<rect x="3" y="5" width="18" height="12" rx="2"/><path d="M8 21h8M12 17v4"/>', sum: () => 'Diagnostic de l’écran', v: () => sAffichage() }
@@ -2247,14 +2267,21 @@ function vStats() {
 /* ====================== DONNÉES ====================== */
 function vData() {
   if (A.dtab === 'profils') A.dtab = 'dests';
-  const tiles = `<div class="dtiles one"><button class="dtile ${A.dtab === 'dests' ? 'on' : ''}" data-set="dtab" data-val="dests"><b>${S.lieux.length}</b><span>Destinations</span><small>Pour chaque ville : photos, vidéos et étudiants</small></button></div>`;
-  const tools = `<div class="dtools"><span class="lbl2">OUTILS</span>${[['import', 'Import Excel'], ['contenus', 'Contenus hors-ligne'], ['backup', 'Sauvegarde']].map(t => `<button class="tool ${A.dtab === t[0] ? 'on' : ''}" data-set="dtab" data-val="${t[0]}">${t[1]}</button>`).join('')}</div>`;
+  const tiles = `<div class="dtiles one"><button class="dtile ${A.dtab === 'dests' ? 'on' : ''}" data-set="dtab" data-val="dests"><b>${S.lieux.length}</b><span>Destinations</span><small>${SRC.on ? 'Gérées dans le Google Sheet' : 'Pour chaque ville : photos, vidéos et étudiants'}</small></button></div>`;
+  const toolList = SRC.on ? [['contenus', 'Contenus hors-ligne']] : [['import', 'Import Excel'], ['contenus', 'Contenus hors-ligne'], ['backup', 'Sauvegarde']];
+  if (SRC.on && !['dests', 'contenus'].includes(A.dtab)) A.dtab = 'dests';
+  const tools = `<div class="dtools"><span class="lbl2">OUTILS</span>${toolList.map(t => `<button class="tool ${A.dtab === t[0] ? 'on' : ''}" data-set="dtab" data-val="${t[0]}">${t[1]}</button>`).join('')}</div>`;
   const body = { dests: dData, import: dImport, contenus: dContenus, backup: dBackup }[A.dtab]();
   return `<div class="ltitle">Données</div>${tiles}${tools}${body}`;
 }
 
 function dData() {
   const arr = S.lieux.slice().sort((x, y) => x.ville.localeCompare(y.ville, 'fr'));
+  if (SRC.on) {
+    return `<div class="note good mt"><b>Données gérées par le Google Sheet</b><br>Pour ajouter ou modifier une destination, une photo ou une vidéo, modifiez le tableau : les écrans se mettent à jour seuls (${esc(srcAgo())}).</div>
+      <div class="btnrow">${sheetUrl() ? `<a class="btn primary" href="${esc(sheetUrl())}" target="_blank" rel="noopener">Ouvrir le tableau</a>` : ''}<button class="btn ghost" data-act="srcSync">Synchroniser maintenant</button></div>
+      <div class="group mt">${arr.map(l => { const np = photosOf(l).length + (l.cover && l.cover.url ? 1 : 0), nv = videosOf(l).length, ne = (l.etudiants || []).length; return `<div class="grow"><div class="m"><div class="t cn">${esc(l.ville)}</div><div class="s">${esc(l.pays)} · ${np} photo${np > 1 ? 's' : ''} · ${nv} vidéo${nv > 1 ? 's' : ''} · ${ne} étudiant${ne > 1 ? 's' : ''}</div></div></div>`; }).join('') || '<div class="grow"><div class="m"><div class="t">Aucune destination</div></div></div>'}</div>`;
+  }
   const nocov = S.lieux.filter(l => !(l.cover && l.cover.url)).length;
   return `<div class="dhead"><h3>Destinations</h3><div class="btnrow" style="margin:0"><button class="btn primary" data-act="newDest">+ Ajouter une destination</button>${nocov ? `<button class="btn ghost" data-act="autoCovers">Photos automatiques (${nocov})</button>` : ''}</div></div><div id="aAutoMsg"></div>
     <div class="lsub" style="margin:0 4px 0">${S.lieux.length} destination${S.lieux.length > 1 ? 's' : ''} · ${S.isLocal ? 'catalogue modifié sur cet iPad' : 'catalogue d’origine (démonstration)'}</div>
@@ -2813,6 +2840,8 @@ async function onAct(b) {
     case 'reload': location.reload(); break;
     case 'lock': S.unlockUntil = 0; closeAdmin(); break;
     case 'resetCat': store.del('cat'); location.reload(); break;
+    case 'srcSync': { const st = await Sync.run({ manual: true, force: true }); refreshSourceUi(); if (st) toast(st.ok ? st.msg : 'Échec : ' + st.msg, 4200); if ($('#aBody') && A.page === 'data') renderAdmin(); break; }
+    case 'srcTest': { A.srcRep = [{ ok: null, t: 'Test en cours…' }]; refreshSourceUi(); const lines = []; await Sync.test(l => { lines.push(l); A.srcRep = lines.concat([{ ok: null, t: 'Vérification…' }]); refreshSourceUi(); }); A.srcRep = lines; refreshSourceUi(); break; }
     case 'globeReset': Object.assign(CFG, GLOBE_DEFAULTS, { spin: 'normal', labels: 'text', breathe: true }); saveCfg(); renderAdmin(); toast('Globe réinitialisé'); break;
 
     case 'newDest': A.draft = emptyLieu(); A.isNew = true; go('dest'); break;
@@ -2881,6 +2910,7 @@ function initAdmin() {
     const ck = e.target.closest('[data-ck]');
     if (ck) { CFG[ck.dataset.ck] = ck.dataset.col; CFG.globeTheme = 'perso'; saveCfg(); renderAdmin(); return; }
     const swb = e.target.closest('[data-sw]');
+    if (swb && swb.dataset.sw === 'srcOn') { SRC.on = !SRC.on; saveSrc(); if (SRC.on) { renderAdmin(); Sync.run({ manual: true, force: true }).then(st => { renderAdmin(); if (st) toast(st.ok ? st.msg : 'Échec : ' + st.msg, 4200); }); } else { store.del('sync.sig'); S.fromSheet = false; toast('Source désactivée : rechargement…'); setTimeout(() => location.reload(), 700); } return; }
     if (swb) { const k = swb.dataset.sw; if (k === 'clusterOn') CFG.cluster = CFG.cluster === 'aucun' ? 'normal' : 'aucun'; else CFG[k] = !CFG[k]; saveCfg(); renderAdmin(); return; }
     const ci = e.target.closest('[data-ci]');
     if (ci) { const it = A.cp.items[+ci.dataset.ci]; A.draft.cover = { url: it.url, credit: it.credit, legende: '' }; A.cp = null; if (!A.isNew) commitDraft(); const st = body.scrollTop; renderAdmin(); body.scrollTop = st; toast('Photo principale choisie'); return; }
@@ -2894,6 +2924,7 @@ function initAdmin() {
       if (k === 'period') { A.period = v; renderAdmin(); return; }
       if (k === 'dtab') { A.dtab = v; renderAdmin(true); return; }
       if (k === 'impMode') { A.imp.mode = v; renderAdmin(); return; }
+      if (k === 'srcEvery') { SRC.every = +v; saveSrc(); renderAdmin(); return; }
       if (k === 'stab') { A.stab = v; A.page = 'settings'; renderAdmin(true); return; }
       if (k === 'decor') { Object.assign(CFG, { sobre: { stars: 'off', atmo: 'off' }, normal: { stars: 'normal', atmo: 'doux' }, riche: { stars: 'beaucoup', atmo: 'fort' } }[v]); saveCfg(); renderAdmin(); return; }
       if (k === 'gsize') { Object.assign(CFG, { s: { dots: 'fin', markerSize: 's', lblSize: 's' }, m: { dots: 'normal', markerSize: 'm', lblSize: 'm' }, l: { dots: 'gros', markerSize: 'l', lblSize: 'l' } }[v]); saveCfg(); renderAdmin(); if (G.ready) requestAnimationFrame(() => G.remeasure()); return; }
@@ -2919,6 +2950,7 @@ function initAdmin() {
     else if (A.sub === 'media') { setPath(A.md, f, e.target.value); if (f === 'url') { const k = $('#aKind'); if (k) k.innerHTML = kindPill(normalizeLink(e.target.value)); } }
   });
   body.addEventListener('change', e => {
+    if (e.target.dataset && e.target.dataset.src) { const k = e.target.dataset.src; SRC[k] = e.target.value.trim(); saveSrc(); if (k === 'sheet' || k === 'key') { A.srcRep = null; setTimeout(refreshSourceUi, 0); } return; }
     if (e.target.dataset && e.target.dataset.cfgsel) { CFG[e.target.dataset.cfgsel] = e.target.value; saveCfg(); return; }
     if (e.target.dataset && e.target.dataset.file) { onFile(e.target); return; }
     if (A.sub === 'dest' && e.target.dataset && e.target.dataset.f === 'cover.url') { const n = normalizeLink(e.target.value); e.target.value = n; if (n) A.draft.cover = { url: n, credit: '', legende: '' }; if (!A.isNew) commitDraft(); e.target.blur(); const st = body.scrollTop; setTimeout(() => { renderAdmin(); body.scrollTop = st; }, 0); return; }
@@ -2926,6 +2958,43 @@ function initAdmin() {
     /* un lien collé est nettoyé dès qu'on quitte le champ (https, Dropbox…) */
     if (A.sub === 'media' && e.target.dataset && e.target.dataset.f === 'url') { const n = normalizeLink(e.target.value); e.target.value = n; A.md.url = n; const k = $('#aKind'); if (k) k.innerHTML = kindPill(n); }
   });
+}
+
+
+/* ---------- Réglages › Source des données (Google Sheet) ---------- */
+function srcAgo() {
+  const t = store.get('sync.okAt', 0), st = Sync.last; if (Sync.busy) return 'synchronisation…';
+  if (!t) return st && !st.ok ? 'échec de la dernière tentative' : 'pas encore synchronisé';
+  const m = Math.round((Date.now() - t) / 60000); return m < 1 ? 'à jour à l’instant' : m < 60 ? `à jour il y a ${m} min` : `à jour il y a ${Math.round(m / 60)} h`;
+}
+const sfield = (label, key, val, ph, hint) => `<div class="grow col"><div class="t">${label}</div>${hint ? `<div class="s">${hint}</div>` : ''}<input class="in" data-src="${key}" value="${esc(val)}" placeholder="${esc(ph)}" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" style="margin-top:8px"></div>`;
+function srcStatusHtml() {
+  const st = Sync.last;
+  if (Sync.busy) return `<div class="note">${esc(Sync.step || 'Synchronisation en cours…')}</div>`;
+  if (!st) return '<div class="note">Aucune synchronisation pour l’instant.</div>';
+  const when = new Date(st.at).toLocaleString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+  const w = (st.warn || []).slice(0, 12).map(x => `<div class="dline ko"><i></i><span>${esc(x)}</span></div>`).join('') + ((st.warn || []).length > 12 ? `<div class="dline ko"><i></i><span>… et ${st.warn.length - 12} autre(s)</span></div>` : '');
+  return `<div class="note ${st.ok ? 'good' : 'bad'}"><b>${st.ok ? 'Dernière synchronisation' : 'Échec de la dernière tentative'}</b> · ${esc(when)}<br>${esc(st.msg || '')}${st.counts ? `<br>${st.counts.dests} destination(s) · ${st.counts.medias} média(s) · ${st.counts.etus} étudiant(s)` : ''}</div>${w ? `<div class="group mt">${w}</div>` : ''}`;
+}
+function srcReportHtml() { return (A.srcRep && A.srcRep.length) ? `<div class="gl">TEST DE LA CONNEXION</div><div class="group">${A.srcRep.map(l => `<div class="dline ${l.ok == null ? 'wait' : l.ok ? 'ok' : 'ko'}"><i></i><span>${esc(l.t)}</span></div>`).join('')}</div>` : ''; }
+function refreshSourceUi() {
+  if (!A.open || A.page !== 'settings' || A.stab !== 'source' || A.sub) return;
+  const s = $('#srcStatus'), r = $('#srcReport'); if (s) s.innerHTML = srcStatusHtml(); if (r) r.innerHTML = srcReportHtml();
+  const b = $('#srcSyncBtn'); if (b) b.disabled = Sync.busy;
+}
+function sSource() {
+  return `
+    <div class="lsub" style="margin:6px 4px 0">Les écrans lisent un Google Sheet où l’équipe colle des liens Google Drive. Chaque écran se met à jour tout seul et garde son contenu hors-ligne.</div>
+    ${SRC.fromFile ? '<div class="note good mt">Cet appareil suit la <b>configuration centrale</b> (fichier data/source.json) : le lien et la clé viennent du site.</div>' : ''}
+    <div class="group mt">
+      ${srow('Utiliser le Google Sheet comme source', 'Activé : le tableau remplace les destinations de cet appareil (elles ne sont plus modifiables ici).', 'srcOn')}
+      ${sfield('Lien du Google Sheet', 'sheet', SRC.sheet, 'https://docs.google.com/spreadsheets/d/…', 'Adresse complète du tableau, partagé en « Tous les utilisateurs disposant du lien : lecteur ».')}
+      ${sfield('Clé d’API Google', 'key', SRC.key, 'AIza…', 'Gratuite : voir le guide GUIDE-GOOGLE-SHEET.')}
+      ${grow('Vérifier le tableau toutes les', '', seg('srcEvery', [[5, '5 min'], [10, '10 min'], [30, '30 min'], [60, '1 h']], SRC.every))}
+    </div>
+    <div class="btnrow"><button class="btn primary" id="srcSyncBtn" data-act="srcSync">Synchroniser maintenant</button><button class="btn ghost" data-act="srcTest">Tester la connexion</button>${sheetUrl() ? `<a class="btn ghost" href="${esc(sheetUrl())}" target="_blank" rel="noopener">Ouvrir le tableau</a>` : ''}</div>
+    <div id="srcStatus" class="mt">${srcStatusHtml()}</div>
+    <div id="srcReport" class="mt">${srcReportHtml()}</div>`;
 }
 
 /* =====================================================================
@@ -3462,6 +3531,283 @@ async function purgeLocal(extra) {
   mediaScan();
 }
 
+/* ===================== Source Google Sheet + Google Drive (1.7) =====================
+   Un tableau Google Sheet (onglets Destinations, Médias, Étudiants) contient des liens Drive.
+   Chaque écran relit le tableau (API Google Sheets) et les métadonnées des fichiers (API Drive) avec une clé d'API gratuite,
+   reconstruit le catalogue, télécharge les nouveaux médias pour le mode hors-ligne, puis bascule d'un coup.
+   En cas d'erreur, le contenu précédent reste affiché. */
+const SRC = Object.assign({ on: false, sheet: '', key: '', every: 10 }, store.get('src', {}));
+function saveSrc() { store.set('src', SRC); }
+const sheetIdOf = u => { const t = String(u || '').trim(), m = /\/spreadsheets\/d\/([\w-]{20,})/.exec(t) || /^([\w-]{25,})$/.exec(t); return m ? m[1] : ''; };
+const sheetUrl = () => SRC.sheet && sheetIdOf(SRC.sheet) ? `https://docs.google.com/spreadsheets/d/${sheetIdOf(SRC.sheet)}/edit` : '';
+const driveFileId = u => { const t = String(u || '').trim(); const m = /drive\.google\.com\/(?:file\/d\/|open\?(?:.*&)?id=|uc\?(?:.*&)?id=|thumbnail\?(?:.*&)?id=)([\w-]{15,})/.exec(t) || /docs\.google\.com\/(?:document|presentation|spreadsheets)\/d\/([\w-]{15,})/.exec(t) || (/^[\w-]{25,}$/.test(t) ? [0, t] : null); return m ? m[1] : ''; };
+const driveApiUrl = id => `https://www.googleapis.com/drive/v3/files/${id}?alt=media&key=${encodeURIComponent(SRC.key)}`;
+
+const Sync = {
+  busy: false, timer: 0, pending: null, last: store.get('sync.st', null), geo: store.get('sync.geo', {}),
+  say() { try { if (typeof refreshSourceUi === 'function') refreshSourceUi(); } catch (e) { } },
+  /* appel d'une API Google avec délai maximum ; les erreurs sont traduites en français */
+  async api(url, ms) {
+    const ctl = new AbortController(), t = setTimeout(() => ctl.abort(), ms || 20000);
+    let r; try { r = await fetch(url, { signal: ctl.signal, cache: 'no-store' }); } catch (e) { clearTimeout(t); throw new SyncError(navigator.onLine ? 'Pas de réponse de Google (connexion lente, blocage du navigateur ou clé restreinte)' : 'Pas de connexion Internet', 'net'); }
+    clearTimeout(t);
+    if (r.ok) return r.json();
+    let msg = ''; try { const j = await r.json(); msg = (j.error && j.error.message) || ''; } catch (e) { }
+    throw new SyncError(Sync.explain(r.status, msg), 'http' + r.status);
+  },
+  explain(code, msg) {
+    if (code === 400) return /API key/i.test(msg) ? 'Clé d’API invalide' : 'Requête refusée par Google (' + msg.slice(0, 80) + ')';
+    if (code === 403) return /not been used|disabled|SERVICE_DISABLED/i.test(msg) ? 'API non activée dans Google Cloud (activez « Google Sheets API » et « Google Drive API »)' : (/referer|referrer/i.test(msg) ? 'Clé d’API restreinte : l’adresse de ce site n’est pas autorisée' : 'Accès refusé (le fichier ou le tableau n’est pas partagé en « toute personne disposant du lien », ou quota dépassé)');
+    if (code === 404) return 'Introuvable (mauvais lien, ou non partagé en « toute personne disposant du lien »)';
+    if (code === 429) return 'Trop de requêtes : Google demande d’attendre un peu';
+    return 'Erreur Google ' + code;
+  },
+  /* ---- lecture du tableau (liens compris, y compris les « puces » Drive et les formules HYPERLINK) ---- */
+  async readSheet() {
+    const id = sheetIdOf(SRC.sheet), k = encodeURIComponent(SRC.key), base = `https://sheets.googleapis.com/v4/spreadsheets/${id}`;
+    const meta = await Sync.api(`${base}?fields=properties.title,sheets.properties.title&key=${k}`);
+    const titles = (meta.sheets || []).map(s => s.properties.title), find = re => titles.find(t => re.test(nrm(t)));
+    const tabs = { dest: find(/^destination/), med: find(/^media|^medias/), etu: find(/^etudiant|^eleve/) };
+    const missing = Object.keys(tabs).filter(x => !tabs[x]).map(x => ({ dest: 'Destinations', med: 'Médias', etu: 'Étudiants' }[x]));
+    if (missing.length) throw new SyncError('Onglet(s) introuvable(s) : ' + missing.join(', ') + '. Onglets trouvés : ' + (titles.join(', ') || 'aucun'), 'tabs');
+    const order = ['dest', 'med', 'etu'], ranges = order.map(x => 'ranges=' + encodeURIComponent(tabs[x])).join('&');
+    const fields = encodeURIComponent('sheets(properties.title,data.rowData.values(formattedValue,hyperlink,chipRuns.chip.richLinkProperties.uri))');
+    const grid = await Sync.api(`${base}?${ranges}&includeGridData=true&fields=${fields}&key=${k}`, 30000);
+    const byTitle = {}; (grid.sheets || []).forEach(s => { byTitle[s.properties.title] = s; });
+    const toRows = t => { const s = byTitle[t], rd = s && s.data && s.data[0] && s.data[0].rowData || []; return rd.map(r => (r.values || []).map(c => ({ t: c && c.formattedValue != null ? String(c.formattedValue).trim() : '', l: c ? (c.hyperlink || (c.chipRuns && c.chipRuns[0] && c.chipRuns[0].chip && c.chipRuns[0].chip.richLinkProperties && c.chipRuns[0].chip.richLinkProperties.uri) || '') : '' }))); };
+    return { title: meta.properties && meta.properties.title || '', dest: toRows(tabs.dest), med: toRows(tabs.med), etu: toRows(tabs.etu), tabs };
+  },
+  /* tableau de lignes -> objets, colonnes reconnues par plusieurs noms (sans accents ni majuscules) */
+  table(rows, alias) {
+    const hi = rows.findIndex(r => r.some(c => c.t)); if (hi < 0) return [];
+    const hs = rows[hi].map(c => nrm(c.t)), idx = {};
+    Object.keys(alias).forEach(k => { for (const a of alias[k]) { const i = hs.indexOf(a); if (i > -1 && !Object.values(idx).includes(i)) { idx[k] = i; break; } } if (idx[k] == null) for (const a of alias[k]) { const i = hs.findIndex((h, n) => h.startsWith(a) && a.length >= 3 && !Object.values(idx).includes(n)); if (i > -1) { idx[k] = i; break; } } });
+    return rows.slice(hi + 1).map((r, n) => { const o = { _row: hi + n + 2 }; Object.keys(idx).forEach(k => { const c = r[idx[k]]; o[k] = c ? c.t : ''; o[k + 'Link'] = c ? c.l : ''; }); return o; }).filter(o => Object.keys(idx).some(k => o[k] || o[k + 'Link']));
+  },
+  link(o, k) { const v = (o[k + 'Link'] || o[k] || '').trim(); return /^https?:\/\//i.test(v) || driveFileId(v) ? v : ''; },
+  async geocode(ville, pays) {
+    const key = nrm(ville) + '|' + nrm(pays); if (Sync.geo[key]) return Sync.geo[key];
+    const g = await geoQuery(ville, pays); if (!g) return null;
+    Sync.geo[key] = { lat: g.lat, lon: g.lon, code: g.code, pays: g.pays }; store.set('sync.geo', Sync.geo); return Sync.geo[key];
+  },
+  /* métadonnées Drive (nom, type, date) : une requête par fichier, 6 à la fois */
+  async driveMeta(ids, warn) {
+    const out = {}, list = Array.from(new Set(ids)); let i = 0;
+    const worker = async () => {
+      while (i < list.length) {
+        const id = list[i++];
+        try { out[id] = await Sync.api(`https://www.googleapis.com/drive/v3/files/${id}?fields=id,name,mimeType,modifiedTime,size&supportsAllDrives=true&key=${encodeURIComponent(SRC.key)}`, 15000); }
+        catch (e) { out[id] = { error: e.message, kind: e.kind }; }
+      }
+    };
+    await Promise.all(Array.from({ length: Math.min(6, list.length) }, worker));
+    return out;
+  },
+  /* ---- construit le catalogue (sans rien appliquer) ---- */
+  async build(progress) {
+    const say = progress || (() => { }), warn = [];
+    if (!sheetIdOf(SRC.sheet)) throw new SyncError('Lien du Google Sheet manquant ou invalide', 'cfg');
+    if (!SRC.key.trim()) throw new SyncError('Clé d’API manquante', 'cfg');
+    say('Lecture du tableau…');
+    const sh = await Sync.readSheet();
+    const D = Sync.table(sh.dest, { ville: ['ville', 'city', 'destination'], pays: ['pays', 'country'], code: ['code', 'codepays', 'codeiso', 'iso'], lat: ['latitude', 'lat'], lon: ['longitude', 'lon', 'lng'], etab: ['etablissement', 'universite', 'ecole', 'etablissementdaccueil'], photo: ['photodambiance', 'photoambiance', 'ambiance', 'photodelaville', 'photo', 'image', 'lienphoto', 'lien'], show: ['afficher', 'actif', 'visible'] });
+    const M = Sync.table(sh.med, { ville: ['ville', 'city', 'destination'], lien: ['liendrive', 'lien', 'liendumedia', 'lienphotovideo', 'photovideo', 'url', 'fichier', 'media'], par: ['prispar', 'par', 'prenom', 'etudiant', 'auteur', 'photographe'], legende: ['legende', 'titre', 'description'], vignette: ['vignette', 'poster', 'couverture', 'lienvignette'], type: ['type'] });
+    const E = Sync.table(sh.etu, { ville: ['ville', 'city', 'destination'], prenom: ['prenom', 'nom', 'etudiant'], photo: ['photo', 'lienphoto', 'liendrive', 'lien', 'image'] });
+    const skip = o => /^(non|no|0|faux|false|masque|cache)$/.test(nrm(o.show || ''));
+    const dests = D.filter(o => o.ville.trim());
+    if (!dests.length) throw new SyncError('Aucune destination dans l’onglet Destinations', 'empty');
+    /* liens Drive à vérifier */
+    const ids = [];
+    dests.forEach(o => { const l = Sync.link(o, 'photo'); if (driveFileId(l)) ids.push(driveFileId(l)); });
+    M.forEach(o => { ['lien', 'vignette'].forEach(k => { const l = Sync.link(o, k); if (driveFileId(l)) ids.push(driveFileId(l)); }); });
+    E.forEach(o => { const l = Sync.link(o, 'photo'); if (driveFileId(l)) ids.push(driveFileId(l)); });
+    say(`Vérification de ${new Set(ids).size} fichier(s) Drive…`);
+    const meta = await Sync.driveMeta(ids, warn);
+    const okFile = (id, ctx) => { const m = meta[id]; if (!m || m.error) { warn.push(`${ctx} : fichier Drive inaccessible (${(m && m.error) || 'erreur'})`); return null; } return m; };
+    const lieux = [];
+    for (const o of dests) {
+      if (skip(o)) continue;
+      const ville = o.ville.trim(), pays = (o.pays || '').trim(); let lat = parseFloat(String(o.lat).replace(',', '.')), lon = parseFloat(String(o.lon).replace(',', '.')), code = (o.code || '').trim().toUpperCase();
+      if (!isFinite(lat) || !isFinite(lon) || !code) {
+        say(`Coordonnées de ${ville}…`);
+        try { const g = await Sync.geocode(ville, pays); if (g) { if (!isFinite(lat) || !isFinite(lon)) { lat = g.lat; lon = g.lon; } if (!code) code = g.code || ''; } } catch (e) { }
+        if (!isFinite(lat) || !isFinite(lon)) { warn.push(`Destinations ligne ${o._row} (${ville}) : coordonnées introuvables, renseignez Latitude et Longitude`); continue; }
+      }
+      const l = { id: slug(ville), ville, pays, code, lat, lon, etablissement: (o.etab || '').trim(), description: '', medias: [], etudiants: [], cover: null };
+      const pl = Sync.link(o, 'photo');
+      if (pl) { const id = driveFileId(pl); if (id) { const m = okFile(id, `Destinations ligne ${o._row} (${ville}) photo d’ambiance`); if (m) l.cover = { url: driveApiUrl(id), credit: '', legende: '' }; } else l.cover = { url: pl, credit: '', legende: '' }; }
+      const mine = r => nrm(r.ville) === nrm(ville);
+      E.filter(mine).forEach(r => {
+        const prenom = (r.prenom || '').trim(); if (!prenom) return;
+        let photo = ''; const pl2 = Sync.link(r, 'photo');
+        if (pl2) { const id = driveFileId(pl2); if (id) { if (okFile(id, `Étudiants ligne ${r._row} (${prenom}) photo`)) photo = driveApiUrl(id); } else photo = pl2; }
+        if (!l.etudiants.some(e => nrm(e.prenom) === nrm(prenom))) l.etudiants.push({ id: 'e-' + slug(prenom), prenom, photo });
+      });
+      const used = {};
+      M.filter(mine).forEach(r => {
+        const lk = Sync.link(r, 'lien'); if (!lk) { warn.push(`Médias ligne ${r._row} (${ville}) : lien manquant ou invalide`); return; }
+        const id = driveFileId(lk); let type = '', url = lk, nameHint = '';
+        if (id) {
+          const m = okFile(id, `Médias ligne ${r._row} (${ville})`); if (!m) return;
+          const mt = m.mimeType || ''; type = /^video\//.test(mt) ? 'video' : /^image\//.test(mt) ? 'photo' : '';
+          if (!type) { warn.push(`Médias ligne ${r._row} (${ville}) : « ${m.name} » n’est ni une photo ni une vidéo (${mt})`); return; }
+          if (/heic|heif/i.test(mt)) warn.push(`Médias ligne ${r._row} (${ville}) : « ${m.name} » est au format HEIC, illisible sur certains écrans : préférez le JPG`);
+          url = driveApiUrl(id); nameHint = id + ':' + (m.modifiedTime || '');
+        } else {
+          const t = nrm(r.type || ''); type = ytId(lk) || vimeoId(lk) || /\.(mp4|mov|m4v|webm)(\?|$)/i.test(lk) || /^video/.test(t) ? 'video' : 'photo';
+        }
+        let eid = ''; const par = (r.par || '').trim();
+        if (par) { let e = l.etudiants.find(x => nrm(x.prenom) === nrm(par)); if (!e) { e = { id: 'e-' + slug(par), prenom: par, photo: '' }; l.etudiants.push(e); } eid = e.id; }
+        let poster = ''; const vl = Sync.link(r, 'vignette');
+        if (vl) { const vid = driveFileId(vl); if (vid) { if (okFile(vid, `Médias ligne ${r._row} (${ville}) vignette`)) poster = driveApiUrl(vid); } else poster = vl; }
+        let mid = 'm-' + (id || slug(lk).slice(0, 24)); if (used[mid]) mid += '-' + (used[mid]++); else used[mid] = 1;
+        l.medias.push({ id: mid, type, url, poster, legende: (r.legende || '').trim(), etu: eid, rev: nameHint });
+      });
+      lieux.push(l);
+    }
+    if (!lieux.length) throw new SyncError('Aucune destination utilisable (voir les avertissements)', 'empty', warn);
+    const cat = lieux.map(normLieu).filter(l => isFinite(l.lat) && isFinite(l.lon));
+    const nMed = cat.reduce((a, l) => a + l.medias.length, 0), nEtu = cat.reduce((a, l) => a + l.etudiants.length, 0);
+    const mt = {}; Object.keys(meta).forEach(id => { if (meta[id] && meta[id].modifiedTime) mt[id] = meta[id].modifiedTime; });
+    return { lieux: cat, warn, mt, counts: { dests: cat.length, medias: nMed, etus: nEtu, files: new Set(ids).size, title: sh.title } };
+  },
+  /* ---- applique un catalogue construit ---- */
+  apply(b) {
+    const posters = store.get('sync.posters', {});
+    b.lieux.forEach(l => l.medias.forEach(m => { if (m.type === 'video' && !m.poster && posters[m.id] && posters[m.id].rev === m.rev && posters[m.id].key) m.poster = posters[m.id].key; }));
+    const prevMt = store.get('sync.mt', {}); Sync.stale = Object.keys(b.mt || {}).filter(id => prevMt[id] && prevMt[id] !== b.mt[id]); store.set('sync.mt', b.mt || {});
+    const sig = JSON.stringify(b.lieux), prev = store.get('sync.sig', '');
+    const changed = sig !== prev || !S.fromSheet;
+    if (changed) {
+      store.set('sync.cat', { version: 2, lieux: b.lieux }); store.set('sync.sig', sig);
+      S.lieux = b.lieux.map(normLieu); S.fromSheet = true; S.isLocal = true; applyCatalog();
+    }
+    return changed;
+  },
+  /* ---- une synchronisation complète ---- */
+  async run(opt) {
+    opt = opt || {};
+    if (Sync.busy) return Sync.last;
+    if (!SRC.on && !opt.force) return null;
+    if (!opt.manual && (S.mode === 'video')) return null;
+    Sync.busy = true; Sync.say();
+    const st = { at: Date.now(), ok: false, warn: [], msg: '' };
+    try {
+      const b = await Sync.build(t => { Sync.step = t; Sync.say(); });
+      st.warn = b.warn; st.counts = b.counts;
+      const quiet = !opt.manual && !['attract', 'explore'].includes(S.mode);
+      if (quiet) { Sync.pending = b; st.msg = 'Nouveautés prêtes (affichées au retour sur le globe)'; }
+      else { const ch = Sync.apply(b); Sync.pending = null; st.msg = ch ? 'Catalogue mis à jour' : 'Déjà à jour'; st.changed = ch; }
+      st.ok = true;
+    } catch (e) {
+      st.msg = e.message || 'Erreur'; st.err = e.kind || 'x'; if (e.warn) st.warn = e.warn;
+      if (e.kind === 'net' && !opt.manual) st.msg += ' · contenu précédent conservé';
+    }
+    Sync.busy = false; Sync.step = ''; Sync.last = st; store.set('sync.st', st);
+    if (st.ok) { store.set('sync.okAt', st.at); setTimeout(() => Sync.afterApply(), 800); }
+    Sync.say(); return st;
+  },
+  /* l'écran était occupé : on applique les nouveautés quand le globe est au repos */
+  flush() { if (Sync.pending && ['attract', 'explore'].includes(S.mode) && $('#fiche').hidden) { const b = Sync.pending; Sync.pending = null; Sync.apply(b); Sync.last = Object.assign({}, Sync.last, { msg: 'Catalogue mis à jour' }); store.set('sync.st', Sync.last); Sync.say(); setTimeout(() => Sync.afterApply(), 800); } },
+  /* après application : téléchargements hors-ligne, puis vignettes des vidéos Drive */
+  async afterApply() {
+    await Sync.invalidate();
+    if (typeof downloadMedia === 'function') { try { await downloadMedia(false); } catch (e) { } }
+    for (let i = 0; i < 600 && MEDIA.running; i++) await new Promise(r => setTimeout(r, 1000));
+    await Sync.posters();
+    if (typeof purgeLocal === 'function') { try { await purgeLocal(); } catch (e) { } }
+  },
+  /* un fichier remplacé dans Drive garde son identifiant : on efface sa copie pour la retélécharger */
+  async invalidate() {
+    const ids = Sync.stale || []; Sync.stale = []; if (!ids.length || !window.caches) return;
+    const c = await caches.open(MEDIA_CACHE);
+    for (const k of await c.keys()) { if (ids.some(id => k.url.indexOf('/files/' + id + '?') > -1)) await c.delete(k); }
+    for (const k of await FS.keys()) { if (ids.some(id => String(k).indexOf('/files/' + id + '?') > -1)) await FS.del(k); }
+  },
+  /* vignette automatique des vidéos qui n'en ont pas : image de la vidéo déjà téléchargée */
+  async posters() {
+    const posters = store.get('sync.posters', {}); let n = 0;
+    for (const l of S.lieux) for (const m of l.medias || []) {
+      if (m.type !== 'video' || m.poster || mediaKind(m.url) !== 'direct') continue;
+      const p = posters[m.id]; if (p && p.rev === m.rev) { m.poster = p.key; n++; continue; }
+      try {
+        const blob = await Sync.frameOf(m.url); if (!blob) continue;
+        const key = `_local/sp-${m.id.replace(/[^\w-]/g, '')}.jpg`; await putLocal(key, blob, 'image/jpeg');
+        posters[m.id] = { key, rev: m.rev }; m.poster = key; n++;
+      } catch (e) { }
+    }
+    if (n) { store.set('sync.posters', posters); store.set('sync.cat', { version: 2, lieux: S.lieux }); if (S.current) { const l = S.byId[S.current.id]; if (l) { S.current = l; fillFiche(l); } } buildList(''); }
+  },
+  async frameOf(url) {
+    const vs = await videoSource(url); if (!vs.local) return null;
+    try {
+      const v = document.createElement('video'); v.muted = true; v.playsInline = true; v.preload = 'auto'; v.src = vs.src;
+      const once = (ev, ms) => new Promise((res, rej) => { const t = setTimeout(() => rej(new Error(ev)), ms); v.addEventListener(ev, () => { clearTimeout(t); res(); }, { once: true }); });
+      await once('loadeddata', 10000);
+      v.currentTime = Math.min(1, (v.duration || 2) / 4); await once('seeked', 8000);
+      const k = Math.min(1, 800 / Math.max(v.videoWidth, v.videoHeight, 1)), c = document.createElement('canvas'); c.width = Math.max(2, Math.round(v.videoWidth * k)); c.height = Math.max(2, Math.round(v.videoHeight * k));
+      c.getContext('2d').drawImage(v, 0, 0, c.width, c.height);
+      return await new Promise(res => c.toBlob(res, 'image/jpeg', 0.82));
+    } finally { vs.revoke(); }
+  },
+  /* configuration centrale : un fichier data/source.json (facultatif) règle tous les écrans d'un coup.
+     Il s'applique si l'appareil n'a pas encore de configuration, ou si son numéro de version est plus récent. */
+  async loadFileConfig() {
+    try {
+      const j = await getJson('data/source.json'); if (!j || !j.sheet) return;
+      const fv = store.get('src.fileVer', 0), v = +j.version || 1;
+      if (!SRC.sheet || v > fv) {
+        SRC.sheet = String(j.sheet).trim(); SRC.key = String(j.key || SRC.key || '').trim(); SRC.every = [5, 10, 30, 60].includes(+j.every) ? +j.every : (SRC.every || 10); SRC.on = j.on !== false; SRC.fromFile = true;
+        store.set('src.fileVer', v); saveSrc();
+      }
+    } catch (e) { }
+  },
+  /* premier démarrage : on charge le tableau AVANT d'afficher, pour ne jamais montrer les données de démonstration */
+  async prefetch() {
+    Sync.busy = true;
+    try {
+      const b = await Sync.build();
+      store.set('sync.cat', { version: 2, lieux: b.lieux }); store.set('sync.sig', JSON.stringify(b.lieux)); store.set('sync.mt', b.mt || {}); store.set('sync.okAt', Date.now());
+      Sync.last = { at: Date.now(), ok: true, msg: 'Catalogue mis à jour', warn: b.warn, counts: b.counts, changed: true }; store.set('sync.st', Sync.last);
+      Sync.busy = false;
+      if (!S.fromSheet && window.__booted) Sync.applyStored();
+      return true;
+    } catch (e) {
+      Sync.last = { at: Date.now(), ok: false, msg: e.message || 'Erreur', warn: e.warn || [], err: e.kind || 'x' }; store.set('sync.st', Sync.last); Sync.busy = false; return false;
+    }
+  },
+  applyStored() { const sy = store.get('sync.cat', null); if (!sy || !sy.lieux) return; S.lieux = sy.lieux.map(normLieu); S.fromSheet = true; S.isLocal = true; applyCatalog(); setTimeout(() => Sync.afterApply(), 800); },
+  /* planification : au démarrage, toutes les N minutes, au retour du réseau et de l'écran */
+  due() { const t = store.get('sync.okAt', 0), tr = Sync.last ? Sync.last.at : 0; return Date.now() - Math.max(t, tr) >= SRC.every * 60000 - 2000; },
+  init() {
+    clearInterval(Sync.timer);
+    Sync.timer = setInterval(() => { if (SRC.on && !Sync.busy && Sync.due()) Sync.run(); Sync.flush(); }, 20000);
+    addEventListener('online', () => { if (SRC.on) setTimeout(() => Sync.run(), 1500); });
+    document.addEventListener('visibilitychange', () => { if (!document.hidden && SRC.on && Sync.due()) Sync.run(); });
+    if (SRC.on) setTimeout(() => { if (Sync.due() || !S.fromSheet) Sync.run(); else Sync.afterApply(); }, 4000);
+  },
+  /* test pas à pas pour l'écran des réglages */
+  async test(log) {
+    const L = (ok, t) => log({ ok, t });
+    const id = sheetIdOf(SRC.sheet);
+    if (!id) { L(false, 'Lien du Google Sheet manquant ou invalide (collez l’adresse complète du tableau)'); return false; }
+    L(true, 'Lien du tableau reconnu');
+    if (!SRC.key.trim()) { L(false, 'Clé d’API manquante'); return false; }
+    L(true, 'Clé d’API renseignée');
+    try {
+      const b = await Sync.build(t => { });
+      L(true, `Tableau lu : « ${b.counts.title || 'sans titre'} »`);
+      L(true, `${b.counts.dests} destination(s), ${b.counts.medias} média(s), ${b.counts.etus} étudiant(s)`);
+      L(true, `${b.counts.files} fichier(s) Drive vérifié(s)`);
+      b.warn.slice(0, 12).forEach(w => L(false, w));
+      if (b.warn.length > 12) L(false, `… et ${b.warn.length - 12} autre(s) avertissement(s)`);
+      L(true, b.warn.length ? 'Prêt (avertissements à vérifier : les lignes en défaut sont ignorées ou signalées)' : 'Tout est prêt');
+      return true;
+    } catch (e) { L(false, e.message || 'Erreur'); (e.warn || []).slice(0, 8).forEach(w => L(false, w)); return false; }
+  }
+};
+class SyncError extends Error { constructor(m, k, w) { super(m); this.kind = k; this.warn = w; } }
+
 /* =====================================================================
    DÉMARRAGE
 ===================================================================== */
@@ -3499,12 +3845,14 @@ function hideBoot() { const b = $('#boot'); b.classList.add('off'); setTimeout((
   try {
     [lieux, terre] = await Promise.all([getJson('data/lieux.json'), getJson('data/terre.json')]);
   } catch (e) { bootMsg('Contenus introuvables. Connectez l’iPad à Internet puis rouvrez l’application.'); return; }
+  await Sync.loadFileConfig();
+  if (SRC.on && !store.get('sync.cat', null) && navigator.onLine) { bootStep(34, 'Synchronisation du contenu…'); await Promise.race([Sync.prefetch(), new Promise(r => setTimeout(r, 9000))]); }
   bootStep(46, 'Chargement des destinations…');
   const cat = loadCatalog(lieux); S.lieux = cat.lieux; S.isLocal = cat.isLocal; indexLieux(); S.terre = terre;
 
   bootStep(74, 'Construction du globe…');
   const ok = initGlobe(terre, S.lieux);
-  initUI(); initAdmin(); loadLogo(); G.applyCfg(true);
+  initUI(); initAdmin(); loadLogo(); G.applyCfg(true); window.__booted = true; Sync.init();
   if (!ok) { toast('Le rendu 3D n’est pas disponible : choisissez une destination dans la liste', 5000); openList(); }
   setMode('attract');
   checkNews();
