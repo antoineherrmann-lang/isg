@@ -786,8 +786,12 @@ a.btn{text-decoration:none;display:inline-flex;align-items:center;justify-conten
    APP_VERSION est comparée par le système de mise à jour :
    à chaque livraison elle doit augmenter (build.py s'en charge).
 ===================================================================== */
-const APP_VERSION = "1.7.1";
+const APP_VERSION = "1.7.2";
 const CHANGELOG = [
+  { v: "1.7.2", d: "17 octobre 2026", t: [
+    "Source Google Sheet : un tableau au format Excel (.xlsx) déposé dans Drive est maintenant lu directement",
+    "Messages d’erreur plus clairs quand le tableau n’est pas un vrai Google Sheet"
+  ]},
   { v: "1.7.1", d: "17 octobre 2026", t: [
     "Source Google Sheet : les photos et vidéos ajoutées depuis l’iPad restent conservées (elles réapparaissent si la source est désactivée)"
   ]},
@@ -2991,7 +2995,7 @@ function sSource() {
     ${SRC.fromFile ? '<div class="note good mt">Cet appareil suit la <b>configuration centrale</b> (fichier data/source.json) : le lien et la clé viennent du site.</div>' : ''}
     <div class="group mt">
       ${srow('Utiliser le Google Sheet comme source', 'Activé : le tableau remplace les destinations de cet appareil (elles ne sont plus modifiables ici).', 'srcOn')}
-      ${sfield('Lien du Google Sheet', 'sheet', SRC.sheet, 'https://docs.google.com/spreadsheets/d/…', 'Adresse complète du tableau, partagé en « Tous les utilisateurs disposant du lien : lecteur ».')}
+      ${sfield('Lien du Google Sheet', 'sheet', SRC.sheet, 'https://docs.google.com/spreadsheets/d/…', 'Adresse complète du Google Sheet (ou d’un fichier Excel déposé dans Drive), partagé en « Toute personne disposant du lien : lecteur ».')}
       ${sfield('Clé d’API Google', 'key', SRC.key, 'AIza…', 'Gratuite : voir le guide GUIDE-GOOGLE-SHEET.')}
       ${grow('Vérifier le tableau toutes les', '', seg('srcEvery', [[5, '5 min'], [10, '10 min'], [30, '30 min'], [60, '1 h']], SRC.every))}
     </div>
@@ -3554,15 +3558,16 @@ const Sync = {
   busy: false, timer: 0, pending: null, last: store.get('sync.st', null), geo: store.get('sync.geo', {}),
   say() { try { if (typeof refreshSourceUi === 'function') refreshSourceUi(); } catch (e) { } },
   /* appel d'une API Google avec délai maximum ; les erreurs sont traduites en français */
-  async api(url, ms) {
+  async api(url, ms, binary) {
     const ctl = new AbortController(), t = setTimeout(() => ctl.abort(), ms || 20000);
     let r; try { r = await fetch(url, { signal: ctl.signal, cache: 'no-store' }); } catch (e) { clearTimeout(t); throw new SyncError(navigator.onLine ? 'Pas de réponse de Google (connexion lente, blocage du navigateur ou clé restreinte)' : 'Pas de connexion Internet', 'net'); }
     clearTimeout(t);
-    if (r.ok) return r.json();
+    if (r.ok) return binary ? r.arrayBuffer() : r.json();
     let msg = ''; try { const j = await r.json(); msg = (j.error && j.error.message) || ''; } catch (e) { }
-    throw new SyncError(Sync.explain(r.status, msg), 'http' + r.status);
+    throw new SyncError(Sync.explain(r.status, msg), r.status === 400 && /not supported for this document/i.test(msg) ? 'office' : 'http' + r.status);
   },
   explain(code, msg) {
+    if (code === 400 && /not supported for this document/i.test(msg)) return 'Le tableau est un fichier Excel (.xlsx) ouvert dans Google Sheets';
     if (code === 400) return /API key/i.test(msg) ? 'Clé d’API invalide' : 'Requête refusée par Google (' + msg.slice(0, 80) + ')';
     if (code === 403) return /not been used|disabled|SERVICE_DISABLED/i.test(msg) ? 'API non activée dans Google Cloud (activez « Google Sheets API » et « Google Drive API »)' : (/referer|referrer/i.test(msg) ? 'Clé d’API restreinte : l’adresse de ce site n’est pas autorisée' : 'Accès refusé (le fichier ou le tableau n’est pas partagé en « toute personne disposant du lien », ou quota dépassé)');
     if (code === 404) return 'Introuvable (mauvais lien, ou non partagé en « toute personne disposant du lien »)';
@@ -3571,18 +3576,37 @@ const Sync = {
   },
   /* ---- lecture du tableau (liens compris, y compris les « puces » Drive et les formules HYPERLINK) ---- */
   async readSheet() {
-    const id = sheetIdOf(SRC.sheet), k = encodeURIComponent(SRC.key), base = `https://sheets.googleapis.com/v4/spreadsheets/${id}`;
-    const meta = await Sync.api(`${base}?fields=properties.title,sheets.properties.title&key=${k}`);
-    const titles = (meta.sheets || []).map(s => s.properties.title), find = re => titles.find(t => re.test(nrm(t)));
+    try { return await Sync.readSheetApi(); }
+    catch (e) { if (e.kind === 'office') return Sync.readOffice(); throw e; }
+  },
+  tabsOf(titles) {
+    const find = re => titles.find(t => re.test(nrm(t)));
     const tabs = { dest: find(/^destination/), med: find(/^media|^medias/), etu: find(/^etudiant|^eleve/) };
     const missing = Object.keys(tabs).filter(x => !tabs[x]).map(x => ({ dest: 'Destinations', med: 'Médias', etu: 'Étudiants' }[x]));
     if (missing.length) throw new SyncError('Onglet(s) introuvable(s) : ' + missing.join(', ') + '. Onglets trouvés : ' + (titles.join(', ') || 'aucun'), 'tabs');
+    return tabs;
+  },
+  async readSheetApi() {
+    const id = sheetIdOf(SRC.sheet), k = encodeURIComponent(SRC.key), base = `https://sheets.googleapis.com/v4/spreadsheets/${id}`;
+    const meta = await Sync.api(`${base}?fields=properties.title,sheets.properties.title&key=${k}`);
+    const titles = (meta.sheets || []).map(s => s.properties.title), tabs = Sync.tabsOf(titles);
     const order = ['dest', 'med', 'etu'], ranges = order.map(x => 'ranges=' + encodeURIComponent(tabs[x])).join('&');
     const fields = encodeURIComponent('sheets(properties.title,data.rowData.values(formattedValue,hyperlink,chipRuns.chip.richLinkProperties.uri))');
     const grid = await Sync.api(`${base}?${ranges}&includeGridData=true&fields=${fields}&key=${k}`, 30000);
     const byTitle = {}; (grid.sheets || []).forEach(s => { byTitle[s.properties.title] = s; });
     const toRows = t => { const s = byTitle[t], rd = s && s.data && s.data[0] && s.data[0].rowData || []; return rd.map(r => (r.values || []).map(c => ({ t: c && c.formattedValue != null ? String(c.formattedValue).trim() : '', l: c ? (c.hyperlink || (c.chipRuns && c.chipRuns[0] && c.chipRuns[0].chip && c.chipRuns[0].chip.richLinkProperties && c.chipRuns[0].chip.richLinkProperties.uri) || '') : '' }))); };
     return { title: meta.properties && meta.properties.title || '', dest: toRows(tabs.dest), med: toRows(tabs.med), etu: toRows(tabs.etu), tabs };
+  },
+  /* repli : le « tableau » est un fichier Excel déposé dans Drive. On le télécharge (API Drive) et on le lit nous-mêmes. */
+  async readOffice() {
+    const id = sheetIdOf(SRC.sheet), k = encodeURIComponent(SRC.key);
+    const meta = await Sync.api(`https://www.googleapis.com/drive/v3/files/${id}?fields=id,name,mimeType&supportsAllDrives=true&key=${k}`);
+    if (!/spreadsheetml|ms-excel/.test(meta.mimeType || '')) throw new SyncError('Ce document n’est pas un tableau lisible (type : ' + (meta.mimeType || 'inconnu') + '). Utilisez un Google Sheet ou un fichier Excel.', 'office');
+    let buf; try { buf = await Sync.api(`https://www.googleapis.com/drive/v3/files/${id}?alt=media&supportsAllDrives=true&key=${k}`, 40000, true); } catch (e) { throw e; }
+    let sheets; try { sheets = readXlsx(buf); } catch (e) { throw new SyncError('Le fichier Excel est illisible (' + (e.message || 'format inattendu') + ')', 'office'); }
+    const tabs = Sync.tabsOf(Object.keys(sheets));
+    const toRows = t => (sheets[t] || []).map(r => r.map(v => ({ t: String(v == null ? '' : v).trim(), l: '' })));
+    return { title: meta.name || '', dest: toRows(tabs.dest), med: toRows(tabs.med), etu: toRows(tabs.etu), tabs, office: true };
   },
   /* tableau de lignes -> objets, colonnes reconnues par plusieurs noms (sans accents ni majuscules) */
   table(rows, alias) {
@@ -3617,6 +3641,7 @@ const Sync = {
     if (!SRC.key.trim()) throw new SyncError('Clé d’API manquante', 'cfg');
     say('Lecture du tableau…');
     const sh = await Sync.readSheet();
+    if (sh.office) warn.push('Le tableau est un fichier Excel (.xlsx) : il est lu, mais un lien collé avec un texte d’affichage n’est pas reconnu. Pour plus de fiabilité : dans Google Sheets, Fichier › Enregistrer en tant que feuille de calcul Google Sheets, puis utilisez le nouveau lien.');
     const D = Sync.table(sh.dest, { ville: ['ville', 'city', 'destination'], pays: ['pays', 'country'], code: ['code', 'codepays', 'codeiso', 'iso'], lat: ['latitude', 'lat'], lon: ['longitude', 'lon', 'lng'], etab: ['etablissement', 'universite', 'ecole', 'etablissementdaccueil'], photo: ['photodambiance', 'photoambiance', 'ambiance', 'photodelaville', 'photo', 'image', 'lienphoto', 'lien'], show: ['afficher', 'actif', 'visible'] });
     const M = Sync.table(sh.med, { ville: ['ville', 'city', 'destination'], lien: ['liendrive', 'lien', 'liendumedia', 'lienphotovideo', 'photovideo', 'url', 'fichier', 'media'], par: ['prispar', 'par', 'prenom', 'etudiant', 'auteur', 'photographe'], legende: ['legende', 'titre', 'description'], vignette: ['vignette', 'poster', 'couverture', 'lienvignette'], type: ['type'] });
     const E = Sync.table(sh.etu, { ville: ['ville', 'city', 'destination'], prenom: ['prenom', 'nom', 'etudiant'], photo: ['photo', 'lienphoto', 'liendrive', 'lien', 'image'] });
