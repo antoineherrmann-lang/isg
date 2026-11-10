@@ -743,7 +743,29 @@ html.lite #fiche .sl{--p:0!important}
 /* ---------- télé tactile (grand écran) ---------- */
 html,body{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;overscroll-behavior:none;touch-action:pan-x pan-y}
 input,textarea{-webkit-user-select:text;user-select:text}
-html.big,html.big *{cursor:none!important}
+/* télé / kiosque tactile : curseur masqué. Ordinateur (souris) : curseur visible, survol et barres de défilement */
+html.touch.big,html.touch.big *{cursor:none!important}
+
+/* ---------- ordinateur (souris, pavé tactile) ---------- */
+html.mouse #stage{cursor:grab}
+html.mouse #stage:active{cursor:grabbing}
+html.mouse #stage.hit{cursor:pointer}
+html.mouse #fTrack{cursor:grab}
+html.mouse #fTrack.dragging{cursor:grabbing;scroll-snap-type:none;scroll-behavior:auto}
+html.mouse .sl,html.mouse .item,html.mouse .grow,html.mouse .round,html.mouse .xbtn,html.mouse .abtn,html.mouse .cnav,html.mouse .lbnav{cursor:pointer}
+html.mouse .round:hover,html.mouse .xbtn:hover,html.mouse .abtn:hover,html.mouse .lbnav:hover,html.mouse .cnav:hover{background:rgba(255,255,255,.26)}
+html.mouse .item:hover,html.mouse .grow:hover{background:rgba(255,255,255,.1)}
+html.mouse .sl:hover{box-shadow:0 0 0 calc(2 * var(--px)) rgba(63,192,240,.8)}
+html.mouse .cnav{display:grid}
+.cnav{display:none;position:absolute;top:50%;margin-top:calc(-22 * var(--px));width:calc(44 * var(--px));height:calc(44 * var(--px));padding:0;border-radius:50%;background:rgba(0,0,0,.5);border:calc(1 * var(--px)) solid rgba(255,255,255,.35);z-index:6;place-items:center;box-sizing:border-box}
+.cnav[hidden]{display:none!important}
+.cnav svg{display:block;width:calc(22 * var(--px));height:calc(22 * var(--px));stroke:#fff;stroke-width:2.4;fill:none;stroke-linecap:round;stroke-linejoin:round}
+#cPrev{left:calc(6 * var(--px))}#cNext{right:calc(6 * var(--px))}
+html.mouse ::-webkit-scrollbar{width:calc(10 * var(--px));height:calc(10 * var(--px))}
+html.mouse ::-webkit-scrollbar-track{background:transparent}
+html.mouse ::-webkit-scrollbar-thumb{background:rgba(255,255,255,.22);border-radius:calc(6 * var(--px));border:calc(2 * var(--px)) solid transparent;background-clip:padding-box}
+html.mouse ::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,.4);background-clip:padding-box}
+html.mouse #fTrack::-webkit-scrollbar{display:none}
 
 @supports (top:env(safe-area-inset-top)){:root{--sat:env(safe-area-inset-top,0px);--sab:env(safe-area-inset-bottom,0px);--sal:env(safe-area-inset-left,0px);--sar:env(safe-area-inset-right,0px)}}
 
@@ -843,7 +865,7 @@ html.noar #vid.portrait iframe{height:100%;width:56.25vh}
         <div id="fHead"><h2 id="fVille"></h2><p id="fPays"></p></div>
       </div>
       <div class="fbody">
-        <div id="fCar"><div id="fTrack"></div><div id="fDots"></div></div>
+        <div id="fCar"><div id="fTrack"></div><div id="fDots"></div><button class="cnav" id="cPrev" aria-label="Photo précédente" hidden><svg viewBox="0 0 24 24"><path d="M15.5 5l-7 7 7 7"/></svg></button><button class="cnav" id="cNext" aria-label="Photo suivante" hidden><svg viewBox="0 0 24 24"><path d="M8.5 5l7 7-7 7"/></svg></button></div>
       </div>
     </div>
   </aside>
@@ -976,8 +998,13 @@ html.noar #vid.portrait iframe{height:100%;width:56.25vh}
    APP_VERSION est comparée par le système de mise à jour :
    à chaque livraison elle doit augmenter (build.py s'en charge).
 ===================================================================== */
-const APP_VERSION = "1.8.1";
+const APP_VERSION = "1.8.2";
 const CHANGELOG = [
+  { v: "1.8.2", d: "17 octobre 2026", t: [
+    "Ordinateur (PC, Mac) : l'application détecte la souris et s'adapte — curseur visible, pas de plein écran forcé, interface moins agrandie",
+    "Souris et clavier : molette pour zoomer, glisser pour tourner et faire défiler, flèches du carrousel, Échap pour fermer, F pour le plein écran",
+    "Les boutons apparaissent quand la souris bouge ; passage automatique entre souris et toucher sur les appareils hybrides"
+  ]},
   { v: "1.8.1", d: "17 octobre 2026", t: [
     "Compatible avec les anciens navigateurs (télé tactile Android) : le globe et les panneaux s'affichent maintenant correctement",
     "Écran de secours lisible si l'application ne peut pas démarrer, et rapport de compatibilité sur l'adresse avec ?diag=1"
@@ -1171,24 +1198,46 @@ const CFG = (() => {
   if (saved.v !== 3 && saved.v !== 4 && saved.v !== 5) { delete saved.labels; }
   saved.v = 5; delete saved.arcs;
   if (saved.spin === undefined) saved.spin = 'normal';
-  return Object.assign({ v: 5, fx: 'auto', ui: 1, fs: true, wake: true, idleSec: 60, spin: 'normal', autoUpdate: true, labels: 'text', breathe: true, hideUi: true, logo: true }, GLOBE_DEFAULTS, saved);
+  return Object.assign({ v: 5, fx: 'auto', input: 'auto', ui: 1, fs: true, wake: true, idleSec: 60, spin: 'normal', autoUpdate: true, labels: 'text', breathe: true, hideUi: true, logo: true }, GLOBE_DEFAULTS, saved);
 })();
 function saveCfg() { store.set('cfg', CFG); applyCfg(); }
-/* ---------- taille de l'interface : s'adapte à l'écran ----------
+/* ---------- type de saisie : souris (ordinateur) ou doigt (iPad, télé tactile) ----------
+   Choisi d'après l'appareil, puis suivi en direct : un toucher passe en mode tactile, un mouvement de souris en mode souris.
+   Réglage manuel : Réglages › Affichage › Écran et saisie. */
+const Input = {
+  auto: (window.matchMedia && matchMedia('(pointer:fine)').matches && !matchMedia('(pointer:coarse)').matches) ? 'mouse' : 'touch', n: 0, uiT: 0,
+  eff() { const c = (typeof CFG !== 'undefined' && CFG.input) || 'auto'; return c === 'mouse' || c === 'touch' ? c : Input.auto; },
+  seen(e) {
+    if (e.pointerType === 'mouse') {
+      if (e.type === 'pointermove' && Math.abs(e.movementX || 0) + Math.abs(e.movementY || 0) < 1) return;
+      if (Input.auto !== 'mouse' && ++Input.n >= 3) { Input.auto = 'mouse'; UI.fit(); }
+      if (Input.eff() === 'mouse') {
+        if (typeof touchAct === 'function') touchAct();
+        const t = Date.now(); if (e.type === 'pointermove' && t - Input.uiT > 400 && typeof showUI === 'function') { Input.uiT = t; showUI(5000); }   // les boutons se montrent quand la souris bouge
+      }
+    } else { Input.n = 0; if (Input.auto !== 'touch') { Input.auto = 'touch'; UI.fit(); } }
+  }
+};
+addEventListener('pointerdown', e => Input.seen(e), true); addEventListener('pointermove', e => Input.seen(e), true);
+
+/* ---------- taille de l'interface : s'adapte à l'écran et à la saisie ----------
    Toutes les longueurs de l'interface sont proportionnelles à --px. Sur iPad, --px vaut 1px (rien ne change) ;
-   sur un grand écran (télé tactile 4K), l'interface grandit avec lui. Réglage manuel : Réglages › Affichage › Taille de l'interface. */
+   sur un grand écran tactile (télé 4K), l'interface grandit avec lui ; avec une souris (lecture de plus près), elle grandit moins.
+   Réglage manuel : Réglages › Affichage › Taille de l'interface. */
 const UI = {
   k: 1, base: 1, big: false, set: false,
   fit() {
-    const m = Math.min(innerWidth / 1024, innerHeight / 768);
-    const base = m < 1.18 ? 1 : Math.min(m, 3.2), k = Math.max(0.7, Math.min(4, base * ((typeof CFG !== 'undefined' && +CFG.ui) || 1)));
-    UI.base = base; UI.big = base >= 1.3;
+    const mouse = Input.eff() === 'mouse', m = Math.min(innerWidth / 1024, innerHeight / 768);
+    let base = m < 1.18 ? 1 : Math.min(m, 3.2);
+    if (mouse) base = m < 1 ? Math.max(0.78, m) : base > 1 ? Math.min(1 + (base - 1) * 0.55, 2.4) : 1;
+    const k = Math.max(0.7, Math.min(4, base * ((typeof CFG !== 'undefined' && +CFG.ui) || 1)));
+    UI.base = base; UI.big = !mouse && base >= 1.3;
     const r = document.documentElement;
     if (!UI.set || Math.abs(k - UI.k) > 0.004) {
       UI.k = k; UI.set = true; r.style.setProperty('--px', k.toFixed(3) + 'px'); r.style.setProperty('--k', k.toFixed(3));
       if (typeof applyCrops === 'function') requestAnimationFrame(() => { try { applyCrops(); parallax(); } catch (e) { } });
     }
-    r.classList.toggle('big', UI.big);
+    r.classList.toggle('big', UI.big); r.classList.toggle('mouse', mouse); r.classList.toggle('touch', !mouse);
     /* navigateur ancien (sans min()/clamp()) : la hauteur des cartes est calculée ici au lieu de min(...) dans le CSS */
     if (r.classList.contains('nomin')) {
       const fc = document.getElementById('fCar'), vh = innerHeight, por = innerHeight > innerWidth * 1.0001;
@@ -1682,6 +1731,13 @@ function bindGestures(stage) {
     if (P.size === 1) { G.drag = { x0: e.clientX, y0: e.clientY, t0: e.timeStamp, moved: 0, lt: now() }; G.vel.x = G.vel.y = 0; }   // t0 : horloge du doigt, pas celle du traitement
     else if (P.size === 2) { const a = Array.from(P.values()); pinch = { d0: Math.hypot(a[0].x - a[1].x, a[0].y - a[1].y), z0: G.view.zoom }; G.drag = null; }
   });
+  /* souris : molette = zoom (le pincement du pavé tactile arrive aussi comme une molette) ; survol d'une destination = curseur main */
+  stage.addEventListener('wheel', e => { e.preventDefault(); G.fly = null; touchAct(); G.view.zoom = clamp(G.view.zoom * Math.exp(e.deltaY * (e.ctrlKey ? 0.01 : 0.0012)), 0.36, 1.9); applyCam(); }, { passive: false });
+  let hoverT = 0;
+  stage.addEventListener('pointermove', e => {
+    if (e.pointerType !== 'mouse' || e.buttons || now() - hoverT < 60) return; hoverT = now();
+    const r = rect(), m = pickAt(e.clientX - r.left, e.clientY - r.top); stage.classList.toggle('hit', !!m);
+  });
   stage.addEventListener('pointermove', e => {
     if (!P.has(e.pointerId)) return;
     const p = P.get(e.pointerId), dx = e.clientX - p.x, dy = e.clientY - p.y;
@@ -1706,7 +1762,7 @@ function bindGestures(stage) {
     if (d && P.size === 0) {
       G.drag = null;
       /* durée mesurée avec l'horloge des événements : fiable même si l'écran est occupé à dessiner une grosse image (télé 4K) */
-      const tapish = d.moved < 14 * UI.k && e.timeStamp - d.t0 < 500;
+      const tapish = d.moved < (Input.eff() === 'mouse' ? 6 : 14) * UI.k && e.timeStamp - d.t0 < 500;
       if (tapish) {
         G.vel.x = G.vel.y = 0;
         /* horloge des événements (et non celle du traitement) : fiable même si l'iPad est occupé à dessiner */
@@ -1781,7 +1837,7 @@ function pickAt(x, y) {
   for (const m of G.markers) {
     if (m.home || m.facing < 0.08) continue;
     const d = Math.hypot(m.sx - x, m.sy - y);
-    if (d < 32 * UI.k && d < bd) { best = m; bd = d; }
+    if (d < (Input.eff() === 'mouse' ? 22 : 32) * UI.k && d < bd) { best = m; bd = d; }
     else if (m.lblOn && x >= m.lx - 4 * UI.k && x <= m.lx + m.lw + 4 * UI.k && y >= m.ly - 6 * UI.k && y <= m.ly + m.lh + 6 * UI.k && 30 * UI.k < bd) { best = m; bd = 30 * UI.k; }
   }
   return best;
@@ -1948,7 +2004,10 @@ function resetCar() {
   t.style.scrollBehavior = 'auto'; t.scrollLeft = 0; try { t.scrollTo({ left: 0, behavior: 'instant' }); } catch (e) { }
   CAR.i = 0; curSlide(); setDots(0); parallax();
 }
-function curSlide() { $$('#fTrack .sl').forEach((e, k) => e.classList.toggle('cur', k === CAR.i)); }
+function curSlide() {
+  $$('#fTrack .sl').forEach((e, k) => e.classList.toggle('cur', k === CAR.i));
+  const pv = $('#cPrev'), nx = $('#cNext'); if (pv && nx) { pv.hidden = CAR.n < 2 || CAR.i <= 0; nx.hidden = CAR.n < 2 || CAR.i >= CAR.n - 1; }   // flèches visibles à la souris seulement (CSS)
+}
 function carGo(i, smooth) { const t = $('#fTrack'); t.scrollTo({ left: i * carStep(), behavior: smooth ? 'smooth' : 'auto' }); }
 const lbList = l => photosOf(l);   // la photo d'ambiance (en haut) n'est jamais dans la visionneuse
 /* ---------- fluidité : effets allégés sur les appareils lents ----------
@@ -2294,10 +2353,10 @@ function loadLogo() {
 /* ---------- télé tactile / kiosque : verrous tactiles, plein écran, écran toujours allumé ---------- */
 function initKiosk() {
   /* ni menu contextuel, ni sélection de texte, ni glisser-déposer, ni zoom de page (sauf dans les champs de saisie) */
-  ['contextmenu', 'dragstart', 'selectstart', 'gesturestart', 'gesturechange'].forEach(ev => document.addEventListener(ev, e => { if (!(e.target && e.target.closest && e.target.closest('input,textarea,[contenteditable]'))) e.preventDefault(); }, { passive: false }));
+  ['contextmenu', 'dragstart', 'selectstart', 'gesturestart', 'gesturechange'].forEach(ev => document.addEventListener(ev, e => { if (ev === 'contextmenu' && Input.eff() === 'mouse') return; if (!(e.target && e.target.closest && e.target.closest('input,textarea,[contenteditable]'))) e.preventDefault(); }, { passive: false }));
   /* plein écran au premier toucher (navigateur de la télé) : seulement sur grand écran, jamais si déjà en plein écran ou installée */
   const askFS = () => {
-    if (CFG.fs === false || !UI.big || document.fullscreenElement || document.webkitFullscreenElement || navigator.standalone) return;
+    if (CFG.fs === false || !UI.big || Input.eff() !== 'touch' || document.fullscreenElement || document.webkitFullscreenElement || navigator.standalone) return;
     if (window.matchMedia && matchMedia('(display-mode: standalone), (display-mode: fullscreen)').matches) return;
     const r = document.documentElement, f = r.requestFullscreen || r.webkitRequestFullscreen;
     if (f) { try { const p = f.call(r); if (p && p.catch) p.catch(() => { }); } catch (e) { } }
@@ -2312,6 +2371,32 @@ function initKiosk() {
   document.addEventListener('pointerup', () => { askFS(); wake(); }, true);
   document.addEventListener('visibilitychange', () => { if (!document.hidden) wake(); });
   Kiosk.wake = wake; wake();
+  /* clavier (ordinateur) : Échap ferme le niveau ouvert, flèches pour les photos, F plein écran, + et - pour zoomer le globe */
+  document.addEventListener('keydown', e => {
+    if (e.ctrlKey || e.metaKey || e.altKey || (e.target && e.target.closest && e.target.closest('input,textarea,select,[contenteditable]'))) return;
+    const k = e.key;
+    if (k === 'Escape') {
+      if (!$('#gate').hidden) closeGate();
+      else if (!$('#ccrop').hidden) CC.close();
+      else if (!$('#crop').hidden) { const b = $('#cropNo'); if (b) b.click(); }
+      else if (LB.on) closeLightbox();
+      else if (V.open) closeVideo();
+      else if (A.open) { if (A.sub) { A.sub = null; renderAdmin(true); } else if (A.page !== 'hub') { A.page = 'hub'; A.stab = null; renderAdmin(true); } else closeAdmin(); }
+      else if (S.mode === 'fiche') closeFiche();
+      else if (S.mode === 'list') closeList();
+      else return;
+      e.preventDefault(); touchAct();
+    } else if (k === 'ArrowLeft' || k === 'ArrowRight') {
+      const d = k === 'ArrowLeft' ? -1 : 1;
+      if (LB.on) lbStep(d); else if (S.mode === 'fiche' && !V.open && CAR.n > 1) { CAR.touched = true; carGo(clamp(CAR.i + d, 0, CAR.n - 1), true); } else return;
+      e.preventDefault(); touchAct();
+    } else if (k === 'f' || k === 'F') { toggleFS(); e.preventDefault(); }
+    else if ((k === '+' || k === '=' || k === '-' || k === '_') && G.ready && !A.open && !LB.on && !V.open) { G.fly = null; G.view.zoom = clamp(G.view.zoom * (k === '-' || k === '_' ? 1.12 : 0.89), 0.36, 1.9); applyCam(); touchAct(); e.preventDefault(); }
+  });
+}
+function toggleFS() {
+  const r = document.documentElement, on = document.fullscreenElement || document.webkitFullscreenElement;
+  try { if (on) (document.exitFullscreen || document.webkitExitFullscreen).call(document); else { const f = r.requestFullscreen || r.webkitRequestFullscreen; if (f) { const p = f.call(r); if (p && p.catch) p.catch(() => { }); } } } catch (e) { }
 }
 const Kiosk = { wake: () => { } };
 
@@ -2339,9 +2424,25 @@ function initUI() {
   onTap($('#fClose'), () => closeFiche());
   $('#upgGlobe').addEventListener('pointerdown', e => { e.stopPropagation(); Fun.tap(e.clientX, e.clientY); });
   $('#fTrack').addEventListener('click', e => {
+    if (CAR.dragMoved) return;
     const s = e.target.closest('.sl'); if (!s || s.classList.contains('empty')) return; touchAct();
     if (s.dataset.t === 'video') openVideo(s.dataset.id); else openLightbox(+s.dataset.pi);
   });
+  $('#cPrev').addEventListener('click', () => { CAR.touched = true; touchAct(); carGo(clamp(CAR.i - 1, 0, CAR.n - 1), true); });
+  $('#cNext').addEventListener('click', () => { CAR.touched = true; touchAct(); carGo(clamp(CAR.i + 1, 0, CAR.n - 1), true); });
+  (function () {   // glisser le carrousel à la souris
+    const t = $('#fTrack'); let d = null;
+    t.addEventListener('pointerdown', e => { if (e.pointerType !== 'mouse' || e.button !== 0) return; d = { x: e.clientX, sl: t.scrollLeft, moved: 0 }; });
+    window.addEventListener('pointermove', e => {
+      if (!d) return; const dx = e.clientX - d.x; d.moved = Math.max(d.moved, Math.abs(dx));
+      if (d.moved > 5) { t.classList.add('dragging'); t.scrollLeft = d.sl - dx; CAR.touched = true; }
+    });
+    const up = () => {
+      if (!d) return; const was = d.moved > 5; d = null; t.classList.remove('dragging');
+      if (was) { CAR.dragMoved = true; setTimeout(() => { CAR.dragMoved = false; }, 120); carGo(clamp(Math.round(t.scrollLeft / carStep()), 0, CAR.n - 1), true); }
+    };
+    window.addEventListener('pointerup', up); window.addEventListener('pointercancel', up);
+  })();
   ['pointerdown', 'touchstart', 'wheel'].forEach(ev => $('#fTrack').addEventListener(ev, () => { CAR.touched = true; }, { passive: true, capture: true }));
   $('#fTrack').addEventListener('load', e => { if (e.target && e.target.tagName === 'IMG') applyCrop(e.target); }, true);
   addEventListener('resize', () => requestAnimationFrame(applyCrops)); addEventListener('orientationchange', () => setTimeout(applyCrops, 300));
@@ -2372,7 +2473,7 @@ function initUI() {
   $('#lb').addEventListener('pointerup', e => { if (sx !== null) { const d = e.clientX - sx; if (Math.abs(d) > 60) lbStep(d < 0 ? 1 : -1); } sx = null; });
 
   document.addEventListener('visibilitychange', () => { if (document.hidden && V.el) V.el.pause(); });
-  document.addEventListener('contextmenu', e => e.preventDefault());
+  document.addEventListener('contextmenu', e => { if (Input.eff() !== 'mouse') e.preventDefault(); });   // clic droit autorisé à la souris
   ['gesturestart', 'gesturechange', 'gestureend'].forEach(ev => document.addEventListener(ev, e => e.preventDefault()));
   /* pas de rebond de la page au doigt (c'est ce qui montrait une bande en bas) : seuls les contenus défilables bougent */
   document.addEventListener('touchmove', e => { if (!e.target.closest || !e.target.closest('.fscroll,#aBody,#listBody,#fTrack,#news,#chooser,.frames,.wgrid,textarea,input,select')) e.preventDefault(); }, { passive: false });
@@ -2576,10 +2677,11 @@ function sAffichage() {
     <div class="group">
       ${grow('Effets visuels', auto ? (on ? 'Automatique : cet appareil est lent, les effets sont allégés.' : 'Automatique : fluide et soigné (ils s’allègent seuls si l’appareil est lent).') : (on ? 'Allégés : pas d’animations d’entrée, fond simplifié.' : 'Complets : ajoute le flou de verre (plus gourmand, à réserver aux appareils puissants).'), seg('fx', [['auto', 'Auto'], ['full', 'Complets'], ['lite', 'Allégés']], CFG.fx))}
     </div>
-    <div class="gl">GRAND ÉCRAN TACTILE</div>
+    <div class="gl">ÉCRAN ET SAISIE</div>
     <div class="group">
+      ${grow('Type de saisie', `Détecté : ${Input.auto === 'mouse' ? 'souris (ordinateur)' : 'toucher (tablette, télé tactile)'}. Souris : curseur visible, pas de plein écran forcé, touche F pour le plein écran, Échap pour fermer.`, seg('input', [['auto', 'Auto'], ['touch', 'Toucher'], ['mouse', 'Souris']], CFG.input || 'auto'))}
       ${grow('Taille de l’interface', `Écran détecté : ${innerWidth} × ${innerHeight} · interface ×${UI.k.toFixed(2).replace('.', ',')} (automatique selon l’écran)`, seg('ui', [[0.8, '80 %'], [1, '100 %'], [1.25, '125 %'], [1.5, '150 %']], +CFG.ui || 1))}
-      ${srow('Plein écran automatique', 'Au premier toucher, sur un grand écran (navigateur de la télé).', 'fs')}
+      ${srow('Plein écran automatique', 'Au premier toucher, sur un grand écran tactile (télé). Jamais avec une souris.', 'fs')}
       ${srow('Écran toujours allumé', 'Empêche la mise en veille tant que l’application est ouverte.', 'wake')}
     </div>
     <div class="gl">DIAGNOSTIC</div>
@@ -3364,6 +3466,7 @@ function initAdmin() {
       if (k === 'dtab') { A.dtab = v; renderAdmin(true); return; }
       if (k === 'impMode') { A.imp.mode = v; renderAdmin(); return; }
       if (k === 'ui') { CFG.ui = +v; saveCfg(); renderAdmin(); return; }
+      if (k === 'input') { CFG.input = v; saveCfg(); renderAdmin(); return; }
       if (k === 'srcEvery') { SRC.every = +v; saveSrc(); renderAdmin(); return; }
       if (k === 'stab') { A.stab = v; A.page = 'settings'; renderAdmin(true); return; }
       if (k === 'decor') { Object.assign(CFG, { sobre: { stars: 'off', atmo: 'off' }, normal: { stars: 'normal', atmo: 'doux' }, riche: { stars: 'beaucoup', atmo: 'fort' } }[v]); saveCfg(); renderAdmin(); return; }
